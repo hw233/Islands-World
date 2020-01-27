@@ -8,7 +8,7 @@
   *Others:  
   *History:
 *********************************************************************************
-*/ 
+*/
 
 using UnityEngine;
 using System.Collections;
@@ -150,7 +150,9 @@ namespace Coolape
                 mat.shader = Shader.Find(mat.shader.name);
 #endif
                 resetTexRef(mat.name, mat, cb, args);
-            } else {
+            }
+            else
+            {
                 Debug.LogError("get mat is null.");
             }
         }
@@ -168,7 +170,7 @@ namespace Coolape
                     //取得texture
                     int count = propNames.Count;
                     //for (int i = 0; i < count; i++)
-                    if(count > 0)
+                    if (count > 0)
                     {
                         //int i = 0;
                         list = ObjPool.listPool.borrowObject();
@@ -187,7 +189,7 @@ namespace Coolape
                 }
                 else
                 {
-                    Debug.LogWarning("propNames is null ====="  + matName);
+                    Debug.LogWarning("propNames is null =====" + matName);
                     pool.finishSetPrefab(mat);
                     Utl.doCallback(cb, mat, args);
                 }
@@ -200,7 +202,8 @@ namespace Coolape
             }
         }
 
-        public static void doresetTexRef(NewList inputs) {
+        public static void doresetTexRef(NewList inputs)
+        {
             ArrayList texNames = inputs[4] as ArrayList;
             ArrayList texPaths = inputs[5] as ArrayList;
             int i = (int)(inputs[6]);
@@ -255,7 +258,9 @@ namespace Coolape
                     object agrs = list[2];
                     Utl.doCallback(cb, mat, agrs);
                     ObjPool.listPool.returnObject(list);
-                } else {
+                }
+                else
+                {
                     list[6] = i;
                     doresetTexRef(list);
                 }
@@ -280,67 +285,76 @@ namespace Coolape
 #if UNITY_EDITOR
                     _materialTexRefCfgPath = PStr.b().a(Application.dataPath).a("/").a(CLPathCfg.self.basePath).a("/upgradeRes4Dev/priority/cfg/materialTexRef.cfg").e();
 #else
-        _materialTexRefCfgPath = PStr.b().a(CLPathCfg.self.basePath).a("/upgradeRes/priority/cfg/materialTexRef.cfg").e();
+                    _materialTexRefCfgPath = PStr.b().a(CLPathCfg.self.basePath).a("/upgradeRes/priority/cfg/materialTexRef.cfg").e();
 #endif
                 }
                 return _materialTexRefCfgPath;
             }
         }
 
-        public static Hashtable materialTexRefCfg {
-			get {
-				if (_materialTexRefCfg == null) {
-					_materialTexRefCfg = readMaterialTexRefCfg ();
-				}
-				return _materialTexRefCfg;
-			}
-			set {
-				_materialTexRefCfg = value;
-			}
-		}
+        public static Hashtable materialTexRefCfg
+        {
+            get
+            {
+                if (_materialTexRefCfg == null)
+                {
+                    _materialTexRefCfg = readMaterialTexRefCfg();
+                }
+                return _materialTexRefCfg;
+            }
+            set
+            {
+                _materialTexRefCfg = value;
+            }
+        }
 
-		/// <summary>
-		/// Gets the material cfg.取得material引用图片的配置
-		/// </summary>
-		/// <returns><c>true</c>, if material cfg was gotten, <c>false</c> otherwise.</returns>
-		/// <param name="matName">Mat name.</param>
-		/// <param name="propNames">Property names.</param>
-		/// <param name="texNames">Tex names.</param>
-		/// <param name="texPaths">Tex paths.</param>
-		public static bool getMaterialTexCfg (string matName, ref ArrayList propNames, ref ArrayList texNames, ref ArrayList texPaths)
-		{
-			Hashtable cfg = MapEx.getMap (materialTexRefCfg, matName);
-			bool ret = true;
-			if (cfg == null) {
+        /// <summary>
+        /// Gets the material cfg.取得material引用图片的配置
+        /// </summary>
+        /// <returns><c>true</c>, if material cfg was gotten, <c>false</c> otherwise.</returns>
+        /// <param name="matName">Mat name.</param>
+        /// <param name="propNames">Property names.</param>
+        /// <param name="texNames">Tex names.</param>
+        /// <param name="texPaths">Tex paths.</param>
+        public static bool getMaterialTexCfg(string matName, ref ArrayList propNames, ref ArrayList texNames, ref ArrayList texPaths)
+        {
+            Hashtable cfg = MapEx.getMap(materialTexRefCfg, matName);
+            bool ret = true;
+            if (cfg == null)
+            {
                 Debug.LogError("Get MaterialTexCfg is null!" + matName);
-				ret = false;
-			} else {
-				propNames = cfg ["pp"] as ArrayList;
-				texNames = cfg ["tn"] as ArrayList;
-				texPaths = cfg ["tp"] as ArrayList;
-			}
-			return ret;
-		}
+                ret = false;
+            }
+            else
+            {
+                propNames = cfg["pp"] as ArrayList;
+                texNames = cfg["tn"] as ArrayList;
+                texPaths = cfg["tp"] as ArrayList;
+            }
+            return ret;
+        }
 
-		public static Hashtable readMaterialTexRefCfg ()
+        public static Hashtable readMaterialTexRefCfg()
         {
             Hashtable ret = null;
-			#if UNITY_EDITOR
-			byte[] buffer = File.Exists (materialTexRefCfgPath) ? File.ReadAllBytes (materialTexRefCfgPath) : null;
-			#else
+#if UNITY_EDITOR
+            byte[] buffer = File.Exists(materialTexRefCfgPath) ? File.ReadAllBytes(materialTexRefCfgPath) : null;
+#else
 			byte[] buffer = FileEx.readNewAllBytes (materialTexRefCfgPath);
-			#endif
-			if (buffer != null) {
-				MemoryStream ms = new MemoryStream ();
-				ms.Write (buffer, 0, buffer.Length);
-				ms.Position = 0;
-				object obj = B2InputStream.readObject (ms);
-				if (obj != null) {
-					ret = obj as Hashtable;
-				}
-			}
-			ret = ret == null ? new Hashtable () : ret;
-			return ret;
-		}
-	}
+#endif
+            if (buffer != null)
+            {
+                MemoryStream ms = new MemoryStream();
+                ms.Write(buffer, 0, buffer.Length);
+                ms.Position = 0;
+                object obj = B2InputStream.readObject(ms);
+                if (obj != null)
+                {
+                    ret = obj as Hashtable;
+                }
+            }
+            ret = ret == null ? new Hashtable() : ret;
+            return ret;
+        }
+    }
 }

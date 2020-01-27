@@ -34,6 +34,7 @@ IDLBattle.searcher = IDLBattleSearcher
 ---@field type IDConst.BattleType
 ---@field targetCity IDDBCity 目标城
 ---@field offShips table key:舰船id; value:{id=舰船id，num=数量(注意bio)}
+---@field fleet NetProtoIsland.ST_fleetinfor 进攻舰队数据
 
 ---@type WrapBattleUnitData
 IDLBattle.currSelectedUnit = nil
@@ -93,7 +94,7 @@ function IDLBattle.init(data, callback, progressCB)
             city = IDMainCity
             grid = city.grid
             -- 预加载进攻方兵种
-            IDLBattle.prepareSoliders(IDLBattle.mData.offShips, callback, progressCB)
+            IDLBattle.prepareSoliders(IDLBattle.mData.fleet.units, callback, progressCB)
         end,
         progressCB
     )
@@ -393,6 +394,12 @@ function IDLBattle.clean()
     end
     if IDLBattleSearcher then
         IDLBattleSearcher.clean()
+    end
+
+    if IDLBattle.mData then
+        IDLBattle.mData.targetCity = nil
+        IDLBattle.mData.offShips = nil
+        IDLBattle.mData = nil
     end
 end
 

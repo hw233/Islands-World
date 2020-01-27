@@ -105,6 +105,8 @@ public class ECLUpgradeBindingServer : EditorWindow
             EditorGUILayout.LabelField ("UpgradeMd5Ver(win)", GUILayout.Width (250));
 #elif UNITY_STANDALONE_OSX
             EditorGUILayout.LabelField ("UpgradeMd5Ver(osx)", GUILayout.Width (250));
+#elif UNITY_WEBGL
+            EditorGUILayout.LabelField ("UpgradeMd5Ver(webgl)", GUILayout.Width (250));
 #endif
             EditorGUILayout.LabelField ("UpgradePkg Name", GUILayout.Width (160));
 			EditorGUILayout.LabelField ("UpgradePkg Mark", GUILayout.Width (250));
@@ -124,6 +126,10 @@ public class ECLUpgradeBindingServer : EditorWindow
 #elif UNITY_STANDALONE_OSX
             if (GUILayout.Button ("Select Md5(osx)")) {
                 setUpgradePkgMutlMode ("osx");
+            }
+#elif UNITY_WEBGL
+            if (GUILayout.Button ("Select Md5(webgl)")) {
+                setUpgradePkgMutlMode ("webgl");
             }
 #endif
         }
@@ -154,6 +160,8 @@ public class ECLUpgradeBindingServer : EditorWindow
                         EditorGUILayout.TextField (MapEx.getString (server, "winversion"), GUILayout.Width (250));
 #elif UNITY_STANDALONE_OSX
                         EditorGUILayout.TextField (MapEx.getString (server, "osxversion"), GUILayout.Width (250));
+#elif UNITY_WEBGL
+                        EditorGUILayout.TextField (MapEx.getString (server, "webglversion"), GUILayout.Width (250));
 #endif
                         EditorGUILayout.TextField (MapEx.getString (server, "pkgName"), GUILayout.Width (160));
 						EditorGUILayout.TextArea (MapEx.getString (server, "pkgRemark"), GUILayout.Width (250));
@@ -173,6 +181,10 @@ public class ECLUpgradeBindingServer : EditorWindow
 #elif UNITY_STANDALONE_OSX
                         if (GUILayout.Button ("Select Md5(osx)")) {
                             ECLUpgradeListProc.popup4Select ((Callback)onGetUpgradePkg, ListEx.builder().Add(cell.Key).Add("osx").ToList());
+                        }
+#elif UNITY_WEBGL
+                        if (GUILayout.Button ("Select Md5(webgl)")) {
+                            ECLUpgradeListProc.popup4Select ((Callback)onGetUpgradePkg, ListEx.builder().Add(cell.Key).Add("wegbl").ToList());
                         }
 #endif
                     }

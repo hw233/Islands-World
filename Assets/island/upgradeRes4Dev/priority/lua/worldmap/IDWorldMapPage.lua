@@ -75,11 +75,11 @@ end
 function IDWorldMapPage:refreshTiles()
     -- 把服务器数据更新一下
     local data = IDDBWorldMap.getDataByPageIdx(self.pageIdx)
-    if data and data.list then
+    if data and data.map then
         ---@type IDWorldMapPage._CellData
         local pdata
         ---@param d NetProtoIsland.ST_mapCell
-        for index, d in ipairs(data.map) do
+        for index, d in pairs(data.map) do
             pdata = self.pageData[index]
             if pdata then
                 pdata.serverData = d

@@ -17,6 +17,7 @@ using XLua;
 
 namespace Coolape
 {
+    #if !UNITY_WEBGL
     public delegate void TcpDispatchDelegate(object data, Tcp tcp);
     public class Tcp : MonoBehaviour
     {
@@ -360,4 +361,5 @@ namespace Coolape
             }
         }
     }
+#endif
 }

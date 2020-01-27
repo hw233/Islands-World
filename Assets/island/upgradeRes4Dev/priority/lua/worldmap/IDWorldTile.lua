@@ -40,7 +40,7 @@ function IDWorldTile:init(csobj, gidx, type, data, attr)
     self.size = bio2number(self.attr.Size)
     ---@type Bounds
     self.bounds = self.boxCollider.bounds --Bounds(self.transform.position, Vector3.one * 5)
-    ---@type IDCellWorldTileHudParam
+    ---@type _ParamIDCellWorldTileHud
     self.hudData = {}
     self.hudData.target = self.transform
     self.hudData.offset = Vector3.zero

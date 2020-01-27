@@ -7,7 +7,7 @@ IDLBuildingHeadquarters = class("IDLBuildingHeadquarters", IDLBuilding)
 function IDLBuildingHeadquarters:init(selfObj, id, star, lev, _isOffense, other)
     -- 通过这种模式把self传过去，不能 self.super:init()
     IDLBuildingHeadquarters.super.init(self, selfObj, id, star, lev, _isOffense, other)
-    ---@type IDCellWorldTileHudParam
+    ---@type _ParamIDCellWorldTileHud
     self.hudData4worldmap = {}
     self.hudData4worldmap.target = self.transform
     self.hudData4worldmap.offset = Vector3.zero
@@ -16,6 +16,7 @@ function IDLBuildingHeadquarters:init(selfObj, id, star, lev, _isOffense, other)
     d.name = IDDBPlayer.myself.name
     d.lev = IDDBPlayer.myself.lev
     d.state = IDDBCity.curCity.stat
+    d.cidx = IDDBCity.curCity.idx
     self.hudData4worldmap.data = d
     self.hudData4worldmap.attr = DBCfg.getDataById(DBCfg.CfgPath.MapTile, 7)
 end

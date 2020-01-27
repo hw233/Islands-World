@@ -64,6 +64,9 @@ namespace Coolape
                 return "Standalone";
 #elif UNITY_STANDALONE_OSX
                 return "StandaloneOSX";
+#elif UNITY_WEBGL
+                return "WebGL";
+
 #else
                 return "Standalone";
 #endif

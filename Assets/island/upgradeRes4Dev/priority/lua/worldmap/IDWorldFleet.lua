@@ -30,6 +30,9 @@ local realFromePos
 ---@type SimpleFogOfWar.FogOfWarInfluence
 local influence = nil
 local isMyFleet = false
+local fleetHud
+---@type _ParamIDCellWorldTileHud
+local fleetHudData = {}
 
 local tips = {}
 
@@ -54,6 +57,11 @@ end
 function _cell.refreshData(data)
     mData = data
     _cell.data = mData
+    fleetHudData.target = transform
+    fleetHudData.dataFleet = mData
+    fleetHudData.offset = Vector3.zero
+    fleetHudData.attr = nil
+    fleetHudData.isFleet = true
 
     if bio2number(mData.cidx) == bio2number(IDDBCity.curCity.idx) then
         influence.Suspended = false
@@ -100,10 +108,51 @@ function _cell.refreshData(data)
             else
                 transform.position = IDWorldMap.grid.grid:GetCellCenter(bio2number(mData.curpos))
             end
-
+            _cell.showHud()
             -- csSelf:invoke4Lua(_cell.showTips, NumEx.NextInt(2, 5))
         end
     )
+end
+
+function _cell.showHud()
+    if
+        bio2number(mData.status) == IDConst.FleetState.docked
+        or (not IDWorldMap.isVisibile(transform.position))
+    then
+        _cell.hideHud()
+        return
+    end
+
+    ---@type Coolape.CLCellLua
+    if fleetHud == nil then
+        CLUIOtherObjPool.borrowObjAsyn(
+            "WorldTileHud",
+            function(name, obj, orgs)
+                ---@param obj UnityEngine.GameObject
+                if fleetHud or (not gameObject.activeInHierarchy) then
+                    CLUIOtherObjPool.returnObj(obj)
+                    SetActive(obj, false)
+                    return
+                end
+                fleetHud = obj:GetComponent("CLCellLua")
+                fleetHud.transform.parent = MyCfg.self.hud3dRoot
+                fleetHud.transform.localScale = Vector3.one
+                fleetHud.transform.localEulerAngles = Vector3.zero
+                fleetHud:init(fleetHudData, nil)
+                SetActive(fleetHud.gameObject, true)
+            end
+        )
+    else
+        fleetHud:init(fleetHudData, nil)
+    end
+end
+
+function _cell.hideHud()
+    if fleetHud then
+        CLUIOtherObjPool.returnObj(fleetHud.gameObject)
+        SetActive(fleetHud.gameObject, false)
+        fleetHud = nil
+    end
 end
 
 -- 设置阵型
@@ -309,6 +358,7 @@ end
 function _cell.clean()
     InvokeEx.cancelInvokeByUpdate(_cell.doRefreshPosition)
     csSelf:cancelInvoke4Lua()
+    _cell.hideHud()
     for i, v in ipairs(ships) do
         if v then
             v:clean()

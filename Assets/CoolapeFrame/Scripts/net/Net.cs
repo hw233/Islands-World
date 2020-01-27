@@ -7,6 +7,7 @@ using XLua;
 
 namespace Coolape
 {
+    #if !UNITY_WEBGL
     public class Net : Tcp
     {
         public static Net self;
@@ -161,4 +162,5 @@ namespace Coolape
             }
         }
     }
+#endif
 }

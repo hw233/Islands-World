@@ -105,7 +105,7 @@ public class ECLGUIResList : ScriptableWizard
 
 	void  initData (string path, int tabs)
 	{
-		//跳过不同平台的资源
+        //跳过不同平台的资源
 #if UNITY_ANDROID
         if (Path.GetFileName(path).Equals("IOS") || Path.GetFileName(path).Equals("Standalone") || Path.GetFileName(path).Equals("StandaloneOSX"))
         {
@@ -121,6 +121,11 @@ public class ECLGUIResList : ScriptableWizard
             }
 #elif UNITY_STANDALONE_OSX
             if(Path.GetFileName(path).Equals("Android") || Path.GetFileName(path).Equals("IOS") || Path.GetFileName(path).Equals("Standalone")) {
+                return;
+            }
+#elif UNITY_WEBGL
+            if (Path.GetFileName(path).Equals("Android") || Path.GetFileName(path).Equals("IOS") || Path.GetFileName(path).Equals("Standalone") || Path.GetFileName(path).Equals("StandaloneOSX"))
+            {
                 return;
             }
 #endif

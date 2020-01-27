@@ -20,6 +20,7 @@ using System.Threading;
 
 namespace Coolape
 {
+    #if !UNITY_WEBGL
     public delegate void NetCallback(USocket socket, object obj);
     public delegate void OnReceiveCallback(USocket socket, byte[] bytes, int len);
 
@@ -332,4 +333,5 @@ namespace Coolape
         }
 
     }
+#endif
 }

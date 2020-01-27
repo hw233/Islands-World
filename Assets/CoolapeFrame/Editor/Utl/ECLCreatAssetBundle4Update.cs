@@ -66,13 +66,13 @@ public class ECLCreatAssetBundle4Update
 		
 		BuildAssetBundleOptions opt = BuildAssetBundleOptions.CollectDependencies;
 		if (isCompress) {
-			opt = BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.CompleteAssets | BuildAssetBundleOptions.IgnoreTypeTreeChanges;
+			opt = BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.CompleteAssets | BuildAssetBundleOptions.IgnoreTypeTreeChanges | BuildAssetBundleOptions.ChunkBasedCompression;
 		} else {
 			opt = BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.CompleteAssets | BuildAssetBundleOptions.IgnoreTypeTreeChanges | BuildAssetBundleOptions.UncompressedAssetBundle;
 		}
 		
 		string bundlePath = "";
-//		Directory.CreateDirectory (Application.dataPath + "/" + file);
+        //		Directory.CreateDirectory (Application.dataPath + "/" + file);
 #if UNITY_ANDROID
 		bundlePath = file + "/Android/" + obj.name + ".unity3d";
 		Directory.CreateDirectory (Path.GetDirectoryName (bundlePath));
@@ -92,6 +92,12 @@ public class ECLCreatAssetBundle4Update
         Directory.CreateDirectory (Path.GetDirectoryName (bundlePath));
         Debug.Log ("bundlePath==" + bundlePath);
         BuildPipeline.BuildAssetBundle (obj, null, bundlePath, opt, BuildTarget.StandaloneOSX);
+#elif UNITY_WEBGL
+        bundlePath = file + "/WebGL/" + obj.name + ".unity3d";
+        Directory.CreateDirectory (Path.GetDirectoryName (bundlePath));
+        Debug.Log ("bundlePath==" + bundlePath);
+        //BuildPipeline.BuildAssetBundle (obj, null, bundlePath, opt, BuildTarget.WebGL);
+        BuildPipeline.BuildAssetBundle (obj, null, bundlePath, opt, BuildTarget.WebGL);
 #endif
         FileInfo fileInfo = new FileInfo (bundlePath);
 		long size = (fileInfo.Length / 1024);
@@ -224,95 +230,95 @@ public class ECLCreatAssetBundle4Update
 		}
 	}
 
-	//=====================================
-	// C# Example
-	// Builds an asset bundle from the selected objects in the project view.
-	// Once compiled go to "Menu" -> "Assets" and select one of the choices
-	// to build the Asset Bundle
-	
-	//	public class ExportAssetBundles
-	//	{
-	//		[MenuItem ("Assets/Build AssetBundle From Selection - Track dependencies")]
-	//		static void ExportResource ()
-	//		{
-	//			// Bring up save panel
-	//			string path = EditorUtility.SaveFilePanel ("Save Resource", "", "New Resource", "unity3d");
-	//			if (path.Length != 0) {
-	//				// Build the resource file from the active selection.
-	//				UnityEngine.Object[] selection = Selection.GetFiltered (typeof(UnityEngine.Object), SelectionMode.DeepAssets);
-	//				#if UNITY_IPHONE
-	//				BuildPipeline.BuildAssetBundle (Selection.activeObject, selection, path,
-	//				                                BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.CompleteAssets,
-	//				                                BuildTarget.iOS);
-	//				#elif UNITY_ANDROID
-	//				BuildPipeline.BuildAssetBundle (Selection.activeObject, selection, path,
-	//					BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.CompleteAssets,
-	//					BuildTarget.Android);
-	//				#else
-	//				BuildPipeline.BuildAssetBundle (Selection.activeObject, selection, path,
-	//					BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.CompleteAssets);
-	//				#endif
-	//
-	//				Selection.objects = selection;
-	//			}
-	//		}
-	//
-	//		[MenuItem ("Assets/Build AssetBundle From Selection - Track dependencies(Uncompress)")]
-	//		static void ExportResourceUncompress ()
-	//		{
-	//			// Bring up save panel
-	//			string path = EditorUtility.SaveFilePanel ("Save Resource", "", "New Resource", "unity3d");
-	//			if (path.Length != 0) {
-	//				// Build the resource file from the active selection.
-	//				UnityEngine.Object[] selection = Selection.GetFiltered (typeof(UnityEngine.Object), SelectionMode.DeepAssets);
-	//#if UNITY_IPHONE
-	//				BuildPipeline.BuildAssetBundle (Selection.activeObject, selection, path,
-	//				                                BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.UncompressedAssetBundle,
-	//				                                BuildTarget.iOS);
-	//				#elif UNITY_ANDROID
-	//				BuildPipeline.BuildAssetBundle (Selection.activeObject, selection, path,
-	//					BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.UncompressedAssetBundle,
-	//					BuildTarget.Android);
-	//				#else
-	//		BuildPipeline.BuildAssetBundle(Selection.activeObject, selection, path,
-	//		BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.UncompressedAssetBundle);
-	//#endif
-	//				Selection.objects = selection;
-	//			}
-	//		}
-	//
-	//		[MenuItem ("Assets/Build AssetBundle From Selection - No dependency tracking")]
-	//		static void ExportResourceNoTrack ()
-	//		{
-	//			// Bring up save panel
-	//			string path = EditorUtility.SaveFilePanel ("Save Resource", "", "New Resource", "unity3d");
-	//			if (path.Length != 0) {
-	//				// Build the resource file from the active selection.
-	//				#if UNITY_IPHONE
-	//				BuildPipeline.BuildAssetBundle (Selection.activeObject, Selection.objects, path, BuildAssetBundleOptions.CompleteAssets, BuildTarget.iOS);
-	//				#elif UNITY_ANDROID
-	//				BuildPipeline.BuildAssetBundle (Selection.activeObject, Selection.objects, path, BuildAssetBundleOptions.CompleteAssets, BuildTarget.Android);
-	//				#else
-	//		BuildPipeline.BuildAssetBundle(Selection.activeObject, Selection.objects, path, BuildAssetBundleOptions.CompleteAssets);
-	//				#endif
-	//			}
-	//		}
-	//
-	//		[MenuItem ("Assets/Build AssetBundle From Selection - No dependency tracking(Uncompress)")]
-	//		static void ExportResourceNoTrackUncompress ()
-	//		{
-	//			// Bring up save panel
-	//			string path = EditorUtility.SaveFilePanel ("Save Resource", "", "New Resource", "unity3d");
-	//			if (path.Length != 0) {
-	//				// Build the resource file from the active selection.
-	//				#if UNITY_IPHONE
-	//				BuildPipeline.BuildAssetBundle (Selection.activeObject, Selection.objects, path, BuildAssetBundleOptions.UncompressedAssetBundle, BuildTarget.iOS);
-	//				#elif UNITY_ANDROID
-	//				BuildPipeline.BuildAssetBundle (Selection.activeObject, Selection.objects, path, BuildAssetBundleOptions.UncompressedAssetBundle, BuildTarget.Android);
-	//				#else
-	//				BuildPipeline.BuildAssetBundle(Selection.activeObject, Selection.objects, path, BuildAssetBundleOptions.UncompressedAssetBundle);
-	//				#endif
-	//			}
-	//		}
-	//	}
+    //=====================================
+    // C# Example
+    // Builds an asset bundle from the selected objects in the project view.
+    // Once compiled go to "Menu" -> "Assets" and select one of the choices
+    // to build the Asset Bundle
+
+    //	public class ExportAssetBundles
+    //	{
+    //		[MenuItem ("Assets/Build AssetBundle From Selection - Track dependencies")]
+    //		static void ExportResource ()
+    //		{
+    //			// Bring up save panel
+    //			string path = EditorUtility.SaveFilePanel ("Save Resource", "", "New Resource", "unity3d");
+    //			if (path.Length != 0) {
+    //				// Build the resource file from the active selection.
+    //				UnityEngine.Object[] selection = Selection.GetFiltered (typeof(UnityEngine.Object), SelectionMode.DeepAssets);
+    //				#if UNITY_IPHONE
+    //				BuildPipeline.BuildAssetBundle (Selection.activeObject, selection, path,
+    //				                                BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.CompleteAssets,
+    //				                                BuildTarget.iOS);
+    //				#elif UNITY_ANDROID
+    //				BuildPipeline.BuildAssetBundle (Selection.activeObject, selection, path,
+    //					BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.CompleteAssets,
+    //					BuildTarget.Android);
+    //				#else
+    //				BuildPipeline.BuildAssetBundle (Selection.activeObject, selection, path,
+    //					BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.CompleteAssets);
+    //				#endif
+    //
+    //				Selection.objects = selection;
+    //			}
+    //		}
+    //
+    //		[MenuItem ("Assets/Build AssetBundle From Selection - Track dependencies(Uncompress)")]
+    //		static void ExportResourceUncompress ()
+    //		{
+    //			// Bring up save panel
+    //			string path = EditorUtility.SaveFilePanel ("Save Resource", "", "New Resource", "unity3d");
+    //			if (path.Length != 0) {
+    //				// Build the resource file from the active selection.
+    //				UnityEngine.Object[] selection = Selection.GetFiltered (typeof(UnityEngine.Object), SelectionMode.DeepAssets);
+    //#if UNITY_IPHONE
+    //				BuildPipeline.BuildAssetBundle (Selection.activeObject, selection, path,
+    //				                                BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.UncompressedAssetBundle,
+    //				                                BuildTarget.iOS);
+    //				#elif UNITY_ANDROID
+    //				BuildPipeline.BuildAssetBundle (Selection.activeObject, selection, path,
+    //					BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.UncompressedAssetBundle,
+    //					BuildTarget.Android);
+    //				#else
+    //		BuildPipeline.BuildAssetBundle(Selection.activeObject, selection, path,
+    //		BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.UncompressedAssetBundle);
+    //#endif
+    //				Selection.objects = selection;
+    //			}
+    //		}
+    //
+    //		[MenuItem ("Assets/Build AssetBundle From Selection - No dependency tracking")]
+    //		static void ExportResourceNoTrack ()
+    //		{
+    //			// Bring up save panel
+    //			string path = EditorUtility.SaveFilePanel ("Save Resource", "", "New Resource", "unity3d");
+    //			if (path.Length != 0) {
+    //				// Build the resource file from the active selection.
+    //				#if UNITY_IPHONE
+    //				BuildPipeline.BuildAssetBundle (Selection.activeObject, Selection.objects, path, BuildAssetBundleOptions.CompleteAssets, BuildTarget.iOS);
+    //				#elif UNITY_ANDROID
+    //				BuildPipeline.BuildAssetBundle (Selection.activeObject, Selection.objects, path, BuildAssetBundleOptions.CompleteAssets, BuildTarget.Android);
+    //				#else
+    //		BuildPipeline.BuildAssetBundle(Selection.activeObject, Selection.objects, path, BuildAssetBundleOptions.CompleteAssets);
+    //				#endif
+    //			}
+    //		}
+    //
+    //		[MenuItem ("Assets/Build AssetBundle From Selection - No dependency tracking(Uncompress)")]
+    //		static void ExportResourceNoTrackUncompress ()
+    //		{
+    //			// Bring up save panel
+    //			string path = EditorUtility.SaveFilePanel ("Save Resource", "", "New Resource", "unity3d");
+    //			if (path.Length != 0) {
+    //				// Build the resource file from the active selection.
+    //				#if UNITY_IPHONE
+    //				BuildPipeline.BuildAssetBundle (Selection.activeObject, Selection.objects, path, BuildAssetBundleOptions.UncompressedAssetBundle, BuildTarget.iOS);
+    //				#elif UNITY_ANDROID
+    //				BuildPipeline.BuildAssetBundle (Selection.activeObject, Selection.objects, path, BuildAssetBundleOptions.UncompressedAssetBundle, BuildTarget.Android);
+    //				#else
+    //				BuildPipeline.BuildAssetBundle(Selection.activeObject, Selection.objects, path, BuildAssetBundleOptions.UncompressedAssetBundle);
+    //				#endif
+    //			}
+    //		}
+    //	}
 }

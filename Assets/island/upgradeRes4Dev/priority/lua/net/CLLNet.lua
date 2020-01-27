@@ -134,7 +134,7 @@ function CLLNet.dispatch(map)
         hideHotWheel()
     else
         -- success
-        CLLNet.cacheData(cmd, map)
+        CLLNet.onReceiveCMD(cmd, map)
     end
 
     -- 通知所有显示的页面
@@ -151,14 +151,15 @@ function CLLNet.dispatch(map)
 end
 
 ---@public 缓存数据
-function CLLNet.cacheData(cmd, data)
-    local func = CLLNet.cacheDataFunc[cmd]
+function CLLNet.onReceiveCMD(cmd, data)
+    local func = CLLNet.receiveCMDFunc[cmd]
     if func then
         func(cmd, data)
     end
 end
+
 ---@public 缓存数据的方法
-CLLNet.cacheDataFunc = {
+CLLNet.receiveCMDFunc = {
     ---@param data NetProtoIsland.RC_login
     [NetProtoIsland.cmds.login] = function(cmd, data)
         NetProtoIsland.__sessionID = bio2number(data.session)
@@ -266,6 +267,10 @@ CLLNet.cacheDataFunc = {
         if IDDBCity.curCity then
             IDDBCity.curCity:onMyselfCityChg(data.city)
         end
+    end,
+    ---@param data NetProtoIsland.RC_sendPrepareAttackIsland
+    [NetProtoIsland.cmds.sendPrepareAttackIsland] = function(cmd, data)
+        getPanelAsy("PanelBattlePrepare", onLoadedPanelTT, data)
     end
 }
 

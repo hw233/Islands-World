@@ -802,6 +802,7 @@ public class ECLPublisher : EditorWindow
 
         //Build Location
         if (currChlData.mPlatform == ChlPlatform.ios ||
+            currChlData.mPlatform == ChlPlatform.webgl ||
             currChlData.mCreateEclipseProject)
         {
             GUILayout.BeginHorizontal();
@@ -1075,7 +1076,7 @@ public class ECLPublisher : EditorWindow
             CLCfgBase.self.singinMd5Code = currChlData.md5SignCode;
         }
 
-        for (int i = 0; i < iconNames.Length; i++)
+        for (int i = 0; iconNames != null && i < iconNames.Length; i++)
         {
             icons.Add((Texture2D)(currChlData.mDefaultIcon[iconNames[i]]));
         }
@@ -1230,8 +1231,10 @@ public class ECLPublisher : EditorWindow
         {
             HotUpgradeServerInfor serverInfor = ECLProjectManager.data.hotUpgradeServers[currChlData.serverIndex] as HotUpgradeServerInfor;
             CLVerManager.self.baseUrl = serverInfor.hotUpgradeBaseUrl;
+#if !UNITY_WEBGL
             Net.self.host4Publish = serverInfor.host4Entry;
             Net.self.gatePort = serverInfor.port4Entry;
+#endif
         }
     }
 
@@ -1372,6 +1375,9 @@ public class ECLPublisher : EditorWindow
         else if (currChlData.buildTarget == BuildTarget.StandaloneOSX)
         {
             locationName = currChlData.mProductName + ".app";
+        } else if(currChlData.buildTarget == BuildTarget.WebGL)
+        {
+            locationName = dataPath() + currChlData.mBuildLocation;
         }
         bool needApend = true;
         if (!string.IsNullOrEmpty(currChlData.mBuildLocation))
@@ -1541,6 +1547,7 @@ public enum ChlPlatform
     ios,
     standaloneWIN,
     StandaloneOSX,
+    webgl,
 }
 
 /// <summary>
@@ -1574,6 +1581,8 @@ public class ChlData
                 case ChlPlatform.standaloneWIN:
                 case ChlPlatform.StandaloneOSX:
                     return BuildTargetGroup.Standalone;
+                case ChlPlatform.webgl:
+                    return BuildTargetGroup.WebGL;
             }
             return BuildTargetGroup.Android;
         }
@@ -1597,6 +1606,8 @@ public class ChlData
                     return BuildTarget.StandaloneWindows64;
                 case ChlPlatform.StandaloneOSX:
                     return BuildTarget.StandaloneOSX;
+                case ChlPlatform.webgl:
+                    return BuildTarget.WebGL;
             }
             return BuildTarget.StandaloneWindows64;
         }
@@ -1816,6 +1827,9 @@ public class ChlData
                 break;
             case "StandaloneOSX":
                 r.mPlatform = ChlPlatform.StandaloneOSX;
+                break;
+            case "webgl":
+                r.mPlatform = ChlPlatform.webgl;
                 break;
         }
         r.isUseUnityIAP = MapEx.getBool(map, "isUseUnityIAP");

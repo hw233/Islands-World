@@ -26,7 +26,7 @@ do
     -- 显示，
     -- 注意，c#侧不会在调用show时，调用refresh
     function _cell.show (go, data)
-        ---@type IDCellWorldTileHudParam
+        ---@type _ParamIDCellWorldTileHud
         mData = data
         uiobjs.followTarget:setTarget(mData.target, mData.offset or Vector3.zero)
     end

@@ -38,6 +38,8 @@ IDWorldMap.offset4Ocean = -0.6 * Vector3.up
 IDWorldMap.mapTileSize = nil -- 大地图地块
 IDWorldMap.scaleCityHeighMin = 45
 IDWorldMap.scaleCityHeighMax = 50
+---@type IDWorldFleet
+IDWorldMap.selectedFleet = nil
 local isDragOcean = false
 local popupMenus
 local aroundPageCache = {}
@@ -85,10 +87,10 @@ function IDWorldMap.__init()
             icon = "icon_detail", --//TODO:图标
             bg = "public_edit_circle_bt_management"
         },
-        attack = {
-            --攻击
+        attackIsland = {
+            --攻击岛屿
             nameKey = "Attack",
-            callback = IDWorldMap.popupEvent.attack,
+            callback = IDWorldMap.popupEvent.attackIsland,
             icon = "icon_detail",
             bg = "public_edit_circle_bt_management"
         },
@@ -136,6 +138,7 @@ function IDWorldMap.init(gidx, onFinishCallback, onProgress)
 
     local onLoadOcena = function()
         IDWorldMap.ocean.luaTable.playBGM()
+        IDWorldMap.oceanTransform.position = lookAtTarget.position + IDWorldMap.offset4Ocean
         -- 屏幕拖动代理
         drag4World.onDragMoveDelegate = IDWorldMap.onDragMove
         drag4World.onDragScaleDelegate = IDWorldMap.onTouchScaleGround
@@ -202,7 +205,6 @@ function IDWorldMap.onLoadOcena(name, obj, orgs)
     -- 先为false
     IDWorldMap.oceanObj.enableMirrorReflection = false
     IDWorldMap.ocean = oceanlua
-    IDWorldMap.oceanTransform.position = lookAtTarget.position + IDWorldMap.offset4Ocean
     SetActive(obj, true)
 end
 
@@ -559,7 +561,7 @@ function IDWorldMap.onClickTile(tile)
             local label = joinStr("Pos:", index)
             local buttons = {}
             if tile.type == IDConst.WorldmapCellType.user then
-                table.insert(buttons, popupMenus.attack)
+                table.insert(buttons, popupMenus.attackIsland)
             elseif tile.type == IDConst.WorldmapCellType.port then
                 table.insert(buttons, popupMenus.docked)
             elseif tile.type == IDConst.WorldmapCellType.decorate then
@@ -650,11 +652,22 @@ IDWorldMap.popupEvent = {
         IDUtl.hidePopupMenus()
         IDWorldMap.moveToView(cellIndex, GameModeSub.city)
     end,
-    ---@public 攻击
-    attack = function(cellIndex)
+    ---@public 攻击岛屿
+    attackIsland = function(cellIndex)
         IDUtl.hidePopupMenus()
-        showHotWheel()
-        CLLNet.send(NetProtoIsland.send.attack(cellIndex, IDWorldMap.doAttack, cellIndex))
+        if IDWorldMap.mode == GameModeSub.fleet and IDWorldMap.selectedFleet then
+            showHotWheel()
+            CLLNet.send(
+                NetProtoIsland.send.fleetAttackIsland(
+                    bio2number(IDWorldMap.selectedFleet.data.idx),
+                    cellIndex,
+                    hideHotWheel,
+                    cellIndex
+                )
+            )
+        else
+            getPanelAsy("PanelFleets", onLoadedPanelTT, {toPos = cellIndex})
+        end
     end,
     ---@public 搬迁
     moveCity = function(cellIndex)
@@ -693,6 +706,7 @@ function IDWorldMap.doMoveCity(cellIndex, retData)
     end
 end
 
+--[[
 ---@public 战斗服务器接口回调
 ---@param retData NetProtoIsland.RC_attack
 function IDWorldMap.doAttack(cellIndex, retData)
@@ -735,10 +749,9 @@ function IDWorldMap.doAttack(cellIndex, retData)
                 IDWorldMap.popupEvent.enterCity(cellIndex)
             end
         )
-    else
-        CLAlert.add(LGet("Error_" .. code))
     end
 end
+]]
 
 ---@public 当地图块有变化时的推送
 function IDWorldMap.onMapCellChg(mapCell, isRemove)
@@ -771,6 +784,7 @@ end
 ---@public 离开世界后的清理
 function IDWorldMap.clean()
     IDWorldMap.selectedFleet = nil
+    IDWorldMap.nearestInfluence = nil
     IDWorldMap.isRecheckingCellsVisible = false
     IDWorldMap.finishEnterCityCallbacks = {}
     IDWorldMap.cleanPages()

@@ -29,6 +29,7 @@ IDDBWorldMap = {}
 --------------------------------------------
 
 local mapPageData = {} -- key:pageIdx, value = list
+local loadingMapPageData = {}
 local mapPageCacheTime = {} -- key:pageIdx, value = timeOut
 IDDBWorldMap.fleets = {} -- key:fidx, value = fleet
 IDDBWorldMap.ConstTimeOutSec = 60 -- 数据超时秒
@@ -133,19 +134,28 @@ function IDDBWorldMap.getDataByPageIdx(pageIdx)
     if pageIdx == nil then
         return nil
     end
-    if mapPageData[pageIdx] == nil or mapPageCacheTime[pageIdx] == nil then
-        -- 没有数据，发送服务器
-        CLLNet.send(NetProtoIsland.send.getMapDataByPageIdx(pageIdx))
-        return
+    if loadingMapPageData[pageIdx] then
+        -- 正在取得数据
+        return nil
     end
-    local timeOut = mapPageCacheTime[pageIdx]
-    if DateEx.nowMS - timeOut > 0 then
-        --说明已经超时了
+    local timeOut = mapPageCacheTime[pageIdx] or 0
+    if mapPageData[pageIdx] == nil or mapPageCacheTime[pageIdx] == nil or DateEx.nowMS - timeOut > 0 then
+        -- 没有数据，发送服务器
+        IDDBWorldMap.lockLoadingMapPageData(pageIdx)
         CLLNet.send(NetProtoIsland.send.getMapDataByPageIdx(pageIdx))
-        return
+        return nil
     end
 
     return mapPageData[pageIdx]
+end
+
+function IDDBWorldMap.lockLoadingMapPageData(pageIdx)
+    loadingMapPageData[pageIdx] = true
+    InvokeEx.invoke(IDDBWorldMap.unlockLoadingMapPageData, pageIdx, 3)
+end
+function IDDBWorldMap.unlockLoadingMapPageData(pageIdx)
+    loadingMapPageData[pageIdx] = nil
+    InvokeEx.cancelInvoke(IDDBWorldMap.unlockLoadingMapPageData)
 end
 
 ---@public 取得一屏数据
@@ -153,6 +163,7 @@ end
 function IDDBWorldMap.onGetMapPageData(data)
     local pageIdx = bio2number(data.pageIdx)
     local cells = data.cells
+    IDDBWorldMap.unlockLoadingMapPageData(pageIdx)
 
     local cellmap = {}
     ---@type NetProtoIsland.ST_mapCell
@@ -268,6 +279,7 @@ end
 function IDDBWorldMap.clean()
     mapPageData = {} -- key:pageIdx, value = list
     mapPageCacheTime = {} -- key:pageIdx, value = timeOut
+    loadingMapPageData = {}
     IDDBWorldMap.fleets = {}
 end
 --------------------------------------------

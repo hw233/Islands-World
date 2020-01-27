@@ -354,9 +354,11 @@ public static class ECLProjectSetting
 								if (GUILayout.Button ("Apply")) {
 									if (CLVerManager.self != null) {
 										CLVerManager.self.baseUrl = hsi.hotUpgradeBaseUrl;
-										Net.self.host4Publish = hsi.host4Entry;
+#if !UNITY_WEBGL
+                                        Net.self.host4Publish = hsi.host4Entry;
 										Net.self.gatePort = hsi.port4Entry;
-									}
+#endif
+                                    }
 								}
 								if (GUILayout.Button ("Delete")) {
 									if (EditorUtility.DisplayDialog ("Alter", "Really want to delete?", "Okay", "Cancel")) {
@@ -610,8 +612,9 @@ public static class ECLProjectSetting
 					}
 					GUILayout.EndHorizontal ();
 				}
-				//===================================================
-				if (Net.self != null) {
+                //===================================================
+#if !UNITY_WEBGL
+                if (Net.self != null) {
 					GUILayout.BeginHorizontal ();
 					{
 						GUILayout.Label ("Host 4 Publish:", GUILayout.Width (labWidth));
@@ -669,6 +672,7 @@ public static class ECLProjectSetting
 					}
 					GUILayout.EndHorizontal ();
 				}
+#endif
 				//===================================================
 				if (CLPanelManager.self != null) {
 					GUILayout.BeginHorizontal ();
@@ -1068,14 +1072,15 @@ public static class ECLProjectSetting
         go.AddComponent<InvokeEx>();
         go.AddComponent<WWWEx>();
 
+#if !UNITY_WEBGL
         go = new GameObject ("Net");
         CLBaseLua netLua = go.AddComponent<CLBaseLua>();
         netLua.luaPath = data.name + "/upgradeRes/priority/lua/net/CLLNet.lua";
         Net net = go.AddComponent<Net> ();
         net.lua = netLua;
         net.serializeluaPath = data.name + "/upgradeRes/priority/lua/net/CLLNetSerialize.lua";
-
-		go = new GameObject ("Main");
+#endif
+        go = new GameObject ("Main");
 		//		type = Types.GetType ("MyMain", "Assembly-CSharp");
 		type = Type.GetType ("MyMain, Assembly-CSharp");
 		if (type == null) {
@@ -1178,21 +1183,23 @@ public static class ECLProjectSetting
 		sound.mainAudio = GameObject.Find ("Main Camera").GetComponent<AudioSource> ();
 		sound.singletonAudio = mainGo.GetComponent<AudioSource> ();
 
-		Net net = GameObject.Find ("Net").GetComponent<Net> ();
+#if !UNITY_WEBGL
+        Net net = GameObject.Find ("Net").GetComponent<Net> ();
         CLBaseLua netLua = net.gameObject.AddComponent<CLBaseLua>();
 		netLua.luaPath = data.name + "/upgradeRes/priority/lua/net/CLLNet.lua";
         net.lua = netLua;
+#endif
 
-		CLMainBase main = mainGo.GetComponent<CLMainBase> ();
+        CLMainBase main = mainGo.GetComponent<CLMainBase> ();
 		main.firstPanel = data.companyPanelName;
 		main.luaPath = data.name + "/upgradeRes/priority/lua/CLLMainLua.lua";
 		mainGo.GetComponent<AudioSource> ().playOnAwake = false;
 
-		#if UNITY_5_6_OR_NEWER
+#if UNITY_5_6_OR_NEWER
 		Transform lookAtTarget = mainGo.transform.Find ("LookAtTarget");
-		#else
+#else
 		Transform lookAtTarget = mainGo.transform.FindChild ("LookAtTarget");
-		#endif
+#endif
 
 		CLSmoothFollow follow = mainCameraGo.GetComponent<CLSmoothFollow> ();
 		follow.target = lookAtTarget;

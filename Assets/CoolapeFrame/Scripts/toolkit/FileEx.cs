@@ -236,7 +236,18 @@ namespace Coolape
 		{
 			try {
 				string buff = "";
-				string fPath = CLPathCfg.persistentDataPath + "/" + fName;
+#if UNITY_WEBGL
+                if (!CLCfgBase.self.isEditMode)
+                {
+                    byte[] bytes = CLPreLoadRes4Webgl.getContent(fName);
+                    if (bytes != null)
+                    {
+                        buff = Encoding.UTF8.GetString(bytes);
+                    }
+                    return buff;
+                }
+#endif
+                string fPath = CLPathCfg.persistentDataPath + "/" + fName;
 				if (File.Exists (fPath)) {
 					buff = File.ReadAllText (fPath);
 				} else {
@@ -263,7 +274,23 @@ namespace Coolape
 		public static IEnumerator readNewAllTextAsyn (string fName, object OnGet)
 		{
 			string buff = "";
-			string fPath = CLPathCfg.persistentDataPath + "/" + fName;
+
+#if UNITY_WEBGL
+            if (!CLCfgBase.self.isEditMode)
+            {
+                byte[] bytes = CLPreLoadRes4Webgl.getContent(fName);
+                if(bytes != null)
+                {
+                    buff = Encoding.UTF8.GetString(bytes);
+                }
+            }
+            else
+            {
+                buff = readNewAllText(fName);
+            }
+            yield return null;
+#else
+            string fPath = CLPathCfg.persistentDataPath + "/" + fName;
 			if (File.Exists (fPath)) {
 				yield return null;
 				buff = File.ReadAllText (fPath);
@@ -287,7 +314,8 @@ namespace Coolape
 				Debug.LogError ("Get null content == " + fPath);
 			}
 #endif
-			Utl.doCallback (OnGet, buff);
+#endif
+            Utl.doCallback (OnGet, buff);
 		}
 
 		/// <summary>
@@ -299,7 +327,14 @@ namespace Coolape
 		{
 			try {
 				byte[] buff = null;
-				string fPath = CLPathCfg.persistentDataPath + "/" + fName;
+
+#if UNITY_WEBGL
+                if (!CLCfgBase.self.isEditMode)
+                {
+                    return CLPreLoadRes4Webgl.getContent(fName);
+                }
+#endif
+                string fPath = CLPathCfg.persistentDataPath + "/" + fName;
 				if (File.Exists (fPath)) {
 					buff = FileEx.ReadAllBytes (fPath);
 				} else {
@@ -327,7 +362,19 @@ namespace Coolape
 		{
 			byte[] buff = null;
 			string fPath = CLPathCfg.persistentDataPath + "/" + fName;
-			if (File.Exists (fPath)) {
+
+#if UNITY_WEBGL
+            if (!CLCfgBase.self.isEditMode)
+            {
+                buff = CLPreLoadRes4Webgl.getContent(fName);
+            }
+            else
+            {
+                buff = readNewAllBytes(fName);
+            }
+            yield return null;
+#else
+            if (File.Exists (fPath)) {
 				yield return null;
 				buff = File.ReadAllBytes (fPath);
 			} else {
@@ -352,7 +399,8 @@ namespace Coolape
 				Debug.LogWarning ("Get null content == " + fPath);
 			}
 #endif
-			Utl.doCallback (OnGet, buff);
+#endif
+            Utl.doCallback (OnGet, buff);
 		}
 
 		public static Hashtable FileTextMap = new Hashtable ();

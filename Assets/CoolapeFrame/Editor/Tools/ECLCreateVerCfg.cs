@@ -95,8 +95,8 @@ public static class ECLCreateVerCfg
 		
 		string[] dirEntries = Directory.GetDirectories (path);
 		foreach (string dir in dirEntries) {
-			//跳过不同平台的资源
-			#if UNITY_ANDROID
+            //跳过不同平台的资源
+#if UNITY_ANDROID
 			if (Path.GetFileName (dir).Equals ("IOS") || Path.GetFileName(dir).Equals("Standalone") || Path.GetFileName(dir).Equals("StandaloneOSX")) {
 				continue;
 			}
@@ -110,6 +110,10 @@ public static class ECLCreateVerCfg
             }
 #elif UNITY_STANDALONE_OSX
             if(Path.GetFileName(dir).Equals("Android") || Path.GetFileName(dir).Equals("IOS") || Path.GetFileName(dir).Equals("Standalone")) {
+                continue;
+            }
+#elif UNITY_WEBGL
+            if(Path.GetFileName(dir).Equals("Android") || Path.GetFileName(dir).Equals("IOS") || Path.GetFileName(dir).Equals("Standalone") || Path.GetFileName(dir).Equals("StandaloneOSX")) {
                 continue;
             }
 #endif

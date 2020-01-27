@@ -231,7 +231,7 @@ namespace Coolape
             }
             return r;
         }
-
+        //================================================================
         public static Hashtable wwwMap = Hashtable.Synchronized(new Hashtable());
         public static Hashtable wwwTimesMap = new Hashtable();
 
@@ -268,14 +268,41 @@ namespace Coolape
             string verVal = "";
             if (!MapEx.getBool(wwwMap, path))
             {
+                string url = "";
                 bool needSave = false;
                 wwwMap[path] = true;
+
+#if UNITY_WEBGL
+                if (!CLCfgBase.self.isEditMode)
+                {
+                    if (localPriorityVer[path] != null)
+                    {
+                        verVal = MapEx.getString(localPriorityVer, path);
+                    }
+                    else
+                    {
+                        verVal = MapEx.getString(otherResVerNew, path);
+                    }
+                    if (!string.IsNullOrEmpty(verVal))
+                    {
+                        url = PStr.begin().a(baseUrl).a("/").a(path).a(".").a(verVal).end();
+                    }
+                    else
+                    {
+                        url = PStr.begin().a(baseUrl).a("/").a(path).end();
+                    }
+                    doGetContent(path, url, needSave, type, onGetAsset, autoRealseAB, originals);
+                    return;
+                }
+#endif
                 if (localPriorityVer[path] != null)
-                {  //在优先资源里有
+                {
+                    //在优先资源里有
                     needSave = false;
                 }
                 else
-                {        //则可能在others里
+                {
+                    //则可能在others里
                     object obj1 = otherResVerOld[path];
                     object obj2 = otherResVerNew[path];
                     if (obj1 == null && obj2 != null)
@@ -307,7 +334,6 @@ namespace Coolape
 #endif
                     }
                 }
-                string url = "";
                 if (needSave)
                 {
                     if (!string.IsNullOrEmpty(verVal))
@@ -330,22 +356,20 @@ namespace Coolape
                     {
                         url = System.IO.Path.Combine(Application.streamingAssetsPath, path);
 #if !UNITY_ANDROID || UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
-//                        url = PStr.begin().a("file:///").a(url).end();
-						#if UNITY_STANDALONE
-						url = PStr.begin ().a ("file:///").a (url).end ();
-						#else
-						url = PStr.begin ().a ("file://").a (url).end ();
-						#endif
+#if UNITY_STANDALONE
+                        url = PStr.begin ().a ("file:///").a (url).end ();
+#else
+                        url = PStr.begin().a("file://").a(url).end();
+#endif
 #endif
                     }
                     else
                     {
-//                        url = PStr.begin().a("file:///").a(url).end();
-						#if UNITY_STANDALONE
+#if UNITY_STANDALONE
 						url = PStr.begin ().a ("file:///").a (url).end ();
-						#else
-						url = PStr.begin ().a ("file://").a (url).end ();
-						#endif
+#else
+                        url = PStr.begin().a("file://").a(url).end();
+#endif
                     }
                 }
                 doGetContent(path, url, needSave, type, onGetAsset, autoRealseAB, originals);
@@ -387,12 +411,15 @@ namespace Coolape
                 }
                 www = WWWEx.get(url, tmptype, (Callback)onWWWBack, (Callback)onWWWBack, transParam, true);
                 addWWW(www, path, url);
-            } else {
+            }
+            else
+            {
                 www = WWWEx.get(url, type, (Callback)onWWWBack, (Callback)onWWWBack, transParam, true);
             }
         }
 
-        void onWWWBack(params object[] parma) {
+        void onWWWBack(params object[] parma)
+        {
             try
             {
                 object content = parma[0];
@@ -422,7 +449,9 @@ namespace Coolape
                 onGetNewstRes(www, url, path, type, content, needSave, onGetAsset, autoRealseAB, originals);
                 ObjPool.listPool.returnObject(list);
                 list = null;
-            }catch(System.Exception e) {
+            }
+            catch (System.Exception e)
+            {
                 Debug.LogError(e);
             }
         }
