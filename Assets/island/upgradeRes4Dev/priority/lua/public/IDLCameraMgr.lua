@@ -7,11 +7,17 @@ local csSelf = CameraMgr.self
 
 local profiles = {}
 local profileAssets = {}
+local postProcLayer, postProcLayerSub
 
 -- 初始化，只会调用一次
 function IDLCameraMgr.init()
     IDLCameraMgr.smoothFollow = MyCfg.self.mainCamera:GetComponent("CLSmoothFollow")
+    postProcLayer = csSelf.maincamera:GetComponent("PostProcessLayer")
+    postProcLayerSub = csSelf.subcamera:GetComponent("PostProcessLayer")
+    postProcLayer.enabled = false
+    postProcLayerSub.enabled = false
     csSelf.subpostprocessing.enabled = false
+    IDLCameraMgr.enabledTop(false)
 
     CameraMgr.self:setLua()
     IDLCameraMgr.getProfile(
@@ -34,6 +40,17 @@ function IDLCameraMgr.setPostProcessingProfile(name, camera)
             end
         end
     )
+    if name == "gray" then
+        postProcLayer.enabled = true
+        IDLCameraMgr.enabledTop(true)
+    else
+        postProcLayer.enabled = false
+        IDLCameraMgr.enabledTop(false)
+    end
+end
+
+function IDLCameraMgr.enabledTop(val)
+    csSelf.subcamera.enabled = val
 end
 
 function IDLCameraMgr.getProfile(name, callback)

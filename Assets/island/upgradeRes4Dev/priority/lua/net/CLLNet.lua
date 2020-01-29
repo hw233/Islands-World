@@ -90,23 +90,29 @@ function CLLNet.dispatchGame(map)
             --csSelf:invoke4Lua(CLLNet.heart, nil, timeOutSec, true);
             InvokeEx.invoke(CLLNet.heart, timeOutSec)
         elseif map == "outofNetConnect" then
-            InvokeEx.cancelInvoke(CLLNet.heart)
-            CLPanelManager.topPanel:procNetwork("outofNetConnect", -9999, "outofNetConnect", nil)
-
-            -- 处理断线处理
-            --//TODO:先屏掉
-            if GameMode.none ~= MyCfg.mode then
-                local ok, result = pcall(procOffLine)
-                if not ok then
-                    printe(result)
-                end
-            end
+            CLLNet.onOffline()
         end
     else
         local dispatchInfor = NetProtoIsland.dispatch[map[0]]
         if dispatchInfor then
             local data = dispatchInfor.onReceive(map)
             CLLNet.dispatch(data)
+        end
+    end
+end
+
+function CLLNet.onOffline()
+    CLLNet.cancelHeart()
+    if CLPanelManager.topPanel then
+        CLPanelManager.topPanel:procNetwork("outofNetConnect", -9999, "outofNetConnect", nil)
+    end
+
+    -- 处理断线处理
+    --//TODO:先屏掉
+    if GameMode.none ~= MyCfg.mode then
+        local ok, result = pcall(procOffLine)
+        if not ok then
+            printe(result)
         end
     end
 end
@@ -292,7 +298,10 @@ function CLLNet.send(package)
 end
 
 function CLLNet.stop()
-    csSelf:stop()
+    if csSelf.connected then
+        csSelf:stop()
+        CLLNet.onOffline()
+    end
 end
 
 return CLLNet

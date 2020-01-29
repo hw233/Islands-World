@@ -84,8 +84,8 @@ function IDLBuildingDefense:showAttackRang()
                 MinAttackRange,
                 function(rangObj)
                     if self.attackMinRangObj then
-                        CLUIOtherObjPool.returnObj(rangObj)
-                        SetActive(rangObj, false)
+                        CLUIOtherObjPool.returnObj(rangObj.gameObject)
+                        SetActive(rangObj.gameObject, false)
                     else
                         self.attackMinRangObj = rangObj
                     end
@@ -104,8 +104,8 @@ function IDLBuildingDefense:showAttackRang()
                 MaxAttackRange,
                 function(rangObj)
                     if self.attackMaxRangObj then
-                        CLUIOtherObjPool.returnObj(rangObj)
-                        SetActive(rangObj, false)
+                        CLUIOtherObjPool.returnObj(rangObj.gameObject)
+                        SetActive(rangObj.gameObject, false)
                     else
                         self.attackMaxRangObj = rangObj
                     end

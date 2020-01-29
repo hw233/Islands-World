@@ -188,11 +188,12 @@ function IDWorldMapPage:refreshOneCell(cellData, isRemove)
 
         ---@type IDWorldTile
         local cell = self.mapCells[index]
+        local pdata = self.pageData[index]
         if cell then
-            local pdata = self.pageData[index]
             cell:init(cell.csSelf, cell.gidx, cell.type, pdata.serverData, cell.attr)
         else
             -- 这种情况说明cell还未加载出来，不过没关系，会刷新出来的
+            self:doLoadEachCell(index, pdata.serverData, pdata.attr, pdata.pageIdx, nil, nil)
         end
     end
 end

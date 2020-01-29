@@ -39,8 +39,8 @@ function IDLBuildingAlliance:showAttackRang()
                 TriggerRadius,
                 function(rangObj)
                     if self.attackMinRangObj then
-                        CLUIOtherObjPool.returnObj(rangObj)
-                        SetActive(rangObj, false)
+                        CLUIOtherObjPool.returnObj(rangObj.gameObject)
+                        SetActive(rangObj.gameObject, false)
                     else
                         self.attackMinRangObj = rangObj
                     end

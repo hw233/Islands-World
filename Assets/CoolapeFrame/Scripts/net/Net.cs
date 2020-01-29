@@ -161,6 +161,19 @@ namespace Coolape
                 dispatchGame(msgQueue.Dequeue());
             }
         }
+
+        public void clean()
+        {
+            if(luaTable != null)
+            {
+                luaTable.Dispose();
+                luaTable = null;
+            }
+            if(lua != null)
+            {
+                lua.destoryLua();
+            }
+        }
     }
 #endif
 }

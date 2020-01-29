@@ -91,7 +91,7 @@ local function _init()
     go.transform.parent = transform
     IDMainCity.grid = go:AddComponent(typeof(CLGrid))
     IDMainCity.grid.gridLineHight = IDMainCity.offset4Tile.y
-    IDMainCity.grid.color4Grid = ColorEx.getColor(255, 255,255, 50)
+    IDMainCity.grid.color4Grid = ColorEx.getColor(255, 255, 255, 50)
     grid = IDMainCity.grid.grid
 
     -- 波浪的处理
@@ -282,17 +282,26 @@ function IDMainCity.init(cityData, onFinishCallback, onProgress)
     )
 end
 
-function IDMainCity.refreshFogOfWarInfluence()
+function IDMainCity.refreshFogOfWarInfluence(oldMode, curMode)
+    local fogOfWar = MyCfg.self.fogOfWar
+
     local dis = 0
     if MyCfg.mode == GameMode.map and IDWorldMap.mode == GameModeSub.map then
         local lev = bio2number(IDMainCity.cityData.headquarters.lev)
         ---@type DBCFHeadquartersLevsData
         local attr = DBCfg.getHeadquartersLevsDataByLev(lev)
         dis = bio2number(attr.Range) * IDWorldMap.grid.cellSize
+        fogOfWar.VisibilitySnapshotInterval = 2 -- 值越大，对性能影响越小
     else
         dis = 120
+        fogOfWar.VisibilitySnapshotInterval = 120 -- 值越大，对性能影响越小
     end
     IDMainCity.fogOfWarInfluence.ViewDistance = dis
+
+    -- if curMode == GameModeSub.map and (oldMode == GameModeSub.mapBtwncity or oldMode == GameModeSub.city) then
+    --     -- 是从主城切换过来的,强制执行一次fog的SnapshotStampTexture
+    --     fogOfWar:SnapshotStampTexture()
+    -- end
 end
 
 ---@public 当主城数据列新时处理
@@ -379,10 +388,10 @@ function IDMainCity.onChgMode(oldMode, curMode)
             IDMainCity.Headquarters:setCollider(true)
         end
         IDMainCity.Headquarters:showHud4WorldMap()
-        -- IDMainCity.grid:hideRect()
+    -- IDMainCity.grid:hideRect()
     end
 
-    IDMainCity.refreshFogOfWarInfluence()
+    IDMainCity.refreshFogOfWarInfluence(oldMode, curMode)
 
     for k, v in pairs(tiles) do
         SetActive(v.gameObject, isShowTile)

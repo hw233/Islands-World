@@ -76,7 +76,7 @@ do
             uiobjs.clickHiddenTimes = uiobjs.clickHiddenTimes + 1
             if uiobjs.clickHiddenTimes == 5 then
                 uiobjs.clickHiddenTimes = 0
-                getPanelAsy("PanelDebugMgr", onLoadedPanelTT)
+                getPanelAsy("PanelDebugMgr", onLoadedPanel)
             end
         elseif goName == "ButtonQuit" then
             if CLLNet then

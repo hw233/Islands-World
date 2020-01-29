@@ -94,7 +94,7 @@ function IDPMain.procNetwork(cmd, succ, msg, paras)
             hideHotWheel()
             IDMainCity.onfinsihCreateBuilding(paras.building)
         elseif cmd == NetProtoIsland.cmds.onPlayerChg then
-            uiobjs.LabelDiam.text = tostring(bio2number(IDDBPlayer.myself.diam))
+            uiobjs.public.LabelDiam.text = tostring(bio2number(IDDBPlayer.myself.diam))
         elseif cmd == NetProtoIsland.cmds.onBuildingChg then
             IDMainCity.onBuildingChg(paras.building)
             local attr = DBCfg.getBuildingByID(bio2number(paras.building.attrid))

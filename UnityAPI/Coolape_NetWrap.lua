@@ -37,5 +37,7 @@ function m:encodeData(obj) end
 function m:parseRecivedData(buffer) end
 ---public Void Update()
 function m:Update() end
+---public Void clean()
+function m:clean() end
 Coolape.Net = m
 return m

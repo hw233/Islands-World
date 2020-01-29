@@ -421,7 +421,8 @@ namespace Coolape
 			for (int i = 0; i < list.Count; i++) {
 				destroyPanel ((CLPanelBase)(list [i]));
 			}
-			panelRetainLayer.Clear ();
+            panelAssetBundle.Clear();
+            panelRetainLayer.Clear ();
 			topPanel = null;
 		}
 

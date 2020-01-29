@@ -39,7 +39,7 @@ public static class XluaGenCodeConfig
         typeof(SkinnedMeshRenderer),
         typeof(MeshRenderer),
         typeof(Renderer),
-        typeof(WWW),
+        //typeof(WWW),
         typeof(System.Collections.Generic.List<int>),
         typeof(Action<string>),
         typeof(UnityEngine.Debug),
@@ -96,6 +96,7 @@ public static class XluaGenCodeConfig
         typeof(UIFollowTarget),
         typeof(HUDRoot),
         typeof(UIRichText4Chat),
+        typeof(UIRichText4Chat.SpritePool),
         typeof(UIAnchor),
 
 		//Coolape
@@ -214,6 +215,7 @@ public static class XluaGenCodeConfig
         typeof(Wave),
         typeof(MyBoundsPool),
         typeof(MyDirectionArrow),
+        typeof(UnityEngine.Scripting.GarbageCollector),
     };
 
 	//C#静态调用Lua的配置（包括事件的原型），仅可以配delegate，interface
@@ -393,6 +395,10 @@ public static class XluaGenCodeConfig
             "UnityEngine.Input",
             "IsJoystickPreconfigured",
             "System.String",
+        },
+        new List<string>() {
+            "UnityEngine.MeshRenderer",
+            "receiveGI",
         },
     };
 }

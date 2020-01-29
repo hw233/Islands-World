@@ -2,6 +2,7 @@
 do
     local IDPDebugMgr = {}
 
+    ---@type Coolape.CLPanelLua
     local csSelf = nil
     local transform = nil
     local uiobjs = {}
@@ -20,6 +21,13 @@ do
         uiobjs.ToggleLog = getCC(grid, "ToggleLog", "UIToggle")
         uiobjs.InputInfor = getCC(grid, "InputInfor", "UIInput")
         uiobjs.InputIP = getCC(grid, "InputIP", "UIInput")
+        uiobjs.ToggleFog = getCC(grid, "ToggleFog", "UIToggle")
+        uiobjs.ToggleTiles = getCC(grid, "ToggleTiles", "UIToggle")
+        uiobjs.ToggleBuildings = getCC(grid, "ToggleBuildings", "UIToggle")
+        uiobjs.ToggleOcean = getCC(grid, "ToggleOcean", "UIToggle")
+        uiobjs.ToggleShadow = getCC(grid, "ToggleShadow", "UIToggle")
+        uiobjs.TogglePostproc = getCC(grid, "TogglePostproc", "UIToggle")
+        uiobjs.ToggleUICamera = getCC(grid, "ToggleUICamera", "UIToggle")
     end
 
     -- 设置数据
@@ -46,10 +54,8 @@ do
         local idx = IDDBPlayer.myself and bio2number(IDDBPlayer.myself.idx) or 0
         local cityidx = IDDBPlayer.myself and bio2number(IDDBPlayer.myself.cityidx) or 0
 
-        uiobjs.InputInfor.value = joinStr("idx=", idx, ";",
-                "cityidx=", cityidx, ";",
-                "uuid=", uuid, ";\n",
-                "deviceinfor=", deiveceInfor, ";")
+        uiobjs.InputInfor.value =
+            joinStr("idx=", idx, ";", "cityidx=", cityidx, ";", "uuid=", uuid, ";\n", "deviceinfor=", deiveceInfor, ";")
     end
 
     -- 刷新
@@ -61,7 +67,7 @@ do
     end
 
     -- 网络请求的回调；cmd：指命，succ：成功失败，msg：消息；paras：服务器下行数据
-    function IDPDebugMgr.procNetwork (cmd, succ, msg, paras)
+    function IDPDebugMgr.procNetwork(cmd, succ, msg, paras)
         --[[
         if(succ == NetSuccess) then
           if(cmd == "xxx") then
@@ -86,6 +92,44 @@ do
         elseif goName == "ButtonApplyIP" then
             CLLNet.refreshBaseUrl(uiobjs.InputIP.value)
             CLAlert.add("success")
+        elseif goName == uiobjs.ToggleFog.name then
+            MyCfg.self.fogOfWar.enabled = uiobjs.ToggleFog.value
+        elseif goName == uiobjs.ToggleTiles.name then
+            if IDMainCity then
+                local tiles = IDMainCity.getTiles()
+                for k, v in pairs(tiles) do
+                    SetActive(v.gameObject, uiobjs.ToggleTiles.value)
+                end
+                if uiobjs.ToggleTiles.value then
+                    IDMainCity.gridTileSidePorc.show()
+                else
+                    IDMainCity.gridTileSidePorc.hide()
+                end
+            end
+        elseif goName == uiobjs.ToggleBuildings.name then
+            if IDMainCity then
+                local buildings = IDMainCity.getBuildings()
+                for k, v in pairs(buildings) do
+                    SetActive(v.gameObject, uiobjs.ToggleBuildings.value)
+                end
+            end
+        elseif goName == uiobjs.ToggleOcean.name then
+            if IDWorldMap and IDWorldMap.ocean then
+                SetActive(IDWorldMap.ocean.gameObject, uiobjs.ToggleOcean.value)
+            end
+        elseif goName == uiobjs.ToggleShadow.name then
+            SetActive(MyCfg.self.shadowRoot.gameObject, uiobjs.ToggleShadow.value)
+        elseif goName == uiobjs.TogglePostproc.name then
+            CameraMgr.self.maincamera:GetComponent("PostProcessLayer").enabled = uiobjs.TogglePostproc.value
+        elseif goName == uiobjs.ToggleUICamera.name then
+            MyCfg.self.uiCamera.enabled = (not uiobjs.ToggleUICamera.value)
+            csSelf:invoke4Lua(
+                function()
+                    MyCfg.self.uiCamera.enabled = true
+                    uiobjs.ToggleUICamera.value = false
+                end,
+                30
+            )
         end
     end
 

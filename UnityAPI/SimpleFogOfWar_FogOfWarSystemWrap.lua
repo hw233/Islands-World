@@ -53,5 +53,7 @@ function m:setRenderQueue(val) end
 function m:LateUpdate() end
 ---public Void ClearStampTexture()
 function m:ClearStampTexture() end
+---public Void SnapshotStampTexture()
+function m:SnapshotStampTexture() end
 SimpleFogOfWar.FogOfWarSystem = m
 return m

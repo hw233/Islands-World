@@ -41,13 +41,13 @@ function CLLPStart.setLuasAtBegainning()
         CLAssetsManager.self.timeOutSec4Realse = 60
     end
 
-    if ReporterMessageReceiver.self and ReporterMessageReceiver.self.gameObject then
-        if KKWhiteList.isWhiteName() then
-            ReporterMessageReceiver.self.gameObject:SetActive(true)
-        else
-            ReporterMessageReceiver.self.gameObject:SetActive(false)
-        end
-    end
+    -- if ReporterMessageReceiver.self and ReporterMessageReceiver.self.gameObject then
+    --     if KKWhiteList.isWhiteName() then
+    --         ReporterMessageReceiver.self.gameObject:SetActive(true)
+    --     else
+    --         ReporterMessageReceiver.self.gameObject:SetActive(false)
+    --     end
+    -- end
     CLPanelManager.self.mainPanelName = "PanelMain"
     -- 添加屏蔽字
     --MyMain.self:invoke4Lua(CLLPStart.addShieldWords, 1)

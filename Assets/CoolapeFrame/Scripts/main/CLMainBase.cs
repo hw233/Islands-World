@@ -253,5 +253,13 @@ namespace Coolape
                 call(f);
             }
         }
+
+        public void gc()
+        {
+            if(lua != null)
+            {
+                lua.GC();
+            }
+        }
     }
 }

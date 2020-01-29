@@ -27,6 +27,7 @@ public class FogOfWarEditor : Editor
 		EditorGUILayout.PropertyField(serializedObject.FindProperty("layer"), new GUIContent("Layer", "Layer to use"));
 		EditorGUILayout.PropertyField(serializedObject.FindProperty("renderQueue"), new GUIContent("Render Queue", "If == 0, use default value"));
 		EditorGUILayout.PropertyField(serializedObject.FindProperty("camera"), new GUIContent("Camera", "If null (default), the mesh will be drawn in all cameras. Otherwise it will be rendered in the given camera only"));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("snapShotInterval"), new GUIContent("SnapShot Interval", "(higher numbers = slower updates = more inaccurate queries, but decreasing performance impact)"));
 
         GUI.enabled = true;
         var frp = serializedObject.FindProperty("fogRenderer");
@@ -50,6 +51,8 @@ public class FogOfWarEditor : Editor
                 }
             }
         }
+
+        fow.fogRenderer = EditorGUILayout.ObjectField("fogRenderer", fow.fogRenderer, typeof(FOWRenderer)) as FOWRenderer;
         GUI.enabled = !Application.isPlaying;
         if (frp.objectReferenceValue != null)
         {

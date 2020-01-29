@@ -24,7 +24,6 @@ UnityEngine_ParticleSystem = UnityEngine.ParticleSystem
 UnityEngine_SkinnedMeshRenderer = UnityEngine.SkinnedMeshRenderer
 UnityEngine_MeshRenderer = UnityEngine.MeshRenderer
 UnityEngine_Renderer = UnityEngine.Renderer
-UnityEngine_WWW = UnityEngine.WWW
 System_Collections_Generic_List`1[[System_Int32, mscorlib, Version=4_0_0_0, Culture=neutral, PublicKeyToken=b77a5c561934e089]] = System.Collections.Generic.List`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]
 System_Action`1[[System_String, mscorlib, Version=4_0_0_0, Culture=neutral, PublicKeyToken=b77a5c561934e089]] = System.Action`1[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]
 UnityEngine_Debug = UnityEngine.Debug
@@ -140,3 +139,4 @@ UnityEngine_Rendering_PostProcessing_PostProcessLayer = UnityEngine.Rendering.Po
 UnityEngine_Rendering_PostProcessing_PostProcessVolume = UnityEngine.Rendering.PostProcessing.PostProcessVolume
 SimpleFogOfWar_FogOfWarSystem = SimpleFogOfWar.FogOfWarSystem
 SimpleFogOfWar_FogOfWarInfluence = SimpleFogOfWar.FogOfWarInfluence
+UnityEngine_Scripting_GarbageCollector = UnityEngine.Scripting.GarbageCollector

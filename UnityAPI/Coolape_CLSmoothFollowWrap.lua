@@ -2,6 +2,7 @@
 ---@field public target UnityEngine.Transform
 ---@field public distance System.Single
 ---@field public height System.Single
+---@field public moveDamping System.Single
 ---@field public heightDamping System.Single
 ---@field public rotationDamping System.Single
 ---@field public offset UnityEngine.Vector3

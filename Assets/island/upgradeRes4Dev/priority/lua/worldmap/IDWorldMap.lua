@@ -252,6 +252,8 @@ function IDWorldMap.setGameMode()
             end
             IDWorldMap.mode = GameModeSub.mapBtwncity
             IDMainCity.onChgMode(IDWorldMap.mode, GameModeSub.mapBtwncity)
+            Time.fixedDeltaTime = 0.08
+            MyCfg.self.fogOfWar.enabled = true
             IDWorldMap.grid:hideRect()
             dragSetting.viewRadius = 15000
             dragSetting.viewCenter = Vector3.zero
@@ -264,6 +266,8 @@ function IDWorldMap.setGameMode()
         if IDWorldMap.mode ~= GameModeSub.map and MyCfg.mode == GameMode.map then
             IDWorldMap.mode = GameModeSub.map
             IDMainCity.onChgMode(IDWorldMap.mode, GameModeSub.map)
+            Time.fixedDeltaTime = 0.08
+            MyCfg.self.fogOfWar.enabled = true
             IDWorldMap.refreshPagesData()
             IDWorldMap.grid:showRect()
             dragSetting.viewRadius = 15000
@@ -280,6 +284,8 @@ function IDWorldMap.setGameMode()
                 IDWorldMap.cleanPages()
             end
             IDWorldMap.mode = GameModeSub.city
+            Time.fixedDeltaTime = 0.04
+            MyCfg.self.fogOfWar.enabled = false -- 提升性
             IDMainCity.onChgMode(IDWorldMap.mode, GameModeSub.city)
             IDWorldMap.grid:hideRect()
             dragSetting.viewRadius = 65
@@ -395,7 +401,9 @@ function IDWorldMap.refreshPagesData()
 end
 
 function IDWorldMap.showFogwar()
+    ---@type SimpleFogOfWar.FogOfWarSystem
     local fogOfWar = MyCfg.self.fogOfWar
+    fogOfWar.VisibilitySnapshotInterval = 1 -- 值越大，对性能影响越小
     local worldsize = bio2number(DBCfg.getConstCfg().GridWorld)
     local citysize = bio2number(DBCfg.getConstCfg().GridCity)
     worldsize = (worldsize + 200) * cellSize

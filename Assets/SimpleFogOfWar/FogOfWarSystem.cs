@@ -40,8 +40,9 @@ namespace SimpleFogOfWar
 		public float edgeSoftness = 1f;
         [SerializeField, HideInInspector]
 		public Color color = Color.black;
-        [SerializeField, HideInInspector]
-		public FOWRenderer fogRenderer;
+        //[SerializeField, HideInInspector]
+        [SerializeField]
+        public FOWRenderer fogRenderer;
         Texture2D viewStamp;
         Material viewStampMat;
 
@@ -294,7 +295,7 @@ namespace SimpleFogOfWar
             SetColor(color);
         }
 
-        void SnapshotStampTexture()
+        public void SnapshotStampTexture()
         {
             var oldRT = RenderTexture.active;
             RenderTexture.active = stampTexture;

@@ -444,7 +444,11 @@ function doReleaseAllRes()
     CLPanelManager.hideAllPanel()
     local panel = CLPanelManager.getPanel(CLMainBase.self.firstPanel)
     CLPanelManager.showPanel(panel)
-    UIRichText4Chat.pool:clean()
+    pcall(
+        function()
+            UIRichText4Chat.pool:clean()
+        end
+    )
     if IDUtl then
         IDUtl.clean()
     end
@@ -468,7 +472,7 @@ function doSomethingBeforeRestart()
     if not ok then
         printe(result)
     end
-    Net.self.luaTable = nil
+    Net.self:clean()
 
     if IDLCameraMgr then
         IDLCameraMgr.clean()
@@ -496,7 +500,7 @@ function releaseRes4GC(releaseRes)
     end
     if not MyCfg.self.isUnityEditor then
         CS.UnityEngine.Scripting.GarbageCollector.GCMode = CS.UnityEngine.Scripting.GarbageCollector.Mode.Enabled
-        MyMain.self.lua:GC()
+        MyMain.self:gc()
         GC.Collect() -- 内存释放
         CS.UnityEngine.Scripting.GarbageCollector.GCMode = CS.UnityEngine.Scripting.GarbageCollector.Mode.Disabled
     end

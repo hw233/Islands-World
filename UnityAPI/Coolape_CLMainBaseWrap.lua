@@ -15,6 +15,9 @@ function m:gameInit() end
 function m:setLanguage(language) end
 ---public Void init()
 function m:init() end
+---public Void preLoadRes4Webgl(Object callback)
+---@param optional Object callback
+function m:preLoadRes4Webgl(callback) end
 ---public Void onGetStreamingAssets(Object[] para)
 ---@param optional Object[] para
 function m:onGetStreamingAssets(para) end
@@ -36,5 +39,7 @@ function m:Update() end
 function m:onOffline() end
 ---public Void doOffline()
 function m:doOffline() end
+---public Void gc()
+function m:gc() end
 Coolape.CLMainBase = m
 return m

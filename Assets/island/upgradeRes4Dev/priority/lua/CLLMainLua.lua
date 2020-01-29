@@ -44,6 +44,7 @@ do
     -- end
 
     --设置帧率
+    QualitySettings.vSyncCount = 0
     Application.targetFrameRate = 30
     --QualitySettings.SetQualityLevel (1, false)
     Time.fixedDeltaTime = 0.08
@@ -171,7 +172,8 @@ do
     function CLLMainLua.begain()
         -- 日志logveiw
         if ReporterMessageReceiver.self ~= nil then
-            ReporterMessageReceiver.self.luaPath = "KOK/upgradeRes/priority/lua/toolkit/KKLogListener.lua"
+            ReporterMessageReceiver.self.luaPath =
+                joinStr(CLPathCfg.self.basePath, "/upgradeRes/priority/lua/toolkit/CLLogListener.lua")
             ReporterMessageReceiver.self:setLua()
         end
 
