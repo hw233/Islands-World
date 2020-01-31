@@ -4,6 +4,14 @@ IDConst = {
     baseRes = number2bio(50000) -- 基础资源量
 }
 
+IDConst.PlayerState = {
+    normal = 1, -- 正常
+}
+IDConst.CityState = {
+    normal = 1, -- 正常
+    protect = 2, -- 免战保护
+}
+
 IDConst.BuildingID = {
     headquartersBuildingID = 1, --主基地
     dockyardBuildingID = 2, -- 造船厂
@@ -114,7 +122,8 @@ IDConst.FleetState = {
     moving = 2, -- 航行中
     docked = 3, -- 停泊在港口
     stay = 4, -- 停留在海面
-    fighting = 5 -- 正在战斗中
+    fightingFleet = 5, -- 正在战斗中
+    fightingIsland = 6 -- 正在战斗中
 }
 ---@public 舰队任务
 IDConst.FleetTask = {
@@ -129,7 +138,8 @@ IDConst.FleetStateName = {
     [2] = "FleetStatemoving", -- 航行中
     [3] = "FleetStateDocked", -- 停泊在港口
     [4] = "FleetStateStay", -- 停留在海面
-    [5] = "FleetStateFighting" -- 正在战斗中
+    [5] = "FleetStateFighting", -- 正在战斗中
+    [6] = "FleetStateFighting" -- 正在战斗中
 }
 ---@public 舰队任务
 IDConst.FleetTaskName = {

@@ -62,31 +62,14 @@ function IDPBattlePrepare.startBattle(data)
     ---@type IDDBCity
 	local city = IDDBCity.new(data.city)
 	local cellIndex = bio2number(city.pos)
+    city:setAllUnits2Buildings(data.dockyardShipss)
 
-    city:setAllDockyardShips(data.dockyardShipss)
-    ---进攻方舰船数据
-    local atkShips = data.dockyardShipss2
-    local offShips = {}
-    local _offShips = {}
-    -- ---@param v NetProtoIsland.ST_dockyardShips
-    -- for k, v in pairs(atkShips) do
-    --     ---@param unit NetProtoIsland.ST_unitInfor
-    --     for i, unit in pairs(v.ships or {}) do
-    --         if bio2number(unit.num) > 0 then
-    --             _offShips[bio2number(unit.id)] = (_offShips[bio2number(unit.id)] or 0) + bio2number(unit.num)
-    --         end
-    --     end
-    -- end
-    -- for k, v in pairs(_offShips) do
-    --     -- 转成bio存储，避免被修改
-    --     offShips[k] = {id = k, num = number2bio(v)}
-	-- end
-
-    ---@type BattleData
+    ---@type _ParamBattleData
     local battleData = {}
     battleData.type = IDConst.BattleType.pvp
+    battleData.attackPlayer = data.player2
+    battleData.targetPlayer = player
     battleData.targetCity = city
-	-- battleData.offShips = offShips
 	battleData.fleet = data.fleetinfor
 	hideTopPanel(csSelf)
     IDUtl.chgScene(

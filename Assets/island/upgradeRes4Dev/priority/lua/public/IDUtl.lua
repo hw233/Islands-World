@@ -442,6 +442,15 @@ function IDUtl.chgScene(mode, data, callback)
     getPanelAsy("PanelSceneManager", onLoadedPanel, params)
 end
 
+---@public 切换玩家账号
+function IDUtl.onSwitchPlayer()
+    if IDMainCity then
+        IDMainCity.grid:clean()
+        IDMainCity.astar4Ocean.isIninted = false
+        IDMainCity.astar4Tile.isIninted = false
+    end
+end
+
 function IDUtl.clean()
     if IDUtl.popupMenu then
         CLUIOtherObjPool.returnObj(IDUtl.popupMenu.gameObject)

@@ -145,7 +145,7 @@ end
 
 function IDRShip:doLandingSoldier(param)
     local i, max = param.i, param.max
-    ---@type WrapBattleUnitData
+    ---@type _ParamBattleUnitData
     local data = {}
     data.id = 3
     data.lev = number2bio(1) -- //TODO:根据科技来得到等级

@@ -4,7 +4,7 @@
 IDDBPlayer = class("IDDBPlayer")
 ---@type IDDBPlayer
 IDDBPlayer.myself = nil
-
+---@param d NetProtoIsland.ST_player
 function IDDBPlayer:ctor(d)
     self._data = d
     self.idx = d.idx  --  唯一标识 int
@@ -14,6 +14,8 @@ function IDDBPlayer:ctor(d)
     self.cityidx = d.cityidx --  城池id int int
     self.unionidx = d.unionidx --  联盟id int int
     self.lev = d.lev --  int
+    self.attacking = d.attacking
+    self.beingattacked = d.beingattacked
 end
 
 function IDDBPlayer:toMap()

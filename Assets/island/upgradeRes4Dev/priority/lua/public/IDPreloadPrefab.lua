@@ -28,7 +28,7 @@ function IDPreloadPrefab.preloadRoles(roles, callback, progressCB)
     IDPreloadPrefab.onFinishCallback = callback
     IDPreloadPrefab.onProgressCB = progressCB
     for k, v in pairs(roles) do
-        local id = (v.id) or k
+        local id = (v.id) and bio2number(v.id) or k
         IDPreloadPrefab.extractRole(id)
     end
     IDPreloadPrefab.startPreload()

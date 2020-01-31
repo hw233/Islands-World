@@ -674,7 +674,12 @@ IDWorldMap.popupEvent = {
                 )
             )
         else
-            getPanelAsy("PanelFleets", onLoadedPanelTT, {toPos = cellIndex})
+            ---@type _ParamIDPFleets
+            local d = {}
+            d.toPos = cellIndex
+            d.fleetTask = IDConst.FleetTask.attack
+            d.isAttackIsland = true
+            getPanelAsy("PanelFleets", onLoadedPanelTT, d)
         end
     end,
     ---@public 搬迁
@@ -692,12 +697,20 @@ IDWorldMap.popupEvent = {
                 CLLNet.send(NetProtoIsland.send.fleetDepart(bio2number(IDWorldMap.selectedFleet.data.idx), cellIndex))
             end
         else
-            getPanelAsy("PanelFleets", onLoadedPanelTT, {toPos = cellIndex})
+            ---@type _ParamIDPFleets
+            local d = {}
+            d.toPos = cellIndex
+            d.fleetTask = IDConst.FleetTask.voyage
+            getPanelAsy("PanelFleets", onLoadedPanelTT, d)
         end
     end,
     ---@public 移动到
     moveTo = function(cellIndex)
-        getPanelAsy("PanelFleets", onLoadedPanelTT, {toPos = cellIndex})
+        ---@type _ParamIDPFleets
+        local d = {}
+        d.toPos = cellIndex
+        d.fleetTask = IDConst.FleetTask.voyage
+        getPanelAsy("PanelFleets", onLoadedPanelTT, d)
     end
 }
 
@@ -713,53 +726,6 @@ function IDWorldMap.doMoveCity(cellIndex, retData)
         csSelf:invoke4Lua(IDWorldMap.recheckCellsVisible, 0.5)
     end
 end
-
---[[
----@public 战斗服务器接口回调
----@param retData NetProtoIsland.RC_attack
-function IDWorldMap.doAttack(cellIndex, retData)
-    hideHotWheel()
-    local code = BioUtl.bio2int(retData.retInfor.code)
-    if code == NetSuccess then
-        ---@type IDDBPlayer
-        local player = IDDBPlayer.new(retData.player)
-        ---@type IDDBCity
-        local city = IDDBCity.new(retData.city)
-        city:setAllDockyardShips(retData.dockyardShipss)
-        ---进攻方舰船数据
-        local atkShips = retData.dockyardShipss2
-        local offShips = {}
-        local _offShips = {}
-        ---@param v NetProtoIsland.ST_dockyardShips
-        for k, v in pairs(atkShips) do
-            ---@param unit NetProtoIsland.ST_unitInfor
-            for i, unit in pairs(v.ships or {}) do
-                if bio2number(unit.num) > 0 then
-                    _offShips[bio2number(unit.id)] = (_offShips[bio2number(unit.id)] or 0) + bio2number(unit.num)
-                end
-            end
-        end
-        for k, v in pairs(_offShips) do
-            -- 转成bio存储，避免被修改
-            offShips[k] = {id = k, num = number2bio(v)}
-        end
-
-        ---@type BattleData
-        local battleData = {}
-        battleData.type = IDConst.BattleType.pvp
-        battleData.targetCity = city
-        battleData.offShips = offShips
-
-        IDUtl.chgScene(
-            GameMode.battle,
-            battleData,
-            function()
-                IDWorldMap.popupEvent.enterCity(cellIndex)
-            end
-        )
-    end
-end
-]]
 
 ---@public 当地图块有变化时的推送
 function IDWorldMap.onMapCellChg(mapCell, isRemove)

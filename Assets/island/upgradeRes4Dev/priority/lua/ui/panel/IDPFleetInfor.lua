@@ -2,6 +2,8 @@
 ---@field public parent IDPFleets
 ---@field public fleetidx number 舰队idx
 ---@field public toPos number 目标坐标
+---@field public fleetTask IDConst.FleetTask 任务类型
+---@field public isAttackIsland boolean 是否功能岛屿
 
 ---@class IDPFleetInfor
 local IDPFleetInfor = {}
@@ -31,6 +33,7 @@ function IDPFleetInfor.init(csObj)
     uiobjs.buttons = getCC(transform, "buttons", "UIGrid")
     uiobjs.ButtonSaveLb = getCC(uiobjs.buttons.transform, "ButtonSave/Label", "UILabel")
     uiobjs.ButtonDepart = getChild(uiobjs.buttons.transform, "ButtonDepart").gameObject
+    uiobjs.ButtonDepartLb = getCC(uiobjs.buttons.transform, "ButtonDepart/Label", "UILabel")
     uiobjs.ButtonGoto = getChild(uiobjs.buttons.transform, "ButtonGoto").gameObject
     uiobjs.ButtonBack = getChild(uiobjs.buttons.transform, "ButtonBack").gameObject
 end
@@ -62,6 +65,11 @@ function IDPFleetInfor.refresh()
     if mData.toPos and mData.toPos >= 0 then
         -- 说明是需要出征的操作
         if fleetInfor then
+            if mData.fleetTask == IDConst.FleetTask.attack then
+                uiobjs.ButtonDepartLb.text = LGet("Attack")
+            else
+                uiobjs.ButtonDepartLb.text = LGet("MoveTo")
+            end
             SetActive(uiobjs.ButtonDepart, true)
         else
             SetActive(uiobjs.ButtonDepart, false)
@@ -115,7 +123,7 @@ function IDPFleetInfor.wrapShipList()
         fleetsMap[bio2number(v.id)] = v
     end
 
-    local cityShipMap = IDDBCity.curCity:getAllShips()
+    local cityShipMap = IDDBCity.curCity:getAllDockyardShips()
     local list = DBCfg.getListByGID(DBCfg.CfgPath.Role, IDConst.RoleGID.ship)
     ---@param v DBCFRoleData
     for i, v in ipairs(list) do
@@ -188,6 +196,15 @@ function IDPFleetInfor.wrapSetedFleetsData()
     return ret
 end
 
+function IDPFleetInfor.onDepartCallback(orgs, result)
+    hideHotWheel()
+    local p = mData.parent.csSelf
+    if p then
+        hideTopPanel(p)
+    end
+    --//TODO:
+end
+
 -- 处理ui上的事件，例如点击等
 function IDPFleetInfor.uiEventDelegate(go)
     local goName = go.name
@@ -228,21 +245,29 @@ function IDPFleetInfor.uiEventDelegate(go)
             return
         end
         showHotWheel()
-        CLLNet.send(
-            NetProtoIsland.send.fleetDepart(
-                bio2number(fleetInfor.idx),
-                mData.toPos,
-                ---@param result NetProtoIsland.RC_fleetDepart
-                function(orgs, result)
-                    hideHotWheel()
-                    local p = CLPanelManager.getPanel("PanelFleets")
-                    if p then
-                        hideTopPanel(p)
-                    end
-                    --//TODO:
-                end
+        if mData.fleetTask == IDConst.FleetTask.attack then
+            if mData.isAttackIsland then
+                CLLNet.send(
+                    NetProtoIsland.send.fleetAttackIsland(
+                        bio2number(fleetInfor.idx),
+                        mData.toPos,
+                        IDPFleetInfor.onDepartCallback
+                    )
+                )
+            else
+                CLLNet.send(
+                    NetProtoIsland.send.fleetAttackFleet(
+                        bio2number(fleetInfor.idx),
+                        mData.toPos,
+                        IDPFleetInfor.onDepartCallback
+                    )
+                )
+            end
+        else
+            CLLNet.send(
+                NetProtoIsland.send.fleetDepart(bio2number(fleetInfor.idx), mData.toPos, IDPFleetInfor.onDepartCallback)
             )
-        )
+        end
     elseif goName == "ButtonGoto" then
         hideTopPanel(mData.parent.csSelf)
         IDWorldMap.gotoFleet(bio2number(fleetInfor.idx))

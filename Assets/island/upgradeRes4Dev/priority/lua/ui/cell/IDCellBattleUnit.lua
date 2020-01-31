@@ -2,7 +2,7 @@
 local _cell = {}
 local csSelf = nil
 local transform = nil
----@type WrapBattleUnitData
+---@type _ParamBattleUnitData
 local mData = nil
 local uiobjs = {}
 

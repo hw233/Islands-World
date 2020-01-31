@@ -1,5 +1,7 @@
 ﻿---@class _ParamIDPFleets 调用参数
----@field toPos number 目标位置 如果不传时，则认为是查看舰队信息，否则认为是出征
+---@field public toPos number 目标位置 如果不传时，则认为是查看舰队信息，否则认为是出征
+---@field public fleetTask IDConst.FleetTask 任务类型
+---@field public isAttackIsland boolean 是否功能岛屿
 
 ---@class IDPFleets 舰队界面
 local IDPFleets = {}
@@ -79,6 +81,8 @@ function IDPFleets.onClickFleet(cell)
     data.parent = IDPFleets
     data.fleetidx = bio2number(d.idx)
     data.toPos = mData.toPos
+    data.fleetTask = mData.fleetTask
+    data.isAttackIsland = mData.isAttackIsland
     uiobjs.fleetsInfor.show(nil, data)
 end
 

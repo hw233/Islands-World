@@ -61,10 +61,7 @@ end
 ---@public 包装舰船列表数据
 function IDPBuildShip:wrapShipList()
     local shipList = DBCfg.getRolesByGID(IDConst.RoleGID.ship)
-    local dockyardShips = IDDBCity.curCity:getShipsByDockyardId(bio2number(dockyardServerData.idx))
-    --if dockyardShips == nil then
-    --    CLLNet.send(NetProtoIsland.send.getShipsByBuildingIdx(bio2number(dockyardServerData.idx)))
-    --end
+    local dockyardShips = IDDBCity.curCity:getShipsByBIdx(bio2number(dockyardServerData.idx))
     dockyardShips = dockyardShips or {}
     local dockyardLev = bio2number(dockyardServerData.lev)
     local list = {}

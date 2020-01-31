@@ -124,7 +124,7 @@ public class CLGrid : UIEventListener
             for (int i = 0; i < lineList4Rect.Count; i++)
             {
                 CLThingsPool.returnObj(((LineRenderer)(lineList4Rect[i])).gameObject);
-                NGUITools.SetActive(((LineRenderer)(lineList4Rect[i])).gameObject, true);
+                NGUITools.SetActive(((LineRenderer)(lineList4Rect[i])).gameObject, false);
             }
             //return;
             lineList4Rect.Clear();

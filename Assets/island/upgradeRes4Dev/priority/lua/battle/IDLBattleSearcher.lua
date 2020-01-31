@@ -176,6 +176,9 @@ end
 function IDLBattleSearcher.refreshUnit(unit)
     --//注意所有移动的战斗单元需要定时刷新
     local index = grid.grid:GetCellIndex(unit.transform.position)
+    if index < 0 then
+        -- 说明投放在网格区域外
+    end
     if unit.isOffense then
         local oldIndex = rolesIndex[unit]
         if oldIndex and oldIndex ~= index then

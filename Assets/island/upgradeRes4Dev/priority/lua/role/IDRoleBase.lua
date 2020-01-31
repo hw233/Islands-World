@@ -33,7 +33,7 @@ IDRoleBase = class("IDRoleBase", IDLUnitBase)
 function IDRoleBase:ctor(csSelf)
     IDRoleBase.super.ctor(self, csSelf)
 
-    ---@type WrapBattleUnitData
+    ---@type _ParamBattleUnitData
     self.serverData = nil -- 服务器数据
     ---@type DBCFRoleData
     self.attr = nil -- 属性

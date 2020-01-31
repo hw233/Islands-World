@@ -27,51 +27,67 @@ function _cell.show(go, data)
         local node = IDMainCity.grid.nodesMap[index]
 
         if
-            IDMainCity.isCannotDeploySide(node.up.index) and IDMainCity.isCannotDeploySide(node.left.index) and
-                IDMainCity.isCannotDeploySide(node.right.index)
+            (node.up == nil or IDMainCity.isCannotDeploySide(node.up.index)) and
+                (node.left == nil or IDMainCity.isCannotDeploySide(node.left.index)) and
+                (node.right == nil or IDMainCity.isCannotDeploySide(node.right.index))
          then
             uiobjs.sprite.spriteName = "shadow_tileLine3"
             uiobjs.sprite.transform.localEulerAngles = Vector3.zero
         elseif
-            IDMainCity.isCannotDeploySide(node.down.index) and IDMainCity.isCannotDeploySide(node.left.index) and
-                IDMainCity.isCannotDeploySide(node.right.index)
+            (node.down == nil or IDMainCity.isCannotDeploySide(node.down.index)) and
+                (node.left == nil or IDMainCity.isCannotDeploySide(node.left.index)) and
+                (node.right == nil or IDMainCity.isCannotDeploySide(node.right.index))
          then
             uiobjs.sprite.spriteName = "shadow_tileLine3"
             uiobjs.sprite.transform.localEulerAngles = Vector3(0, 0, 180)
         elseif
-            IDMainCity.isCannotDeploySide(node.left.index) and IDMainCity.isCannotDeploySide(node.up.index) and
-                IDMainCity.isCannotDeploySide(node.down.index)
+            (node.left == nil or IDMainCity.isCannotDeploySide(node.left.index)) and
+                (node.up == nil or IDMainCity.isCannotDeploySide(node.up.index)) and
+                (node.down == nil or IDMainCity.isCannotDeploySide(node.down.index))
          then
             uiobjs.sprite.spriteName = "shadow_tileLine3"
             uiobjs.sprite.transform.localEulerAngles = Vector3(0, 0, 90)
         elseif
-            IDMainCity.isCannotDeploySide(node.right.index) and IDMainCity.isCannotDeploySide(node.up.index) and
-                IDMainCity.isCannotDeploySide(node.down.index)
+            (node.right == nil or IDMainCity.isCannotDeploySide(node.right.index)) and
+                (node.up == nil or IDMainCity.isCannotDeploySide(node.up.index)) and
+                (node.down == nil or IDMainCity.isCannotDeploySide(node.down.index))
          then
             uiobjs.sprite.spriteName = "shadow_tileLine3"
             uiobjs.sprite.transform.localEulerAngles = Vector3(0, 0, 270)
-        elseif IDMainCity.isCannotDeploySide(node.up.index) and IDMainCity.isCannotDeploySide(node.left.index) then
+        elseif
+            (node.up == nil or IDMainCity.isCannotDeploySide(node.up.index)) and
+                (node.left == nil or IDMainCity.isCannotDeploySide(node.left.index))
+         then
             uiobjs.sprite.spriteName = "shadow_tileLine2"
             uiobjs.sprite.transform.localEulerAngles = Vector3.zero
-        elseif IDMainCity.isCannotDeploySide(node.up.index) and IDMainCity.isCannotDeploySide(node.right.index) then
+        elseif
+            (node.up == nil or IDMainCity.isCannotDeploySide(node.up.index)) and
+                (node.right == nil or IDMainCity.isCannotDeploySide(node.right.index))
+         then
             uiobjs.sprite.spriteName = "shadow_tileLine2"
             uiobjs.sprite.transform.localEulerAngles = Vector3(0, 0, 270)
-        elseif IDMainCity.isCannotDeploySide(node.down.index) and IDMainCity.isCannotDeploySide(node.left.index) then
+        elseif
+            (node.down == nil or IDMainCity.isCannotDeploySide(node.down.index)) and
+                (node.left == nil or IDMainCity.isCannotDeploySide(node.left.index))
+         then
             uiobjs.sprite.spriteName = "shadow_tileLine2"
             uiobjs.sprite.transform.localEulerAngles = Vector3(0, 0, 90)
-        elseif IDMainCity.isCannotDeploySide(node.down.index) and IDMainCity.isCannotDeploySide(node.right.index) then
+        elseif
+            (node.down == nil or IDMainCity.isCannotDeploySide(node.down.index)) and
+                (node.right == nil or IDMainCity.isCannotDeploySide(node.right.index))
+         then
             uiobjs.sprite.spriteName = "shadow_tileLine2"
             uiobjs.sprite.transform.localEulerAngles = Vector3(0, 0, 180)
-        elseif IDMainCity.isCannotDeploySide(node.up.index) then
+        elseif (node.up == nil or IDMainCity.isCannotDeploySide(node.up.index)) then
             uiobjs.sprite.spriteName = "shadow_tileLine"
             uiobjs.sprite.transform.localEulerAngles = Vector3.zero
-        elseif IDMainCity.isCannotDeploySide(node.down.index) then
+        elseif (node.down == nil or IDMainCity.isCannotDeploySide(node.down.index)) then
             uiobjs.sprite.spriteName = "shadow_tileLine"
             uiobjs.sprite.transform.localEulerAngles = Vector3(0, 0, 180)
-        elseif IDMainCity.isCannotDeploySide(node.left.index) then
+        elseif (node.left == nil or IDMainCity.isCannotDeploySide(node.left.index)) then
             uiobjs.sprite.spriteName = "shadow_tileLine"
             uiobjs.sprite.transform.localEulerAngles = Vector3(0, 0, 90)
-        elseif IDMainCity.isCannotDeploySide(node.right.index) then
+        elseif (node.right == nil or IDMainCity.isCannotDeploySide(node.right.index)) then
             uiobjs.sprite.spriteName = "shadow_tileLine"
             uiobjs.sprite.transform.localEulerAngles = Vector3(0, 0, 270)
         else

@@ -46,7 +46,7 @@ function IDLBuildingDockyard:showShipsInPort()
     if self.serverData == nil or MyCfg.mode == GameMode.battle then
         return
     end
-    local shipsMap = IDDBCity.curCity:getShipsByDockyardId(bio2number(self.serverData.idx))
+    local shipsMap = IDDBCity.curCity:getShipsByBIdx(bio2number(self.serverData.idx))
     if shipsMap then
         for k, v in pairs(shipsMap) do
             if self.shipsInPorts[k] == nil then
@@ -93,7 +93,7 @@ function IDLBuildingDockyard:showShipsInOcean()
         return
     end
     -- 取得一个舰船id及数量
-    local ships = IDDBCity.curCity:getShipsByDockyardId(bio2number(self.serverData.idx))
+    local ships = IDDBCity.curCity:getShipsByBIdx(bio2number(self.serverData.idx))
     if ships then
         local num = 0
         ---@param unit NetProtoIsland.ST_unitInfor

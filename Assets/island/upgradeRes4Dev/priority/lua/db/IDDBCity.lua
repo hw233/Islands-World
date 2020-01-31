@@ -35,8 +35,9 @@ function IDDBCity:setBaseData(d)
     self.lev = d.lev -- 等级 int int
     self.pos = d.pos -- 城所在世界grid的index int int
     self.pidx = d.pidx -- 玩家idx int int
-    self.dockyardShips = {} --造船厂里的已经有的舰船数据
+    self.buildingWithUnits = {} --舰船里的已经有的战斗单元（舰船、宠物）数据
     self.tiles = d.tiles
+    self.protectEndTime = d.protectEndTime
 end
 
 ---@public 初始化造船厂数据
@@ -51,10 +52,10 @@ function IDDBCity:initDockyardShips()
 end
 
 ---@public 设置所有造船厂的舰船数据
-function IDDBCity:setAllDockyardShips(list)
+function IDDBCity:setAllUnits2Buildings(list)
     ---@param v NetProtoIsland.ST_dockyardShips
     for i, v in ipairs(list) do
-        self:onGetShips4Dockyard(v)
+        self:onGetUnits4Building(v)
     end
 end
 
@@ -156,21 +157,25 @@ end
 
 ---@public 取得造船厂的航船数据
 ---@param idx number 造船厂的idx
-function IDDBCity:getShipsByDockyardId(idx)
-    return self.dockyardShips[idx]
+function IDDBCity:getShipsByBIdx(idx)
+    return self.buildingWithUnits[idx]
 end
 
 ---@public 取得所有的舰船数据
 ---@return table key:id, val:num
-function IDDBCity:getAllShips()
+function IDDBCity:getAllDockyardShips()
     local shipMap = {}
-    for bidx, map in pairs(self.dockyardShips) do
-        ---@param unit NetProtoIsland.ST_unitInfor
-        for id, unit in pairs(map) do
-            if shipMap[id] then
-                shipMap[id] = bio2number(unit.num) + shipMap[id]
-            else
-                shipMap[id] = bio2number(unit.num)
+    for bidx, map in pairs(self.buildingWithUnits) do
+        ---@type NetProtoIsland.ST_building
+        local b = self.buildings[bidx]
+        if bio2number(b.attrid) == IDConst.BuildingID.dockyardBuildingID then
+            ---@param unit NetProtoIsland.ST_unitInfor
+            for id, unit in pairs(map) do
+                if shipMap[id] then
+                    shipMap[id] = bio2number(unit.num) + shipMap[id]
+                else
+                    shipMap[id] = bio2number(unit.num)
+                end
             end
         end
     end
@@ -188,7 +193,7 @@ function IDDBCity:getDockyardUsedSpace(idx)
     end
 
     --已经造好的
-    local shipsMap = self:getShipsByDockyardId(idx)
+    local shipsMap = self:getShipsByBIdx(idx)
     local ret = 0
     local attr
     if shipsMap then
@@ -211,14 +216,14 @@ end
 
 ---@public 当取得造船厂的舰船数据
 ---@param data NetProtoIsland.ST_dockyardShips
-function IDDBCity:onGetShips4Dockyard(data)
+function IDDBCity:onGetUnits4Building(data)
     local bidx = bio2number(data.buildingIdx)
     local shipsMap = {}
     ---@param v NetProtoIsland.ST_unitInfor
     for i, v in ipairs(data.ships or {}) do
         shipsMap[bio2number(v.id)] = v
     end
-    self.dockyardShips[bidx] = shipsMap
+    self.buildingWithUnits[bidx] = shipsMap
 end
 
 ---@public 当主城变化时

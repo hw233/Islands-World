@@ -185,7 +185,13 @@ function CLLPStart.procNetwork(cmd, succ, msg, pars)
             --if not rt then
             --    printe(err)
             --end
-            CLLPStart.doEnterGame()
+
+            if IDDBPlayer.myself.beingattacked then
+                -- //TODO: 如果你正在被其它玩家攻击，我就不能进入
+                CLAlert.add("你正在被其它玩家攻击，暂时不能进入!", Color.yellow, 10)
+            else
+                CLLPStart.doEnterGame()
+            end
         end
     else
         -- 接口返回不成功

@@ -22,6 +22,13 @@
 -- //           游戏大卖       公司腾飞
 -- //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 --]]
+---@class _ParamBattleData 战场数据
+---@field public type IDConst.BattleType 类型
+---@field public attackPlayer IDDBPlayer 进攻方玩家信息
+---@field public targetPlayer IDDBPlayer 被攻击方玩家信息
+---@field public targetCity IDDBCity 被攻击方主城信息(舰船数据已经在city结构里)
+---@field public fleet NetProtoIsland.ST_fleetinfor 进攻舰队数据
+
 ---@class IDLBattle  战斗逻辑
 IDLBattle = {}
 ---@type IDPreloadPrefab
@@ -30,13 +37,10 @@ local IDPreloadPrefab = require("public.IDPreloadPrefab")
 local IDLBattleSearcher = require("battle.IDLBattleSearcher")
 ---@type IDLBattleSearcher
 IDLBattle.searcher = IDLBattleSearcher
----@class BattleData 战场数据
----@field type IDConst.BattleType
----@field targetCity IDDBCity 目标城
----@field offShips table key:舰船id; value:{id=舰船id，num=数量(注意bio)}
----@field fleet NetProtoIsland.ST_fleetinfor 进攻舰队数据
 
----@type WrapBattleUnitData
+local lookAtTarget = MyCfg.self.lookAtTarget
+
+---@type _ParamBattleUnitData
 IDLBattle.currSelectedUnit = nil
 ---@type Coolape.CLBaseLua
 local csSelf = nil
@@ -46,7 +50,7 @@ local transform = nil
 local city = nil -- 城池对象
 ---@type CLGrid
 local grid
----@type BattleData
+---@type _ParamBattleData
 IDLBattle.mData = nil -- 战斗方数据
 IDLBattle.isFirstDeployRole = true
 -- 一次部署的数量
@@ -78,7 +82,7 @@ function IDLBattle._init()
 end
 
 ---@public 初始化
----@param data BattleData 进攻方数据
+---@param data _ParamBattleData 进攻方数据
 ---@param callback 回调
 ---@param progressCB 进度回调
 function IDLBattle.init(data, callback, progressCB)
@@ -87,16 +91,20 @@ function IDLBattle.init(data, callback, progressCB)
     -- 先暂停资源释放
     CLAssetsManager.self:pause()
     IDWorldMap.addFinishEnterCityCallback(IDLBattle.onEnterCity)
+    
+    lookAtTarget.position = IDWorldMap.grid.grid:GetCellCenter(bio2number(data.targetCity.pos))
     -- 加载城
     IDMainCity.init(
         IDLBattle.mData.targetCity,
         function()
             city = IDMainCity
             grid = city.grid
+            
             -- 预加载进攻方兵种
             IDLBattle.prepareSoliders(IDLBattle.mData.fleet.units, callback, progressCB)
         end,
-        progressCB
+        progressCB,
+        true
     )
 end
 
@@ -104,6 +112,8 @@ function IDLBattle.onEnterCity()
     -- 初始化寻敌器
     IDLBattleSearcher.init(city)
     IDMainCity.showDeployRange()
+    city.grid:showRect()
+    CameraMgr.self.subcamera.enabled = true
     -- 不要雾
     MyCfg.self.fogOfWar.enabled = false
 end
@@ -121,8 +131,20 @@ end
 ---@public 点击了海面
 function IDLBattle.onClickOcean()
     local clickPos = MyMainCamera.lastHit.point
+    local index = grid.grid:GetCellIndex(clickPos)
+    if index < 0 then
+        CLAlert.add(LGet("MsgDeployUnitInRange"), Color.yellow, 1)
+        -- city.grid:showRect()
+        -- csSelf:invoke4Lua(IDLBattle.hideCityRange, 3)
+        return
+    end
     IDLBattle.deployBattleUnit()
 end
+
+-- function IDLBattle.hideCityRange()
+    -- city.grid:hideRect()
+-- end
+
 ---@public 通知战场，玩家点击了我
 function IDLBattle.onClickSomeObj(obj, pos)
     if IDLBattle.isDebug and obj.isBuilding then
@@ -189,7 +211,7 @@ function IDLBattle.deployBattleUnit()
 end
 
 ---@public 部署舰船
----@param shipData WrapBattleUnitData
+---@param shipData _ParamBattleUnitData
 ---@param pos UnityEngine.Vector3
 function IDLBattle.DeployRole(shipData, pos, isOffense, needDeployNum)
     CLEffect.play("EffectDeploy", pos)
@@ -289,7 +311,8 @@ function IDLBattle.needEndBattle()
         return true
     end
     --//TODO:进攻方是否已经没有可以投放的单元(目前只处理了舰船，后续还有宠物和技能)
-    for k, v in pairs(IDLBattle.mData.offShips) do
+    ---@param v NetProtoIsland.ST_unitInfor
+    for k, v in pairs(IDLBattle.mData.fleet.units) do
         if bio2Int(v.num) > 0 then
             return false
         end
@@ -363,6 +386,7 @@ function IDLBattle.endBattle()
 end
 
 function IDLBattle.clean()
+    CameraMgr.self.subcamera.enabled = false
     -- 雾
     MyCfg.self.fogOfWar.enabled = true
     IDLBattle.isFirstDeployRole = true
@@ -398,7 +422,8 @@ function IDLBattle.clean()
 
     if IDLBattle.mData then
         IDLBattle.mData.targetCity = nil
-        IDLBattle.mData.offShips = nil
+        IDLBattle.mData.targetPlayer = nil
+        IDLBattle.mData.attackPlayer = nil
         IDLBattle.mData = nil
     end
 end

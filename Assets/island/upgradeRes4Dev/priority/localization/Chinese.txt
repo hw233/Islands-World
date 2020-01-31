@@ -219,3 +219,5 @@ FleetTaskVoyage=出征中
 FleetTaskBack=返航
 FleetTaskAttack=攻击
 MsgFleetIsNil=舰队未找到(数据错误)!
+MsgDeployUnitInRange=请在黄色区域内投放战斗！
+MsgSomebodyAttackYou=玩家[%s]的舰队正在攻击您的岛屿！

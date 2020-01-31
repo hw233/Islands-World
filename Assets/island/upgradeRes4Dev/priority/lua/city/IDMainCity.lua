@@ -187,7 +187,9 @@ local function _init()
     }
 end
 
-function IDMainCity.init(cityData, onFinishCallback, onProgress)
+---@param cityData IDDBCity
+---@param isForceInitAStar boolean 是否强制初始化A星
+function IDMainCity.init(cityData, onFinishCallback, onProgress, isForceInitAStar)
     _init()
 
     -- 先把主城的缩放还原，保证加载时的各种设置正确
@@ -213,7 +215,9 @@ function IDMainCity.init(cityData, onFinishCallback, onProgress)
     -- 屏幕拖动代理
     --drag4World.onDragMoveDelegate = IDMainCity.onDragMove
     --drag4World.onDragScaleDelegate = IDMainCity.onScaleGround
-
+    if isForceInitAStar then
+        IDMainCity.grid:clean()
+    end
     local size = bio2number(DBCfg.getConstCfg().GridCity)
     IDMainCity.grid.numRows = size
     IDMainCity.grid.numCols = size
@@ -223,18 +227,24 @@ function IDMainCity.init(cityData, onFinishCallback, onProgress)
     IDMainCity.grid.transform.localPosition = Vector3(-size / 2, 0, -size / 2)
     IDMainCity.grid.showGrid = false
     IDMainCity.grid.showGridRange = true
-    -- IDMainCity.grid:showRect()
+    if MyCfg.mode == GameMode.battle then
+        IDMainCity.grid.color4Rect = Color.yellow
+        -- IDMainCity.grid:showRect()
+    else
+        IDMainCity.grid.color4Rect = Color.red
+        IDMainCity.grid:hideRect()
+    end
     IDMainCity.grid:init(isInitGridNodes)
     isInitGridNodes = false
 
-    if not IDMainCity.astar4Ocean.isIninted then
+    if isForceInitAStar or (not IDMainCity.astar4Ocean.isIninted) then
         IDMainCity.astar4Ocean.numRows = size -- size * 2
         IDMainCity.astar4Ocean.numCols = size -- size * 2
         IDMainCity.astar4Ocean.cellSize = 1 -- 0.5
         IDMainCity.astar4Ocean.transform.localPosition = Vector3(-size / 2, 0, -size / 2)
         IDMainCity.astar4Ocean:init()
     end
-    if not IDMainCity.astar4Tile.isIninted then
+    if isForceInitAStar or (not IDMainCity.astar4Tile.isIninted) then
         IDMainCity.astar4Tile.numRows = size -- size * 2
         IDMainCity.astar4Tile.numCols = size -- size * 2
         IDMainCity.astar4Tile.cellSize = 1 -- 0.5
@@ -730,7 +740,7 @@ function IDMainCity.clean()
         SetActive(seabed, false)
         seabed = nil
     end
-
+    IDMainCity.grid:hideRect()
     IDLGridTileSide.clean()
 
     gridState4Building = {}

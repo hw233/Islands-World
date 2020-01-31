@@ -172,11 +172,18 @@ CLLNet.receiveCMDFunc = {
         ---@type NetProtoIsland.ST_player
         local player = data.player
         local p = IDDBPlayer.new(player)
+
+        -- 切换账号时的情况
+        if IDDBPlayer.myself and bio2number(IDDBPlayer.myself.idx) ~= bio2number(p.idx) then
+            IDUtl.onSwitchPlayer()
+        end
+
         IDDBPlayer.myself = p
         ---@type NetProtoIsland.ST_city
         local city = data.city
         local curCity = IDDBCity.new(city)
         curCity:initDockyardShips()
+
         IDDBCity.curCity = curCity
         -- 初始化时间
         local systime = bio2number(data.systime)
@@ -248,7 +255,7 @@ CLLNet.receiveCMDFunc = {
     end,
     [NetProtoIsland.cmds.getShipsByBuildingIdx] = function(cmd, data)
         if IDDBCity.curCity then
-            IDDBCity.curCity:onGetShips4Dockyard(data.dockyardShips)
+            IDDBCity.curCity:onGetUnits4Building(data.dockyardShips)
         end
     end,
     ---@param data NetProtoIsland.RC_onFinishBuildOneShip
@@ -276,7 +283,12 @@ CLLNet.receiveCMDFunc = {
     end,
     ---@param data NetProtoIsland.RC_sendPrepareAttackIsland
     [NetProtoIsland.cmds.sendPrepareAttackIsland] = function(cmd, data)
-        getPanelAsy("PanelBattlePrepare", onLoadedPanelTT, data)
+        if bio2number(data.player.idx) == bio2number(IDDBPlayer.myself.idx) and IDDBPlayer.myself.attacking then
+            --//TODO: 当我正在攻击其它玩家时，突然又来玩家来攻击我，但是你已经在攻击状态，所以不能退出，只能简单提示下
+            CLAlert.add(LGetFmt("MsgSomebodyAttackYou", data.player2.name), Color.red, 5)
+        else
+            getPanelAsy("PanelBattlePrepare", onLoadedPanelTT, data)
+        end
     end
 }
 

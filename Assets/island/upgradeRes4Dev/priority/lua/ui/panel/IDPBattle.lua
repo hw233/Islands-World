@@ -1,4 +1,4 @@
-﻿---@class WrapBattleUnitData 战斗单元的数据包装
+﻿---@class _ParamBattleUnitData 战斗单元的数据包装
 ---@field public type IDConst.UnitType
 ---@field public id System.Int32
 ---@field public name String
@@ -11,7 +11,7 @@ IDPBattle = {}
 
 local csSelf = nil
 local transform = nil
----@type BattleData
+---@type _ParamBattleData
 local mData
 local uiobjs = {}
 
@@ -31,8 +31,6 @@ end
 -- 设置数据
 function IDPBattle.setData(paras)
     mData = paras
-    --mData.defData
-    --mData.offData 进攻方的舰船数据
 end
 
 -- 显示，在c#中。show为调用refresh，show和refresh的区别在于，当页面已经显示了的情况，当页面再次出现在最上层时，只会调用refresh
@@ -49,18 +47,19 @@ function IDPBattle.showShips()
     -- wrap mData
     local list = {}
     local shipMap = {}
-    ---@type WrapBattleUnitData
+    ---@type _ParamBattleUnitData
     local cellData
-    for k, v in pairs(mData.offShips) do
-        local shipId = v.id
+    ---@param v NetProtoIsland.ST_unitInfor
+    for k, v in pairs(mData.fleet.units) do
+        local shipId = bio2number(v.id)
         if shipMap[shipId] == nil then
             cellData = {}
             cellData.type = IDConst.UnitType.ship
-            cellData.id = tonumber(shipId)
+            cellData.id = shipId
             cellData.num = v.num
-            local attr = DBCfg.getRoleByID(v.id)
+            local attr = DBCfg.getRoleByID(shipId)
             cellData.name = LGet(attr.NameKey)
-            cellData.icon = IDUtl.getRoleIcon(v.id)
+            cellData.icon = IDUtl.getRoleIcon(shipId)
             shipMap[shipId] = cellData
         else
             cellData = shipMap[shipId]
@@ -92,23 +91,22 @@ end
 
 -- 网络请求的回调；cmd：指命，succ：成功失败，msg：消息；paras：服务器下行数据
 function IDPBattle.procNetwork(cmd, succ, msg, paras)
-    --[[
-    if(succ == NetSuccess) then
-      if(cmd == "xxx") then
-        -- TODO:
-      end
+    if (succ == NetSuccess) then
+        if cmd == NetProtoIsland.cmds.sendEndAttackIsland then
+            hideHotWheel()
+            IDLBattle.clean()
+            IDUtl.chgScene(GameMode.map)
+        end
     end
-    --]]
 end
 
 -- 处理ui上的事件，例如点击等
 function IDPBattle.uiEventDelegate(go)
     local goName = go.name
     if goName == "ButtonQuit" then
-        IDLBattle.clean()
-        --//TODO:强制退出战斗时，通知服务器
-        -- CLLNet.send(NetProtoIsland.send.stopAttack)
-        IDUtl.chgScene(GameMode.map)
+        --//强制退出战斗时，通知服务器
+        showHotWheel()
+        CLLNet.send(NetProtoIsland.send.quitIslandBattle(bio2number(mData.fleet.idx)))
     end
 end
 
