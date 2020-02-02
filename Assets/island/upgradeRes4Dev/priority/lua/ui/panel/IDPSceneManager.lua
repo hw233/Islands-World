@@ -134,7 +134,7 @@ function IDPSceneManager.loadCity()
         dragSetting.scaleMax = 20
         dragSetting.scaleHeightMini = 10
         dragSetting.scaleHeightMax = 100
-        dragSetting.viewRadius = 65
+        -- dragSetting.viewRadius = 65
         dragSetting.dragMovement = Vector3.one
          -- * 0.4
         dragSetting.scaleSpeed = 1
@@ -207,7 +207,7 @@ function IDPSceneManager.loadBattle()
         dragSetting.scaleMax = 20
         dragSetting.scaleHeightMini = 10
         dragSetting.scaleHeightMax = 100
-        dragSetting.viewRadius = 65
+        -- dragSetting.viewRadius = 65
         dragSetting.dragMovement = Vector3.one
          -- * 0.4
         dragSetting.scaleSpeed = 1

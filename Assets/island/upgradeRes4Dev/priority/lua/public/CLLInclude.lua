@@ -411,8 +411,6 @@ do
         return string.format(LGet(key), ...)
     end
 
-    hideTopPanel = CLPanelManager.hideTopPanel
-
     ---@public 异步加载panel
     ---@param panelName string 页面名
     ---@param callback function 取得页面的回调(panel, orgs)

@@ -25,11 +25,12 @@ function IDPBattlePrepare.setData(paras)
 end
 
 --当有通用背板显示时的回调
-function IDPBattlePrepare.onShowFrame()
+function IDPBattlePrepare.onShowFrame(cs)
 end
 
 -- 显示，在c#中。show为调用refresh，show和refresh的区别在于，当页面已经显示了的情况，当页面再次出现在最上层时，只会调用refresh
 function IDPBattlePrepare.show()
+    csSelf.panel.depth = CLPanelManager.self.depth + 500
 	uiobjs.LabelPlayerTarget.text = mData.player.name
 	uiobjs.LabelPosTarget.text = bio2number(mData.city.pos)
 	csSelf:cancelInvoke4Lua(IDPBattlePrepare.cooldown)
@@ -57,6 +58,10 @@ end
 
 ---@param data NetProtoIsland.RC_sendStartAttackIsland
 function IDPBattlePrepare.startBattle(data)
+    if IDWorldMap then
+        IDWorldMap.unselectFleet()
+    end
+
     ---@type IDDBPlayer
     local player = IDDBPlayer.new(data.player)
     ---@type IDDBCity
@@ -71,13 +76,11 @@ function IDPBattlePrepare.startBattle(data)
     battleData.targetPlayer = player
     battleData.targetCity = city
 	battleData.fleet = data.fleetinfor
-	hideTopPanel(csSelf)
+	doHidePanel(csSelf)
     IDUtl.chgScene(
         GameMode.battle,
         battleData,
-        function()
-            IDWorldMap.popupEvent.enterCity(cellIndex)
-        end
+        nil
     )
 end
 

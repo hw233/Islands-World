@@ -260,21 +260,59 @@ function getLuaFunc(trace)
 end
 
 ---@param p coolape.Coolape.CLPanelLua
+function doShowPanel(p, paras)
+    p:setData(paras)
+    CLPanelManager.showPanel(p)
+    if CLLNet then
+        CLLNet.addPanelListener(p)
+    end
+end
+
+---@param p coolape.Coolape.CLPanelLua
+function doHidePanel(p)
+    CLPanelManager.hidePanel(p)
+    if CLLNet then
+        CLLNet.removePanelListener(p)
+    end
+end
+
+---@param p coolape.Coolape.CLPanelLua
 function onLoadedPanel(p, paras)
+    if CLPanelManager.topPanel then
+        if CLLNet then
+            CLLNet.removePanelListener(CLPanelManager.topPanel)
+        end
+    end
     p:setData(paras)
     CLPanelManager.showTopPanel(p)
+    if CLLNet then
+        CLLNet.addPanelListener(p)
+    end
 end
 
 ---@param p coolape.Coolape.CLPanelLua
 function onLoadedPanelTT(p, paras)
     p:setData(paras)
     CLPanelManager.showTopPanel(p, true, true)
+    if CLLNet then
+        CLLNet.addPanelListener(p)
+    end
 end
 
 ---@param p coolape.Coolape.CLPanelLua
 function onLoadedPanelTF(p, paras)
     p:setData(paras)
     CLPanelManager.showTopPanel(p, true, false)
+    if CLLNet then
+        CLLNet.addPanelListener(p)
+    end
+end
+
+function hideTopPanel(p)
+    CLPanelManager.hideTopPanel(p)
+    if CLLNet then
+        CLLNet.removePanelListener(p)
+    end
 end
 
 function SetActive(go, isActive)
@@ -396,7 +434,7 @@ end
 
 ---@public 离线处理
 function procOffLine()
-    if MyCfg.mode == GameMode.none or (IDPSceneManager and IDPSceneManager.isLoadingScene()) then
+    if MyCfg.mode == GameMode.none or IDUtl.isLoadingScene then
         return
     end
 
@@ -473,6 +511,9 @@ function doSomethingBeforeRestart()
         printe(result)
     end
     Net.self:clean()
+    ---@type Coolape.CLBaseLua
+    local worldmap = getCC(MyMain.self.transform, "worldmap", "CLBaseLua")
+    worldmap:destoryLua()
 
     if IDLCameraMgr then
         IDLCameraMgr.clean()

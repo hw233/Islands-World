@@ -275,7 +275,6 @@ function IDMainCity.init(cityData, onFinishCallback, onProgress, isForceInitASta
         SetActive(seabed, true)
     end
 
-    IDMainCity.refreshFogOfWarInfluence()
     IDMainCity.loadTiles(
         function()
             IDMainCity.loadBuildings(
@@ -290,28 +289,6 @@ function IDMainCity.init(cityData, onFinishCallback, onProgress, isForceInitASta
             )
         end
     )
-end
-
-function IDMainCity.refreshFogOfWarInfluence(oldMode, curMode)
-    local fogOfWar = MyCfg.self.fogOfWar
-
-    local dis = 0
-    if MyCfg.mode == GameMode.map and IDWorldMap.mode == GameModeSub.map then
-        local lev = bio2number(IDMainCity.cityData.headquarters.lev)
-        ---@type DBCFHeadquartersLevsData
-        local attr = DBCfg.getHeadquartersLevsDataByLev(lev)
-        dis = bio2number(attr.Range) * IDWorldMap.grid.cellSize
-        fogOfWar.VisibilitySnapshotInterval = 2 -- 值越大，对性能影响越小
-    else
-        dis = 120
-        fogOfWar.VisibilitySnapshotInterval = 120 -- 值越大，对性能影响越小
-    end
-    IDMainCity.fogOfWarInfluence.ViewDistance = dis
-
-    -- if curMode == GameModeSub.map and (oldMode == GameModeSub.mapBtwncity or oldMode == GameModeSub.city) then
-    --     -- 是从主城切换过来的,强制执行一次fog的SnapshotStampTexture
-    --     fogOfWar:SnapshotStampTexture()
-    -- end
 end
 
 ---@public 当主城数据列新时处理
@@ -400,8 +377,6 @@ function IDMainCity.onChgMode(oldMode, curMode)
         IDMainCity.Headquarters:showHud4WorldMap()
     -- IDMainCity.grid:hideRect()
     end
-
-    IDMainCity.refreshFogOfWarInfluence(oldMode, curMode)
 
     for k, v in pairs(tiles) do
         SetActive(v.gameObject, isShowTile)

@@ -297,7 +297,7 @@ end
 
 function IDUtl.newMapTileLua(type)
     -- if type == IDConst.WorldmapCellType.user then
-        return IDWorldTile.new()
+    return IDWorldTile.new()
     -- end
 end
 
@@ -433,12 +433,20 @@ function IDUtl.showPopupMenus(target, targetPosition, buttonsList, label, params
     end
 end
 
+IDUtl.isLoadingScene = false
 ---@public 切换场景
 function IDUtl.chgScene(mode, data, callback)
+    if IDUtl.isLoadingScene then
+        return
+    end
+    IDUtl.isLoadingScene = true
     local params = {}
     params.mode = mode
     params.data = data
-    params.__finishCallback__ = callback
+    params.__finishCallback__ = function()
+        Utl.doCallback(callback)
+        IDUtl.isLoadingScene = false
+    end
     getPanelAsy("PanelSceneManager", onLoadedPanel, params)
 end
 

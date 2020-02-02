@@ -6,7 +6,9 @@ require("db.IDDBPlayer")
 require("db.IDDBCity")
 require("db.IDDBWorldMap")
 CLLNet = {}
-
+local PanelListener = {}
+---@type CLLQueue
+local ListenerQueue = CLLQueue.new()
 local strLen = string.len
 local strSub = string.sub
 local strPack = string.pack
@@ -86,8 +88,9 @@ function CLLNet.dispatchGame(map)
     end
     if type(map) == "string" then
         if map == "connectCallback" then
-            CLPanelManager.topPanel:procNetwork("connectCallback", 1, "connectCallback", nil)
-            --csSelf:invoke4Lua(CLLNet.heart, nil, timeOutSec, true);
+            if CLPanelManager.topPanel then
+                CLPanelManager.topPanel:procNetwork("connectCallback", 1, "connectCallback", nil)
+            end
             InvokeEx.invoke(CLLNet.heart, timeOutSec)
         elseif map == "outofNetConnect" then
             CLLNet.onOffline()
@@ -108,7 +111,6 @@ function CLLNet.onOffline()
     end
 
     -- 处理断线处理
-    --//TODO:先屏掉
     if GameMode.none ~= MyCfg.mode then
         local ok, result = pcall(procOffLine)
         if not ok then
@@ -144,15 +146,42 @@ function CLLNet.dispatch(map)
     end
 
     -- 通知所有显示的页面
-    local panels4Retain = CLPanelManager.panels4Retain
-    if (panels4Retain ~= nil and panels4Retain.Length > 0) then
-        for i = 0, panels4Retain.Length - 1 do
-            panels4Retain[i]:procNetwork(cmd, succ, msg, map)
+    -- local panels4Retain = CLPanelManager.panels4Retain
+    -- if (panels4Retain ~= nil and panels4Retain.Length > 0) then
+    --     for i = 0, panels4Retain.Length - 1 do
+    --         panels4Retain[i]:procNetwork(cmd, succ, msg, map)
+    --     end
+    -- else
+    --     if (CLPanelManager.topPanel ~= nil) then
+    --         CLPanelManager.topPanel:procNetwork(cmd, succ, msg, map)
+    --     end
+    -- end
+
+    -- 线程安全考虑，先把要处理的panle放到quque中
+    for k, p in pairs(PanelListener) do
+        ListenerQueue:enQueue(p)
+    end
+    local p
+    while(ListenerQueue:size() > 0)  do
+        ---@type coolape.Coolape.CLPanelBase
+        p = ListenerQueue:deQueue()
+        if p then
+            p:procNetwork(cmd, succ, msg, map)
         end
-    else
-        if (CLPanelManager.topPanel ~= nil) then
-            CLPanelManager.topPanel:procNetwork(cmd, succ, msg, map)
-        end
+    end
+end
+
+---@param p Coolape.CLPanelBase
+function CLLNet.addPanelListener(p)
+    if p then
+        PanelListener[p] = p
+    end
+end
+
+---@param p Coolape.CLPanelBase
+function CLLNet.removePanelListener(p)
+    if p then
+        PanelListener[p] = nil
     end
 end
 
@@ -283,11 +312,22 @@ CLLNet.receiveCMDFunc = {
     end,
     ---@param data NetProtoIsland.RC_sendPrepareAttackIsland
     [NetProtoIsland.cmds.sendPrepareAttackIsland] = function(cmd, data)
-        if bio2number(data.player.idx) == bio2number(IDDBPlayer.myself.idx) and IDDBPlayer.myself.attacking then
-            --//TODO: 当我正在攻击其它玩家时，突然又来玩家来攻击我，但是你已经在攻击状态，所以不能退出，只能简单提示下
-            CLAlert.add(LGetFmt("MsgSomebodyAttackYou", data.player2.name), Color.red, 5)
+        if IDDBPlayer.myself:equal(data.player) then
+            -- 防守方
+            if IDDBPlayer.myself.attacking then
+                -- 当我正在攻击其它玩家时，突然又有玩家来攻击我，但是你已经在攻击状态，所以不能退出，只能简单提示下
+                CLAlert.add(LGetFmt("MsgSomebodyAttackYou", data.player2.name), Color.red, 5)
+            else
+                getPanelAsy("PanelBeingAttacked", doShowPanel, data)
+            end
         else
-            getPanelAsy("PanelBattlePrepare", onLoadedPanelTT, data)
+            if IDDBPlayer.myself:equal(data.player2) then
+                -- 进攻方
+                IDWorldMap.selectFleet(bio2number(data.fleetinfor.idx))
+                getPanelAsy("PanelBattlePrepare", doShowPanel, data)
+            else
+                -- 数据错误
+            end
         end
     end
 }

@@ -104,17 +104,24 @@ end
 
 ---@public 地块的显示与隐藏
 function IDWorldMapPage:checkVisible(centerPos)
+    local debugIndex = nil -- 648632
     local pos
     ---@type UnityEngine.Vector3
     local diff
+    local isDebug = false
     ---@param d IDWorldMapPage._CellData
     for index, d in pairs(self.pageData) do
         d.bounds.center = d.position
-        local visibile = IDWorldMap.isVisibile(d.position, d.bounds)
+        isDebug = false
+        if index == debugIndex then
+            isDebug = true
+        end
+        local visibile = IDWorldMap.isVisibile(d.position, d.bounds, isDebug)
         if not visibile then
             --[[ 当正确的位置上不可见时，加上偏移量再来判断一次是否可见。
-             为什么要这样做？因为有可能出现本身是可见的，因为加上了偏移量后反面不可见的情况，因此只有在不可见的情况下才处理偏移量
-             ]]
+                为什么要这样做？因为有可能出现本身是可见的，因为加上了偏移量后反面不可见的情况，
+                因此只有在不可见的情况下才处理偏移量
+            ]]
             if centerPos then
                 -- 把bounds向中心靠拢一点，让看起来更流畅一些
                 centerPos.y = 0
@@ -132,7 +139,7 @@ function IDWorldMapPage:checkVisible(centerPos)
             else
                 pos = nil
             end
-            visibile = IDWorldMap.isVisibile(pos, d.bounds)
+            visibile = IDWorldMap.isVisibile(pos, d.bounds, isDebug)
         end
 
         if visibile then

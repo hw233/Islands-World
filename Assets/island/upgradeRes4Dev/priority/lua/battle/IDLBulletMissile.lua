@@ -29,7 +29,7 @@ function _cell.resetTarget(bullet)
     else
         r = 4
     end
-    local target = IDLBattle.searcher.getTarget(bullet.attacker, bullet.transform.position, r)
+    local target = IDLBattle.searcher.getTargetInRange(bullet.attacker, bullet.transform.position, r)
     if target then
         --[[ 注意：当target为nil时，不能设置bullet的target,
 		因为可能bullet已经有目标了，而通过上面的方法只是再次取得更优的目标，

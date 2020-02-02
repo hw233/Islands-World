@@ -90,18 +90,22 @@ function IDLBattle.init(data, callback, progressCB)
     IDLBattle.mData = data
     -- 先暂停资源释放
     CLAssetsManager.self:pause()
-    IDWorldMap.addFinishEnterCityCallback(IDLBattle.onEnterCity)
+    -- IDWorldMap.addFinishEnterCityCallback(IDLBattle.onEnterCity)
     
-    lookAtTarget.position = IDWorldMap.grid.grid:GetCellCenter(bio2number(data.targetCity.pos))
+    local posindex = bio2number(IDLBattle.mData.targetCity.pos)
     -- 加载城
     IDMainCity.init(
         IDLBattle.mData.targetCity,
         function()
             city = IDMainCity
             grid = city.grid
-            
             -- 预加载进攻方兵种
-            IDLBattle.prepareSoliders(IDLBattle.mData.fleet.units, callback, progressCB)
+            IDLBattle.prepareSoliders(IDLBattle.mData.fleet.units,
+            function()
+                Utl.doCallback(callback)
+                IDWorldMap.moveToView(posindex, GameModeSub.city, IDLBattle.onEnterCity)
+            end,
+             progressCB)
         end,
         progressCB,
         true

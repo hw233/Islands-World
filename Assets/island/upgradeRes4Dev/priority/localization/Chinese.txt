@@ -100,6 +100,7 @@ Flag5=卖萌海盗旗
 Sculpture=飓风龙神
 Wood=树桩
 Bush=灌木
+MailBox=邮箱
 Basic=基础
 Resource=资源
 Defense=防御

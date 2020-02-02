@@ -35,7 +35,7 @@ do
         return;
         end
         lastClickTime = currTime;
-        CLPanelManager.hideTopPanel();
+        hideTopPanel();
         --]]
     end
 

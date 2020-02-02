@@ -66,6 +66,7 @@ public static class XluaGenCodeConfig
 
 		//NGUI
 		typeof(UICamera),
+        typeof(UIPanel),
         typeof(Localization),
         typeof(NGUITools),
         typeof(UIRect),
