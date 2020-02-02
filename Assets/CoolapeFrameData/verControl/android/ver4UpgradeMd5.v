@@ -88,7 +88,7 @@ island/upgradeRes4Publish/priority/lua/ui/panel/CLLPConfirm.lua,b3ee3f1798c3d194
 island/upgradeRes4Publish/priority/cfg/worldmap/23.cfg,cdd261158d6863c0fc409641863c74bb
 island/upgradeRes4Publish/other/things/Buildings/Android/10.unity3d,42223f21d974c88cec18f4706a912395
 island/upgradeRes4Publish/priority/lua/ui/cell/IDAttrUIProc.lua,ce9e6b10060eab0505212143b4f3bf22
-island/upgradeRes4Publish/other/Materials/Buildings/Android/pao04.unity3d,37ea9ff904b7a6bfb85a3c3748f75fa5
+island/upgradeRes4Publish/other/Materials/Buildings/Android/pao04.unity3d,d249a023104212e6dd222ba191621752
 island/upgradeRes4Publish/priority/cfg/DBCFBuildingData.cfg,da12babaf23d8279ae484cf7c2296b7b
 island/upgradeRes4Publish/other/Textures/Buildings/Android/kjzm.unity3d,71103be3df631c98e848bd36790e57f6
 island/upgradeRes4Publish/other/Materials/Android/pao01_mingzhong.unity3d,495b9616c1b20fd05cdf18c0dd3dc9a0
@@ -97,12 +97,12 @@ island/upgradeRes4Publish/other/Materials/Buildings/Android/yj.unity3d,4290ace55
 island/upgradeRes4Publish/other/Materials/Buildings/Android/fangkongqiqiu.unity3d,0977b618d529192c04ec948a890a12e8
 island/upgradeRes4Publish/other/sound/Android/pickup_rock.unity3d,251ee8529b8c9fa31b5930c7e662e4e4
 island/upgradeRes4Publish/other/things/Buildings/Android/3.unity3d,ba5362e3e324f0f59cc3360949e7cef1
-island/upgradeRes4Publish/priority/lua/battle/IDLBulletMissile.lua,3be4e473acfc8a5e078987c3ed12cef1
+island/upgradeRes4Publish/priority/lua/battle/IDLBulletMissile.lua,828c6b7122034c7ba5a59e6f7616db99
 island/upgradeRes4Publish/other/sound/Android/naga_hit.unity3d,3c954f23e899f65a82694309188943fb
 island/upgradeRes4Publish/other/uiAtlas/public/Android/leftArrow.unity3d,9294976164a4d51cf1db816ae27e79b6
 island/upgradeRes4Publish/other/Textures/effect/glow/Android/glow_00143.unity3d,40941078739992c80b8cc840f8169dad
 island/upgradeRes4Publish/priority/cfg/worldmap/38.cfg,fd13242b16e797876d067a98ea1cbbde
-island/upgradeRes4Publish/priority/lua/city/IDMainCity.lua,f6d9a916c82e1194b99d251e99da6613
+island/upgradeRes4Publish/priority/lua/city/IDMainCity.lua,30d861ba7cce7f8e4a33e473db4b5187
 island/upgradeRes4Publish/priority/lua/city/IDLBuildingTrapFrozen.lua,242a2e5b1007726a2eac2b183780c6ee
 island/upgradeRes4Publish/priority/cfg/worldmap/10.cfg,a99e71e0a64666c91b75405370273bee
 island/upgradeRes4Publish/other/uiAtlas/coolape/Android/button.unity3d,8b5bcc5b87f49a39ecaead5d8d92cbdb
@@ -115,7 +115,7 @@ island/upgradeRes4Publish/other/uiAtlas/res/Android/diamond.unity3d,293c1a089c0b
 island/upgradeRes4Publish/other/Textures/ship/dyft/Android/dyft.unity3d,4a39bf0df6c955578fd8b75c74cc3b32
 island/upgradeRes4Publish/other/model/Buildings/Android/yj.unity3d,a6412eddb86e8cba9bd478e3e9979254
 island/upgradeRes4Publish/other/sound/Android/collect_coins_01.unity3d,7da09a5ab26f89e96cae693b3dfaf130
-island/upgradeRes4Publish/priority/lua/city/IDLBuildingDefense.lua,5f231f3026ab3bd142b1948ba585fd35
+island/upgradeRes4Publish/priority/lua/city/IDLBuildingDefense.lua,2be51cf0b07986acac1965255ac6fe48
 island/upgradeRes4Publish/other/things/Android/seabed.unity3d,73ecd26c4c13926575488e9e61e60c44
 island/upgradeRes4Publish/priority/lua/ui/panel/IDPSetting.lua,bf0033f4b3e98dff1c672d12dd7da052
 island/upgradeRes4Publish/other/Textures/effect/pao07/Android/0707.unity3d,ec99789790c7c90c60ecce0e3ad1b15c
@@ -172,7 +172,7 @@ island/upgradeRes4Publish/priority/lua/ui/cell/IDCellWorldTipHud.lua,c44111e2574
 island/upgradeRes4Publish/other/uiAtlas/public/Android/common_card_m_disable.unity3d,08a8ceecd909ccb5664e1d6105985811
 island/upgradeRes4Publish/other/Materials/cannonball/huoqiang/Android/dabaozha.unity3d,b748af9ce69b3104fda79dea164a5c90
 island/upgradeRes4Publish/priority/lua/toolkit/CLLPrintEx.lua,9b7fc0fab706050720d8f9d7176a8077
-island/upgradeRes4Publish/priority/lua/worldmap/IDWorldMap.lua,25f18248ec4d1a9ba4b6f9418af861a0
+island/upgradeRes4Publish/priority/lua/worldmap/IDWorldMap.lua,434f9d21c3aa033b029bc57b71e46a24
 island/upgradeRes4Publish/other/things/Tiles/Android/TileSideLeft2.unity3d,866bd4aa1c1ea4e0d28f36d5a4cd6c25
 island/upgradeRes4Publish/other/Materials/Buildings/Android/xmt.unity3d,629a5f04bf251ab9903e92fbf4062c0b
 island/upgradeRes4Publish/other/sound/Android/pickup_tesla.unity3d,a20c68b651ddcbe503897f34d214abeb
@@ -183,7 +183,7 @@ island/upgradeRes4Publish/other/sound/Android/pickup_troop_housing.unity3d,eb997
 island/upgradeRes4Publish/other/uiAtlas/public/Android/jiahao.unity3d,2e08a432cbfb6141fc7bc23bdc5a4946
 island/upgradeRes4Publish/other/uiAtlas/attrIcon/Android/gongjisudu.unity3d,2e377fa22f33e0f5d9032c6c846905ea
 island/upgradeRes4Publish/other/Textures/effect/Android/pao02_kaihuo.unity3d,66ac4f67cdfc35b8ae62e9757c9f015a
-island/upgradeRes4Publish/priority/lua/public/IDLCameraMgr.lua,0a582cf7f043f00bba73343943d658a3
+island/upgradeRes4Publish/priority/lua/public/IDLCameraMgr.lua,7ac26e2093f666220af6d352209d84cc
 island/upgradeRes4Publish/priority/cfg/worldmap/58.cfg,52f314620f8e6c69f194a5ee0c5c79c0
 island/upgradeRes4Publish/other/sound/Android/missile.unity3d,2cae0400bf56032270231f8aef7b83b0
 island/upgradeRes4Publish/other/Textures/ship/lhdh/Android/xft.unity3d,0832bac30b12cf13640e320235444d25
@@ -292,7 +292,7 @@ island/upgradeRes4Publish/other/Materials/Tiles/Android/dikuai3.unity3d,b92090c0
 island/upgradeRes4Publish/priority/ui/other/Android/BuildingCamera.unity3d,9b3d131a6e2733790333e6dc139406ee
 island/upgradeRes4Publish/other/effect/Android/BombSwirl.unity3d,713fd7c05746588c00668bdda0133363
 island/upgradeRes4Publish/other/Textures/cg/trap/dileibaozha/Android/huohuan.unity3d,496b3a6fdddcf6582951f456a402359b
-island/upgradeRes4Publish/priority/lua/battle/IDLBattleSearcher.lua,8018bf5bc14340708e7e2427f605d29f
+island/upgradeRes4Publish/priority/lua/battle/IDLBattleSearcher.lua,241b73392f6b1f68901a57532140f132
 island/upgradeRes4Publish/other/uiAtlas/icon/Android/build.unity3d,57e35423983220cdb970b0d8c515a357
 island/upgradeRes4Publish/other/Materials/effect/Android/fz1.unity3d,05196d6b1fa44a402285605c3532da0c
 island/upgradeRes4Publish/other/sound/Android/pickup_building_tech.unity3d,6ce3c6d622027d909470deb4cbf6b094
@@ -471,7 +471,7 @@ island/upgradeRes4Publish/other/model/Tiles/Android/dikuai.unity3d,5b79c328887de
 island/upgradeRes4Publish/priority/lua/ui/cell/IDCellFleets.lua,0005179678f9b5c5196e8d975299c35a
 island/upgradeRes4Publish/other/model/Cannonball/pao04/Android/pao04_daodan.unity3d,2f2994934be34e48530f17b46f45f28a
 island/upgradeRes4Publish/other/Textures/LightningBolt/Textures/Android/LightningSpriteSheet3.unity3d,ed3b44dd2ddd05167828d831eaaf023b
-island/upgradeRes4Publish/other/bullet/Android/Missile.unity3d,f839b59b8a1e856d71af5fef7265f544
+island/upgradeRes4Publish/other/bullet/Android/Missile.unity3d,e28314d176997990fbeb1179fcf9000c
 island/upgradeRes4Publish/priority/cfg/DBCFCfgData.cfg,ad8d368945dade17001b288a43af9ca9
 island/upgradeRes4Publish/other/sound/Android/collect_Food.unity3d,651dfba348c63eae387df7fb75289475
 island/upgradeRes4Publish/other/Materials/ship/lhdh/Materials/Android/xft.unity3d,cb774f170a4a5327570aa3917b6a5e19
@@ -609,7 +609,7 @@ island/upgradeRes4Publish/priority/ui/panel/Android/PanelBackplate.unity3d,64173
 island/upgradeRes4Publish/other/uiAtlas/buildingIcon/Android/17.unity3d,090f95d8682ba8ea8af703296f5698c0
 island/upgradeRes4Publish/other/Textures/Buildings/Android/lsjgc.unity3d,19adf96e917f00955fd4f014a09bdd7b
 island/upgradeRes4Publish/priority/lua/city/IDLBuildingDefenseLightning.lua,25fd1d82b5f8d092066a302265c57d48
-island/upgradeRes4Publish/priority/lua/battle/IDLBattle.lua,18954b5952e902e5a9ad0d31af1b3eab
+island/upgradeRes4Publish/priority/lua/battle/IDLBattle.lua,3e0bd3cd28d6314e50c25a91fa6b55dd
 island/upgradeRes4Publish/other/uiAtlas/buildingIcon/Android/25.unity3d,be2ddb9681fa212c482dc29ae10bbbee
 island/upgradeRes4Publish/other/Textures/Tiles/Android/bolang.unity3d,073882a517aae533263f7b9176d72edd
 island/upgradeRes4Publish/other/uiAtlas/roleIcon/Android/5.unity3d,8d301f2bc50f508a574ce07972e98c86
@@ -618,7 +618,7 @@ island/upgradeRes4Publish/priority/lua/city/IDLBuildingTrapAirBomb.lua,9037d82f8
 island/upgradeRes4Publish/other/things/Tiles/Android/Tile_1.unity3d,46b2a3d75e4e98800801beb140cf4cef
 island/upgradeRes4Publish/other/effect/Android/BombAir.unity3d,9de1b5dd1966708115f5be246e56adaa
 island/upgradeRes4Publish/priority/lua/city/IDLBuildingDefenseMissile2.lua,82e067bc2933ef1d97359e6431718a00
-island/upgradeRes4Publish/priority/lua/net/CLLNet.lua,48f749ff0e9439f64c33ec53d1e03977
+island/upgradeRes4Publish/priority/lua/net/CLLNet.lua,a84d3383127f314b3232138181b4dc49
 island/upgradeRes4Publish/priority/lua/city/IDLBuilding_bak.lua,22f78a8d0be47abeafabf3431205c332
 island/upgradeRes4Publish/priority/ui/panel/Android/PanelHotWheel.unity3d,08632ee535bb3fc1812013fab4d5036f
 island/upgradeRes4Publish/other/model/Buildings/Android/liangcang.unity3d,64c821145dec91c0c6a66f859fcaa646
@@ -737,7 +737,7 @@ island/upgradeRes4Publish/other/Materials/Buildings/Android/bingdongdilei.unity3
 island/upgradeRes4Publish/other/sound/Android/heavy_die_01.unity3d,eb0314ac02d7a09366225c251d30ebb5
 island/upgradeRes4Publish/other/effect/Android/BombLandmine.unity3d,a7373fb773d85375301ec4e456e4b570
 island/upgradeRes4Publish/other/Textures/ship/wgqjh/Android/wgqjh_jc.unity3d,91e25e35e545ff3b709591f6f8604327
-island/upgradeRes4Publish/priority/lua/city/IDLGridTileSide.lua,3956c410a4121b9f2a734508f7416df8
+island/upgradeRes4Publish/priority/lua/city/IDLGridTileSide.lua,3887c38c63b5a4443e746ce57631e528
 island/upgradeRes4Publish/other/model/ship/dyft/Android/dyft.unity3d,eb83ef288b505bc5c37f2862822f3195
 island/upgradeRes4Publish/other/Materials/Tiles/Android/dikuai2.unity3d,ccec614224ccb76f0933b3ccf2aef7e6
 island/upgradeRes4Publish/priority/cfg/worldmap/90.cfg,a9d5b48603c2b0d73975fafea0d0d465
@@ -813,7 +813,7 @@ island/upgradeRes4Publish/priority/ui/other/Android/WorldTileHud.unity3d,bf967f0
 island/upgradeRes4Publish/priority/ui/other/Android/WorldTipHud.unity3d,91a540a96bf35f745865c78657b4a2ce
 island/upgradeRes4Publish/other/things/Tiles/Android/TileSideLeftUpAngle.unity3d,c500771819b8479e07459fd0a2e6e155
 island/upgradeRes4Publish/other/model/ship/zbc/Android/zbc.unity3d,04e35bdefecf08964a05cf342d3b8fce
-island/upgradeRes4Publish/other/things/Buildings/Android/15.unity3d,65125e822667b4dfd955ba35b70d8964
+island/upgradeRes4Publish/other/things/Buildings/Android/15.unity3d,1ca7fcf6384144cb4f7a73b9bb92b465
 island/upgradeRes4Publish/priority/cfg/worldmap/84.cfg,2617aa7e18941e1d27c56e44e04a2b33
 island/upgradeRes4Publish/priority/cfg/worldmap/77.cfg,a945405b0c911abe7af512df4c9108ba
 island/upgradeRes4Publish/priority/lua/bio/BioInputStream.lua,b3f94b1017db307427c6e39a8ee4d60e

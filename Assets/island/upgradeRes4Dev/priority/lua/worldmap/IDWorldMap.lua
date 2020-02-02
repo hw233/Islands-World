@@ -136,7 +136,7 @@ function IDWorldMap.init(gidx, onFinishCallback, onProgress)
     IDWorldMap.__init()
     lookAtTarget.transform.position = grid:GetCellCenter(gidx)
 
-    local onLoadOcena = function()
+    local onLoadOcean = function()
         IDWorldMap.ocean.luaTable.playBGM()
         IDWorldMap.oceanTransform.position = lookAtTarget.position + IDWorldMap.offset4Ocean
         -- 屏幕拖动代理
@@ -182,18 +182,18 @@ function IDWorldMap.init(gidx, onFinishCallback, onProgress)
         CLThingsPool.borrowObjAsyn(
             "OceanLow",
             function(name, obj, orgs)
-                IDWorldMap.onLoadOcena(name, obj, orgs)
-                onLoadOcena()
+                IDWorldMap.onLoadOcean(name, obj, orgs)
+                onLoadOcean()
             end
         )
     else
-        onLoadOcena()
+        onLoadOcean()
     end
     IDWorldMap.grid:showRect()
 end
 
 -- 重新加载海
-function IDWorldMap.onLoadOcena(name, obj, orgs)
+function IDWorldMap.onLoadOcean(name, obj, orgs)
     IDWorldMap.oceanObj = obj:GetComponent("MirrorReflection")
     IDWorldMap.oceanTransform = IDWorldMap.oceanObj.transform
     IDWorldMap.oceanTransform.parent = transform

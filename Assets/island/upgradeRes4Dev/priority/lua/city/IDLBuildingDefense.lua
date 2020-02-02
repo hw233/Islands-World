@@ -64,7 +64,6 @@ end
 
 function IDLBuildingDefense:OnPress(go, isPress)
     IDLBuildingDefense.super.OnPress(self, go, isPress)
-
     self.OnPressed = isPress
     if isPress then
         self:showAttackRang()

@@ -493,6 +493,7 @@ end
 ---@param attacker IDLUnitBase
 ---@param pos UnityEngine.Vector3
 ---@param r number 半径
+---@return IDLUnitBase
 function IDLBattleSearcher.getTargetInRange(attacker, pos, r)
     local onlyOnGroundOrSky = pos.y <= 1 and 1 or 2
     local index = grid.grid:GetCellIndex(pos)

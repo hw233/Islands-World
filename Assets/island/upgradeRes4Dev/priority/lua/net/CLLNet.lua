@@ -354,6 +354,7 @@ function CLLNet.stop()
         csSelf:stop()
         CLLNet.onOffline()
     end
+    PanelListener = {}
 end
 
 return CLLNet

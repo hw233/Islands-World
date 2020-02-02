@@ -338,7 +338,7 @@ function IDLBattle.onBulletHit(bullet)
     --//TODO:有一种可能就是当子弹击中目标时，发射子弹的对象已经死掉并且又被从对象池时取出来重新使用。不过好像这种情况在这个游戏里不太可能出理，先不考虑
     ---@type IDRoleBase
     local target = bullet.target and bullet.target.luaTable or nil
-    CLEffect.play(bulletAttr.HitEffect, bullet.transform.position)
+    CLEffect.play(bulletAttr.HitEffect, bullet.hitPoint)
     SoundEx.playSound(bulletAttr.HitSFX, 1, 2)
     if bulletAttr.IsScreenShake then
         -- 震屏
@@ -348,7 +348,7 @@ function IDLBattle.onBulletHit(bullet)
     -- 波及范围内单位
     local DamageAffectRang = bio2number(attacker.attr.DamageAffectRang) / 100
     if DamageAffectRang > 0 then
-        --//波及范围内单位
+        -- 波及范围内单位
         local list = IDLBattleSearcher.getTargetsInRange(attacker, pos, DamageAffectRang)
         if list and #list > 0 then
             ---@param unit IDLUnitBase
@@ -358,7 +358,7 @@ function IDLBattle.onBulletHit(bullet)
             end
         else
             if target and (not target.isDead) then
-                local dis = Vector3.Distance(pos, bullet.target.transform.position)
+                local dis = Vector3.Distance(pos, target.transform.position)
                 if dis <= 0.5 then
                     -- 半格范围内都算击中目标
                     local damage = attacker:getDamage(target)
@@ -368,8 +368,8 @@ function IDLBattle.onBulletHit(bullet)
         end
     else
         if target and (not target.isDead) then
-            local dis = Vector3.Distance(pos, bullet.target.transform.position)
-            if dis <= 0.5 then
+            local dis = Vector3.Distance(pos, target.transform.position)
+            if dis <= 0.6 then
                 -- 半格范围内都算击中目标
                 local damage = attacker:getDamage(target)
                 target:onHurt(damage, attacker)

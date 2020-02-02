@@ -439,14 +439,22 @@ namespace Coolape
                     {
                         tpindex = -1;
                     }
-                    ret.Add(tpindex);
+
+                    if (IsInBounds(tpindex))
+                    {
+                        ret.Add(tpindex);
+                    }
 
                     tpindex = center - i * numRows + half - 1;
                     if (tpindex / numRows != (center - i * numRows) / numRows)
                     {
                         tpindex = -1;
                     }
-                    ret.Add(tpindex);
+
+                    if (IsInBounds(tpindex))
+                    {
+                        ret.Add(tpindex);
+                    }
                 }
                 for (int i = 1; i < half; i++)
                 {
@@ -455,14 +463,22 @@ namespace Coolape
                     {
                         tpindex = -1;
                     }
-                    ret.Add(tpindex);
+
+                    if (IsInBounds(tpindex))
+                    {
+                        ret.Add(tpindex);
+                    }
 
                     tpindex = center + i * numRows + half - 1;
                     if (tpindex / numRows != (center + i * numRows) / numRows)
                     {
                         tpindex = -1;
                     }
-                    ret.Add(tpindex);
+
+                    if (IsInBounds(tpindex))
+                    {
+                        ret.Add(tpindex);
+                    }
                 }
 
                 row = half - 1;
@@ -473,14 +489,22 @@ namespace Coolape
                     {
                         tpindex = -1;
                     }
-                    ret.Add(tpindex);
+
+                    if (IsInBounds(tpindex))
+                    {
+                        ret.Add(tpindex);
+                    }
 
                     tpindex = center - i * numRows - half;
                     if (tpindex / numRows != (center - i * numRows) / numRows)
                     {
                         tpindex = -1;
                     }
-                    ret.Add(tpindex);
+
+                    if (IsInBounds(tpindex))
+                    {
+                        ret.Add(tpindex);
+                    }
                 }
                 for (int i = 0; i < half - 1; i++)
                 {
@@ -489,14 +513,22 @@ namespace Coolape
                     {
                         tpindex = -1;
                     }
-                    ret.Add(tpindex);
+
+                    if (IsInBounds(tpindex))
+                    {
+                        ret.Add(tpindex);
+                    }
 
                     tpindex = center + i * numRows - half;
                     if (tpindex / numRows != (center + i * numRows) / numRows)
                     {
                         tpindex = -1;
                     }
-                    ret.Add(tpindex);
+
+                    if (IsInBounds(tpindex))
+                    {
+                        ret.Add(tpindex);
+                    }
                 }
             }
             else
@@ -509,14 +541,22 @@ namespace Coolape
                     {
                         tpindex = -1;
                     }
-                    ret.Add(tpindex);
+
+                    if (IsInBounds(tpindex))
+                    {
+                        ret.Add(tpindex);
+                    }
 
                     tpindex = center - i * numRows + half;
                     if (tpindex / numRows != (center - i * numRows) / numRows)
                     {
                         tpindex = -1;
                     }
-                    ret.Add(tpindex);
+
+                    if (IsInBounds(tpindex))
+                    {
+                        ret.Add(tpindex);
+                    }
                 }
                 for (int i = 1; i <= half; i++)
                 {
@@ -525,14 +565,22 @@ namespace Coolape
                     {
                         tpindex = -1;
                     }
-                    ret.Add(tpindex);
+
+                    if (IsInBounds(tpindex))
+                    {
+                        ret.Add(tpindex);
+                    }
 
                     tpindex = center + i * numRows + half;
                     if (tpindex / numRows != (center + i * numRows) / numRows)
                     {
                         tpindex = -1;
                     }
-                    ret.Add(tpindex);
+
+                    if (IsInBounds(tpindex))
+                    {
+                        ret.Add(tpindex);
+                    }
                 }
 
                 for (int i = 1; i <= half; i++)
@@ -542,14 +590,22 @@ namespace Coolape
                     {
                         tpindex = -1;
                     }
-                    ret.Add(tpindex);
+
+                    if (IsInBounds(tpindex))
+                    {
+                        ret.Add(tpindex);
+                    }
 
                     tpindex = center - i * numRows - half;
                     if (tpindex / numRows != (center - i * numRows) / numRows)
                     {
                         tpindex = -1;
                     }
-                    ret.Add(tpindex);
+
+                    if (IsInBounds(tpindex))
+                    {
+                        ret.Add(tpindex);
+                    }
                 }
                 for (int i = 0; i < half; i++)
                 {
@@ -558,14 +614,22 @@ namespace Coolape
                     {
                         tpindex = -1;
                     }
-                    ret.Add(tpindex);
+
+                    if (IsInBounds(tpindex))
+                    {
+                        ret.Add(tpindex);
+                    }
 
                     tpindex = center + i * numRows - half;
                     if (tpindex / numRows != (center + i * numRows) / numRows)
                     {
                         tpindex = -1;
                     }
-                    ret.Add(tpindex);
+
+                    if (IsInBounds(tpindex))
+                    {
+                        ret.Add(tpindex);
+                    }
                 }
             }
 
@@ -605,7 +669,10 @@ namespace Coolape
                         {
                             tpindex = -1;
                         }
-                        ret.Add(tpindex);
+                        if (IsInBounds(tpindex))
+                        {
+                            ret.Add(tpindex);
+                        }
                     }
                     for (int i = 0; i < half; i++)
                     {
@@ -614,7 +681,11 @@ namespace Coolape
                         {
                             tpindex = -1;
                         }
-                        ret.Add(tpindex);
+
+                        if (IsInBounds(tpindex))
+                        {
+                            ret.Add(tpindex);
+                        }
                     }
                 }
                 for (int row = 1; row <= half - 1; row++)
@@ -626,7 +697,11 @@ namespace Coolape
                         {
                             tpindex = -1;
                         }
-                        ret.Add(tpindex);
+
+                        if (IsInBounds(tpindex))
+                        {
+                            ret.Add(tpindex);
+                        }
                     }
                     for (int i = 0; i < half; i++)
                     {
@@ -635,7 +710,11 @@ namespace Coolape
                         {
                             tpindex = -1;
                         }
-                        ret.Add(tpindex);
+
+                        if (IsInBounds(tpindex))
+                        {
+                            ret.Add(tpindex);
+                        }
                     }
                 }
 
@@ -651,7 +730,11 @@ namespace Coolape
                         {
                             tpindex = -1;
                         }
-                        ret.Add(tpindex);
+
+                        if (IsInBounds(tpindex))
+                        {
+                            ret.Add(tpindex);
+                        }
                     }
 
                     for (int i = 1; i <= half; i++)
@@ -661,7 +744,11 @@ namespace Coolape
                         {
                             tpindex = -1;
                         }
-                        ret.Add(tpindex);
+
+                        if (IsInBounds(tpindex))
+                        {
+                            ret.Add(tpindex);
+                        }
                     }
                 }
 
@@ -674,7 +761,11 @@ namespace Coolape
                         {
                             tpindex = -1;
                         }
-                        ret.Add(tpindex);
+
+                        if (IsInBounds(tpindex))
+                        {
+                            ret.Add(tpindex);
+                        }
                     }
 
                     for (int i = 1; i <= half; i++)
@@ -684,7 +775,11 @@ namespace Coolape
                         {
                             tpindex = -1;
                         }
-                        ret.Add(tpindex);
+
+                        if (IsInBounds(tpindex))
+                        {
+                            ret.Add(tpindex);
+                        }
                     }
                 }
             }

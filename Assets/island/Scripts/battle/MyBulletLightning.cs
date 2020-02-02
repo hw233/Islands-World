@@ -31,6 +31,18 @@ public class MyBulletLightning : CLBulletBase
         //stop base.FixedUpdate running
     }
 
+    public override Vector3 hitPoint
+    {
+        get
+        {
+            if(target != null)
+            {
+                return target.transform.position;
+            }
+            return Vector3.zero;
+        }
+    }
+
     public override void doFire(CLUnit attacker, CLUnit target, Vector3 orgPos, Vector3 dir, object attr, object data, object callbak)
     {
         lightningBolt.EndObject = target.gameObject;

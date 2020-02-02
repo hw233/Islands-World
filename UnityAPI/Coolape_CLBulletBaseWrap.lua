@@ -21,6 +21,7 @@
 ---@field public haveCollider System.Boolean
 ---@field public boxCollider UnityEngine.BoxCollider
 ---@field public transform UnityEngine.Transform
+---@field public hitPoint UnityEngine.Vector3
 local m = { }
 ---public CLBulletBase .ctor()
 ---@return CLBulletBase

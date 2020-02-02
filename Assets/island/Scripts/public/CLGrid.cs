@@ -28,6 +28,7 @@ public class CLGrid : UIEventListener
     public bool showGridRange = true;
     public GridBase grid = new GridBase();
     bool isShowingGrid = false;
+    public bool isWorld = true;
     [HideInInspector]
     public Vector3 originPos = Vector3.zero;
 
@@ -47,7 +48,14 @@ public class CLGrid : UIEventListener
     //}
     public void init(bool isInitNodes)
     {
-        init(transform.position, isInitNodes);
+        if (isWorld)
+        {
+            init(transform.position, isInitNodes);
+        }
+        else
+        {
+            init(transform.localPosition, isInitNodes);
+        }
     }
     public void init(Vector3 origin, bool isInitNodes)
     {

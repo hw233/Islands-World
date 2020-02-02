@@ -14,6 +14,7 @@
 ---@field public showGrid System.Boolean
 ---@field public showGridRange System.Boolean
 ---@field public grid Coolape.GridBase
+---@field public isWorld System.Boolean
 ---@field public originPos UnityEngine.Vector3
 ---@field public lineName System.String
 ---@field public nodesMap System.Collections.Generic.Dictionary2System.Int32Coolape.CLAStarNode

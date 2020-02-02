@@ -228,8 +228,8 @@ function IDMainCity.init(cityData, onFinishCallback, onProgress, isForceInitASta
     IDMainCity.grid.showGrid = false
     IDMainCity.grid.showGridRange = true
     if MyCfg.mode == GameMode.battle then
-        IDMainCity.grid.color4Rect = Color.yellow
         -- IDMainCity.grid:showRect()
+        IDMainCity.grid.color4Rect = Color.yellow
     else
         IDMainCity.grid.color4Rect = Color.red
         IDMainCity.grid:hideRect()
@@ -358,6 +358,12 @@ function IDMainCity.onChgMode(oldMode, curMode)
         IDMainCity.Headquarters:hideHud4WorldMap()
     elseif curMode == GameModeSub.mapBtwncity then
         preGameMode = oldMode
+        if oldMode == GameModeSub.city then
+            if IDLGridTileSide.state == IDLGridTileSide.StateEnum.hidden then
+                IDLGridTileSide.refreshAndShow(nil, nil, true)
+            end
+        end
+
         isShowBuilding = false
         isShowTile = true
         IDMainCity.onClickOcean()
@@ -366,6 +372,12 @@ function IDMainCity.onChgMode(oldMode, curMode)
         IDMainCity.Headquarters:showHud4WorldMap()
     elseif curMode == GameModeSub.map then
         preGameMode = oldMode
+        if oldMode == GameModeSub.city then
+            if IDLGridTileSide.state == IDLGridTileSide.StateEnum.hidden then
+                IDLGridTileSide.refreshAndShow(nil, nil, true)
+            end
+        end
+
         isShowBuilding = false
         isShowTile = false
         IDMainCity.onClickOcean()
@@ -1686,7 +1698,10 @@ function IDMainCity.setCannotDeploySideCells()
         for i = 0, aroundList.Count - 1 do
             ---@type Coolape.CLAStarNode
             local _node = aroundList[i]
-            if cannotDeploySideCells[_node.index] == nil and needshowTileRedCells[_node.index] == nil then
+            if
+                _node.index >= 0 and cannotDeploySideCells[_node.index] == nil and
+                    needshowTileRedCells[_node.index] == nil
+             then
                 if IDMainCity.isCannotDeploySide(_node.index) then
                     cannotDeploySideCells[_node.index] = _node.index
                 end
@@ -1711,7 +1726,7 @@ function IDMainCity.setCannotDeploySideCells()
             local cells = grid:getCells(b.gridIndex, size)
             for i = 0, cells.Count - 1 do
                 local index2 = cells[i]
-                if cannotDeploySideCells[index2] == nil and needshowTileRedCells[index2] == nil then
+                if index2 >= 0 and cannotDeploySideCells[index2] == nil and needshowTileRedCells[index2] == nil then
                     if IDMainCity.isCannotDeploySide(index2) then
                         cannotDeploySideCells[index2] = index2
                     else

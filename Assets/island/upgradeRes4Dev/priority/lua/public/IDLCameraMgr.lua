@@ -45,7 +45,7 @@ function IDLCameraMgr.setPostProcessingProfile(name, camera)
         IDLCameraMgr.enabledTop(true)
     else
         postProcLayer.enabled = false
-        IDLCameraMgr.enabledTop(false)
+        IDLCameraMgr.enabledTop(true)
     end
 end
 

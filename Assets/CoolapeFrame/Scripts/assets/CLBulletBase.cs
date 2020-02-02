@@ -343,7 +343,15 @@ namespace Coolape
 			CLBulletPool.returnObj (this);
 		}
 
-		public void onFinishFire (bool needRelease)
+        public virtual Vector3 hitPoint
+        {
+            get
+            {
+                return transform.position;
+            }
+        }
+
+        public void onFinishFire (bool needRelease)
 		{
 			if (needRelease) {
 				isFireNow = false;

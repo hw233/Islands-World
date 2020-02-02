@@ -29,12 +29,12 @@ function _cell.resetTarget(bullet)
     else
         r = 4
     end
-    local target = IDLBattle.searcher.getTargetInRange(bullet.attacker, bullet.transform.position, r)
+    local target = IDLBattle.searcher.getTargetInRange(bullet.attacker.luaTable, bullet.transform.position, r)
     if target then
         --[[ 注意：当target为nil时，不能设置bullet的target,
 		因为可能bullet已经有目标了，而通过上面的方法只是再次取得更优的目标，
-		只有当取得目标是才更新子弹的目标]]
-        bullet.target = target
+		只有当取得目标时才更新子弹的目标]]
+        bullet.target = target.csSelf
     end
 end
 

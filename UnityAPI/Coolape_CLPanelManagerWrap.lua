@@ -62,8 +62,9 @@ function m.hideTopPanel(panel, showMain, immed) end
 ---public Void rmPanelRetainLayer(CLPanelBase panel)
 ---@param optional CLPanelBase panel
 function m.rmPanelRetainLayer(panel) end
----public Void hideAllPanel()
-function m.hideAllPanel() end
+---public Void hideAllPanel(String exceptPanelName)
+---@param optional String exceptPanelName
+function m.hideAllPanel(exceptPanelName) end
 ---public Void Update()
 function m:Update() end
 ---public Void Start()

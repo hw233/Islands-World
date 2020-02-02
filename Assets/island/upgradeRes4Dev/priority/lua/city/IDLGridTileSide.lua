@@ -1229,7 +1229,8 @@ function IDLGridTileSide.onLoadSide(name, obj, orgs)
     if name == SidesName.TileSideFour then
         pos = pos + IDMainCity.offset4Tile
     end
-    obj.transform.position = pos
+    -- obj.transform.position =  pos
+    obj.transform.localPosition =  pos - IDMainCity.transform.position
     SetActive(obj, true)
     tileSides[index] = obj
     if callback then
