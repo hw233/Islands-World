@@ -159,12 +159,25 @@ function IDLBuildingDefense:SetActive(active)
 end
 
 function IDLBuildingDefense:begainAttack()
+    -- 建筑的状态为修复和升级中的不可以进攻，正在修复的建筑还不可以进攻
     self.csSelf:cancelInvoke4Lua(self.idel)
+    if
+        bio2number(self.serverData.state) == IDConst.BuildingState.renew or
+            bio2number(self.serverData.state) == IDConst.BuildingState.upgrade
+     then
+        return
+    end
     self:doAttack()
 end
 
 function IDLBuildingDefense:doAttack()
     if GameMode.battle ~= MyCfg.mode or self.isDead then
+        return
+    end
+    if
+        bio2number(self.serverData.state) == IDConst.BuildingState.renew or
+            bio2number(self.serverData.state) == IDConst.BuildingState.upgrade
+     then
         return
     end
 
@@ -186,7 +199,7 @@ function IDLBuildingDefense:doSearchTarget()
         -- 重新寻敌
         target = IDLBattle.searchTarget(self)
     else
-        local pos1= self.transform.position
+        local pos1 = self.transform.position
         pos1.y = 0
         local pos2 = target.transform.position
         pos2.y = 0

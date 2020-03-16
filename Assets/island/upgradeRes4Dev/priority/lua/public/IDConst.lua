@@ -65,10 +65,9 @@ IDConst.RoleID = {
 ---@public 游戏中各种类型
 IDConst.UnitType = {
     building = 1,
-    ship = 2,
+    role = 2,
     tech = 3,
-    pet = 4,
-    skill = 5
+    skill = 4
 }
 
 ---@public 资源各类
@@ -97,8 +96,8 @@ IDConst.AttrType = {
 
 ---@public 战斗类型
 IDConst.BattleType = {
-    pvp = 1, -- 攻击玩家
-    pve = 2 -- 副本
+    attackIsland = 1, -- 攻击岛
+    attackFleet = 2, -- 攻击舰队
 }
 
 ---@public 换装的类型
@@ -147,5 +146,27 @@ IDConst.FleetTaskName = {
     [2] = "FleetTaskVoyage", -- 出征
     [3] = "FleetTaskBack", -- 返航
     [4] = "FleetTaskAttack" -- 攻击
+}
+
+---@public 邮件类型，1：系统，2：战报；3：私信，4:联盟，5：客服
+IDConst.MailType = {
+    all = 0, -- 全部（收件箱）
+    system = 1, -- 1：系统
+    report = 2, -- 2：战报；
+    private = 3, -- 3：私信、gm
+    -- union = 4, -- 4:联盟
+    -- gm = 5 -- 5：客服
+}
+IDConst.MailTypeName = {
+    [0] = "All",
+    [1] = "System",
+    [2] = "BattleReport",
+    [3] = "Other",
+}
+---@public 邮件状态
+IDConst.MailState = {
+    unread = 0, -- 未读
+    readNotRewared = 1, -- 已读未领取
+    readRewared = 2  -- 已读已领取
 }
 return IDConst

@@ -34,7 +34,7 @@ function IDLBuildingRes:showCollect()
             self.csSelf:invoke4Lua(self.showCollect, 60)
         end
     else
-        printe("当建筑不可收集资源！")
+        printe("当前建筑不可收集资源！")
     end
 end
 
@@ -163,6 +163,33 @@ function IDLBuildingRes:canCollect()
         end
     end
     return false
+end
+
+function IDLBuildingRes:onHurt(damage, attacker)
+    if not self.isDead then
+        -- 处理扣除资源
+        if damage > 0 then
+            local _damage = damage
+            if _damage > bio2number(self.data.curHP) then
+                _damage = bio2number(self.data.curHP)
+            end
+            local resType = IDUtl.getResTypeByBuildingID(bio2number(self.attr.ID))
+            local persent = _damage / bio2number(self.data.HP)
+            -- 只计算分钟数
+            local passTime = DateEx.nowMS - bio2number(self.serverData.starttime)
+            passTime = NumEx.getIntPart(passTime / 60000)
+            local constcfg = DBCfg.getConstCfg()
+            local MaxTimeLen4ResYields = bio2number(constcfg.MaxTimeLen4ResYields)
+            -- 判断时长是否超过最大生产时长(目前配置的时最大只可生产8小时产量)
+            if passTime > MaxTimeLen4ResYields then
+                passTime = MaxTimeLen4ResYields
+            end
+            -- 此处计算的是分钟数，相当于掠夺了xx分钟的产量
+            self.data.lootRes[resType] = persent * passTime + self.data.lootRes[resType]
+            self:showBeLootResEffect()
+        end
+    end
+    IDLBuildingRes.super.onHurt(self, damage, attacker)
 end
 
 function IDLBuildingRes:SetActive(active)

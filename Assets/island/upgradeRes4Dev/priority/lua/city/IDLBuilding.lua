@@ -40,11 +40,17 @@ function IDLBuilding:init(selfObj, id, star, lev, _isOffense, other)
     self.gridIndex = other.index
     -- 所在格子的index
     self.oldindex = self.gridIndex
+    self.lastshowBeLootResEffect = 0
+    self.stateFlags = {} -- 建筑各种状态标志
 
     if GameMode.battle == MyCfg.mode then
         -- 初始化数据
         ---@type UnitData4Battle
         self.data = {}
+        self.data.lootRes = {}
+        self.data.lootRes[IDConst.ResType.food] = 0
+        self.data.lootRes[IDConst.ResType.gold] = 0
+        self.data.lootRes[IDConst.ResType.oil] = 0
         self.data.HP =
             DBCfg.getGrowingVal(
             bio2number(self.attr.HPMin),
@@ -64,12 +70,31 @@ function IDLBuilding:init(selfObj, id, star, lev, _isOffense, other)
         self.data.damage = number2bio(self.data.damage)
     end
 
+    self:showBuildingStateFlags()
+
     if not other.hideShadow then
         -- 某种情况下是不需要影子的
         self:loadShadow()
     end
     self:loadFloor()
     self:upgrading()
+end
+
+---@public 显示建筑的各种状态标识
+function IDLBuilding:showBuildingStateFlags()
+    if self.serverData == nil then
+        return
+    end
+    --//TODO:显示建筑的不同状态表现
+    local state = bio2number(self.serverData.state)
+    if state == IDConst.BuildingState.renew then
+    elseif state == IDConst.BuildingState.upgrade then
+    elseif state == IDConst.BuildingState.working then
+    end
+end
+
+function IDLBuilding:hideBuildingStateFlags()
+    --//TODO:
 end
 
 ---@public 加载影子
@@ -483,7 +508,41 @@ function IDLBuilding:onHurt(damage, attacker)
     IDLBuilding.super.onHurt(self, damage, attacker)
 end
 
+---@public 处理被掠夺资源的处理
+function IDLBuilding:showBeLootResEffect(force)
+    if force or DateEx.nowMS - self.lastshowBeLootResEffect >= 3000 then
+        self.lastshowBeLootResEffect = DateEx.nowMS
+        local resType = IDUtl.getResTypeByBuildingID(bio2number(self.attr.ID))
+        self:onBeLootRes(resType)
+    end
+end
+
+function IDLBuilding:onBeLootRes(resType)
+    local oriVal = self.data.lootRes[resType]
+    local lootVal = NumEx.getIntPart(oriVal)
+    if lootVal > 0 then
+        local bidx = bio2number(self.serverData.idx)
+        self.data.lootRes[resType] = oriVal - lootVal
+        -- 通知战场
+        IDLBattle.onLootRes(bidx, resType, lootVal)
+        local effectName, soundName
+        if resType == IDConst.ResType.food then
+            effectName = joinStr("collectRes.food")
+            soundName = "collect_Food"
+        elseif resType == IDConst.ResType.gold then
+            effectName = joinStr("collectRes.gold")
+            soundName = "collect_coins_01"
+        elseif resType == IDConst.ResType.oil then
+            effectName = joinStr("collectRes.oil")
+            soundName = "collect_oil_01"
+        end
+        SoundEx.playSound(soundName, 1, 2)
+        CLEffect.play(effectName, self.transform.position)
+    end
+end
+
 function IDLBuilding:iamDie()
+    self:showBeLootResEffect(true)
     CLEffect.play("BombBuilding", self.transform.position)
     SetActive(self.gameObject, false)
     self.csSelf:clean()
@@ -495,6 +554,7 @@ function IDLBuilding:clean()
     self.canClick = true
     self.isJump = false
     self:hideShadow()
+    self:hideBuildingStateFlags()
 
     if self.floor ~= nil then
         CLThingsPool.returnObj(self.floor)

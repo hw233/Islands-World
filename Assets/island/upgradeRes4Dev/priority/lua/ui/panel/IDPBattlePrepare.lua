@@ -63,18 +63,18 @@ function IDPBattlePrepare.startBattle(data)
     end
 
     ---@type IDDBPlayer
-    local player = IDDBPlayer.new(data.player)
+    local targetPlayer = IDDBPlayer.new(data.player)
     ---@type IDDBCity
-	local city = IDDBCity.new(data.city)
-	local cellIndex = bio2number(city.pos)
-    city:setAllUnits2Buildings(data.dockyardShipss)
+	local targetCity = IDDBCity.new(data.city)
+	local cellIndex = bio2number(targetCity.pos)
+    targetCity:setAllUnits2Buildings(data.dockyardShipss)
 
     ---@type _ParamBattleData
     local battleData = {}
-    battleData.type = IDConst.BattleType.pvp
+    battleData.type = IDConst.BattleType.attackIsland
     battleData.attackPlayer = data.player2
-    battleData.targetPlayer = player
-    battleData.targetCity = city
+    battleData.targetPlayer = targetPlayer
+    battleData.targetCity = targetCity
 	battleData.fleet = data.fleetinfor
 	doHidePanel(csSelf)
     IDUtl.chgScene(

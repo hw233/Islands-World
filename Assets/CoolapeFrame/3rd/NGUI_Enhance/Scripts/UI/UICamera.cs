@@ -1810,8 +1810,11 @@ public class UICamera : MonoBehaviour
 			Notify(currentTouch.pressed, "OnPress", true);
 
 			if (mTooltip != null) ShowTooltip(false);
-			selectedObject = currentTouch.pressed;
-		}
+            if (currentTouch != null) // modify by chenbin
+            {
+                selectedObject = currentTouch.pressed;
+            }
+        }
 		else if (currentTouch.pressed != null && (currentTouch.delta.sqrMagnitude != 0f || currentTouch.current != currentTouch.last))
 		{
 			// Keep track of the total movement

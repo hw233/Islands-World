@@ -160,7 +160,7 @@ do
 
         local chlCode = getChlCode()
         local url = Utl.urlAddTimes(joinStr(CLVerManager.self.baseUrl, "/appVer.", chlCode, ".json"))
-        WWWEx.get(url, CLAssetType.text, onGetVer, onGetVerError, nil, true)
+        WWWEx.get(url, CLAssetType.text, onGetVer, onGetVerError, nil, true, 2)
     end
 
     -- 更新安装游戏
@@ -237,18 +237,19 @@ do
                         -- 说明有单个资源
                         lbprogressBarTotal.text = joinStr(v, "/", all)
                     end
-                    -- 单个资源的进度
-                    CLLPSplash.onProgressCell()
 
                     -- 表明已经更新完成
                     if (value == 1) then
-                        csSelf:cancelInvoke4Lua(CLLPSplash.onProgressCell)
+                        InvokeEx.cancelInvokeByUpdate(CLLPSplash.onProgressCell)
                         NGUITools.SetActive(progressBarTotal.gameObject, false)
                         NGUITools.SetActive(LabelTip.gameObject, false)
                         NGUITools.SetActive(progressBar.gameObject, false)
+                    else
+                        -- 单个资源的进度
+                        CLLPSplash.onProgressCell()
                     end
                 else
-                    csSelf:cancelInvoke4Lua(CLLPSplash.onProgressCell)
+                    InvokeEx.cancelInvokeByUpdate(CLLPSplash.onProgressCell)
                     progressBarTotal.value = 0
                     NGUITools.SetActive(progressBarTotal.gameObject, false)
                     NGUITools.SetActive(LabelTip.gameObject, false)
@@ -264,12 +265,11 @@ do
     function CLLPSplash.onProgressCell(...)
         if (www4UpgradeCell ~= nil) then
             NGUITools.SetActive(progressBar.gameObject, true)
-            progressBar.value = www4UpgradeCell.progress
-            csSelf:cancelInvoke4Lua(CLLPSplash.onProgressCell)
-            csSelf:invoke4Lua(CLLPSplash.onProgressCell, 0.1)
+            progressBar.value = www4UpgradeCell.downloadProgress or 0
+            InvokeEx.invokeByUpdate(CLLPSplash.onProgressCell, 0.02)
         else
             NGUITools.SetActive(progressBar.gameObject, false)
-            csSelf:cancelInvoke4Lua(CLLPSplash.onProgressCell)
+            InvokeEx.cancelInvokeByUpdate(CLLPSplash.onProgressCell)
         end
     end
 
@@ -322,7 +322,7 @@ do
         CLLPSplash.checkSignCode()
 
         if (progressBar ~= nil) then
-            csSelf:cancelInvoke4Lua(CLLPSplash.onProgressCell)
+            InvokeEx.cancelInvokeByUpdate(CLLPSplash.onProgressCell)
             NGUITools.SetActive(progressBar.gameObject, false)
             NGUITools.SetActive(progressBarTotal.gameObject, false)
             NGUITools.SetActive(LabelTip.gameObject, false)

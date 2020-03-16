@@ -5,6 +5,8 @@
 ---@field public icon String
 ---@field public num bio
 ---@field public lev bio
+---@field public fidx bio 所属舰队idx
+---@field public bidx bio 所属建筑idx
 
 -- xx界面
 IDPBattle = {}
@@ -54,12 +56,13 @@ function IDPBattle.showShips()
         local shipId = bio2number(v.id)
         if shipMap[shipId] == nil then
             cellData = {}
-            cellData.type = IDConst.UnitType.ship
+            cellData.type = IDConst.UnitType.role
             cellData.id = shipId
             cellData.num = v.num
             local attr = DBCfg.getRoleByID(shipId)
             cellData.name = LGet(attr.NameKey)
             cellData.icon = IDUtl.getRoleIcon(shipId)
+            cellData.fidx = mData.fleet.idx
             shipMap[shipId] = cellData
         else
             cellData = shipMap[shipId]
@@ -94,8 +97,7 @@ function IDPBattle.procNetwork(cmd, succ, msg, paras)
     if (succ == NetSuccess) then
         if cmd == NetProtoIsland.cmds.sendEndAttackIsland then
             hideHotWheel()
-            IDLBattle.clean()
-            IDUtl.chgScene(GameMode.map)
+            IDLBattle.endBattle()
         end
     end
 end

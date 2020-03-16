@@ -20,7 +20,6 @@
 ---@field public mVerPrioriPath System.String
 ---@field public mVerOtherPath System.String
 ---@field public wwwMap System.Collections.Hashtable
----@field public wwwTimesMap System.Collections.Hashtable
 ---@field public clientVersion System.String
 local m = { }
 ---public CLVerManager .ctor()

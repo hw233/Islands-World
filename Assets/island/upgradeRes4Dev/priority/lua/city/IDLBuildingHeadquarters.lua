@@ -23,8 +23,8 @@ end
 
 function IDLBuildingHeadquarters:onFinishBuildingUpgrade()
     IDLBuildingHeadquarters.super.onFinishBuildingUpgrade(self)
-    if IDMainCity then
-        IDMainCity.refreshFogOfWarInfluence()
+    if IDWorldMap then
+        IDWorldMap.refreshFogOfWarInfluence(nil, IDWorldMap.mode)
     end
 end
 
@@ -53,7 +53,7 @@ function IDLBuildingHeadquarters:showHud4WorldMap()
             "WorldTileHud",
             function(name, obj, orgs)
                 ---@param obj UnityEngine.GameObject
-                if self.hud4Worldmap or (not self.gameObject.activeInHierarchy) then
+                if IDWorldMap.mode == GameModeSub.city or self.hud4Worldmap or (not self.gameObject.activeInHierarchy) then
                     CLUIOtherObjPool.returnObj(obj)
                     SetActive(obj, false)
                     return
@@ -72,7 +72,10 @@ function IDLBuildingHeadquarters:showHud4WorldMap()
             "WorldTipHud",
             function(name, obj, orgs)
                 ---@param obj UnityEngine.GameObject
-                if self.hud4WorldmapTip or (not self.gameObject.activeInHierarchy) then
+                if
+                    IDWorldMap.mode == GameModeSub.city or self.hud4WorldmapTip or
+                        (not self.gameObject.activeInHierarchy)
+                 then
                     CLUIOtherObjPool.returnObj(obj)
                     SetActive(obj, false)
                     return
@@ -99,6 +102,40 @@ function IDLBuildingHeadquarters:hideHud4WorldMap()
         CLUIOtherObjPool.returnObj(self.hud4WorldmapTip.gameObject)
         SetActive(self.hud4WorldmapTip.gameObject, false)
         self.hud4WorldmapTip = nil
+    end
+end
+
+function IDLBuildingHeadquarters:onHurt(damage, attacker)
+    if not self.isDead then
+        -- 处理扣除资源
+        if damage > 0 then
+            local _damage = damage
+            if _damage > bio2number(self.data.curHP) then
+                _damage = bio2number(self.data.curHP)
+            end
+            local persent = _damage / bio2number(self.data.HP)
+            local resType = IDConst.ResType.food
+            self.data.lootRes[resType] = persent * bio2number(self.serverData.val) + (self.data.lootRes[resType] or 0)
+
+            resType = IDConst.ResType.gold
+            self.data.lootRes[resType] =
+                NumEx.getIntPart(persent * bio2number(self.serverData.val2)) + (self.data.lootRes[resType] or 0)
+
+            resType = IDConst.ResType.oil
+            self.data.lootRes[resType] =
+                NumEx.getIntPart(persent * bio2number(self.serverData.val3)) + (self.data.lootRes[resType] or 0)
+            self:showBeLootResEffect()
+        end
+    end
+    IDLBuildingHeadquarters.super.onHurt(self, damage, attacker)
+end
+
+function IDLBuildingHeadquarters:showBeLootResEffect(force)
+    if force or DateEx.nowMS - self.lastshowBeLootResEffect > 60000 then
+        self.lastshowBeLootResEffect = DateEx.nowMS
+        self:onBeLootRes(IDConst.ResType.food)
+        self:onBeLootRes(IDConst.ResType.gold)
+        self:onBeLootRes(IDConst.ResType.oil)
     end
 end
 

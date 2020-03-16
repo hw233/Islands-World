@@ -15,7 +15,7 @@ IDWorldMap.grid = nil
 IDWorldMap.mode = GameModeSub.none
 ---@type SimpleFogOfWar.FogOfWarInfluence 离屏中心最近的Influence
 IDWorldMap.nearestInfluence = nil
----@type GridBase
+---@type Coolape.GridBase
 local grid = nil
 local isInited = false
 local lookAtTarget = MyCfg.self.lookAtTarget
@@ -142,6 +142,7 @@ function IDWorldMap.init(gidx, onFinishCallback, onProgress)
         -- 屏幕拖动代理
         drag4World.onDragMoveDelegate = IDWorldMap.onDragMove
         drag4World.onDragScaleDelegate = IDWorldMap.onTouchScaleGround
+        drag4World.onDragAngleViewCallback = IDWorldMap.onTouchRotate
         local pageIdx = IDWorldMap.getPageIdx(gidx)
         cityGidx = gidx
         centerPageIdx = pageIdx
@@ -158,7 +159,8 @@ function IDWorldMap.init(gidx, onFinishCallback, onProgress)
                 IDWorldMap.refreshFogOfWarInfluence(GameModeSub.none, GameMode.map)
                 CLLNet.send(NetProtoIsland.send.setPlayerCurrLook4WorldPage(centerPageIdx))
                 onFinishCallback()
-                smoothFollow:tween(Vector2(20, 100), Vector2(10, 15), 2.5, nil, IDWorldMap.scaleGround)
+                -- smoothFollow:tween(Vector2(20, 100), Vector2(10, 15), 2.5, nil, IDWorldMap.scaleGround)
+                IDWorldMap.moveToView(cityGidx, GameModeSub.city)
             end,
             onProgress,
             forceInitAstar
@@ -211,6 +213,10 @@ function IDWorldMap.onLoadOcean(name, obj, orgs)
     SetActive(obj, true)
 end
 
+function IDWorldMap.getCityIndex()
+    return cityGidx
+end
+
 function IDWorldMap.setGameMode()
     if IDWorldMap.mode == GameModeSub.fleet then
         return
@@ -236,18 +242,18 @@ function IDWorldMap.setGameMode()
             end
         end
     end
-    if GameMode.map == MyCfg.mode then
+    if MyCfg.mode == GameMode.map then
         dragSetting.scaleMini = 7
         dragSetting.scaleMax = 20
-        dragSetting.scaleHeightMini = 10
+        dragSetting.scaleHeightMini = 7
         dragSetting.scaleHeightMax = 100
     else
         dragSetting.scaleMini = 7
         dragSetting.scaleMax = 20
-        dragSetting.scaleHeightMini = 10
+        dragSetting.scaleHeightMini = 7
         dragSetting.scaleHeightMax = 30
     end
-
+    local oldMode = IDWorldMap.mode
     if smoothFollow.height > IDWorldMap.scaleCityHeighMin and smoothFollow.height < IDWorldMap.scaleCityHeighMax then
         if IDWorldMap.mode ~= GameModeSub.mapBtwncity and MyCfg.mode == GameMode.map then
             if IDWorldMap.mode == GameModeSub.map then
@@ -262,7 +268,7 @@ function IDWorldMap.setGameMode()
             dragSetting.viewCenter = Vector3.zero
             if IDPMain then
                 -- 通知ui
-                IDPMain.onChgMode()
+                IDPMain.onChgMode(oldMode, IDWorldMap.mode)
             end
         end
     elseif smoothFollow.height > IDWorldMap.scaleCityHeighMax then
@@ -277,7 +283,7 @@ function IDWorldMap.setGameMode()
             dragSetting.viewCenter = Vector3.zero
             if IDPMain then
                 -- 通知ui
-                IDPMain.onChgMode()
+                IDPMain.onChgMode(oldMode, IDWorldMap.mode)
             end
         end
     else
@@ -287,7 +293,11 @@ function IDWorldMap.setGameMode()
                 IDWorldMap.cleanPages()
             end
             IDWorldMap.mode = GameModeSub.city
-            Time.fixedDeltaTime = 0.04
+            if MyCfg.mode == GameMode.battle then
+                Time.fixedDeltaTime = 0.02
+            else
+                Time.fixedDeltaTime = 0.04
+            end
             -- MyCfg.self.fogOfWar.enabled = false -- 提升性
             IDWorldMap.refreshFogOfWarInfluence(IDWorldMap.mode, GameModeSub.city)
             IDMainCity.onChgMode(IDWorldMap.mode, GameModeSub.city)
@@ -297,7 +307,7 @@ function IDWorldMap.setGameMode()
             dragSetting.viewCenter = center
             if IDPMain then
                 -- 通知ui
-                IDPMain.onChgMode()
+                IDPMain.onChgMode(oldMode, IDWorldMap.mode)
             end
         end
     end
@@ -313,17 +323,25 @@ function IDWorldMap.refreshFogOfWarInfluence(oldMode, curMode)
         fogOfWar.VisibilitySnapshotInterval = 200 -- （秒）值越大，对性能影响越小
         MyCfg.self.fogOfWar.enabled = false
     else
-        local lev = bio2number(IDMainCity.cityData.headquarters.lev)
-        ---@type DBCFHeadquartersLevsData
-        local attr = DBCfg.getHeadquartersLevsDataByLev(lev)
-        dis = bio2number(attr.Range) * IDWorldMap.grid.cellSize
-        IDMainCity.fogOfWarInfluence.ViewDistance = dis
-        fogOfWar.VisibilitySnapshotInterval = 1 -- （秒）值越大，对性能影响越小
-        MyCfg.self.fogOfWar.enabled = true
+        if IDMainCity.cityData then
+            local lev = bio2number(IDMainCity.cityData.headquarters.lev)
+            ---@type DBCFHeadquartersLevsData
+            local attr = DBCfg.getHeadquartersLevsDataByLev(lev)
+            dis = bio2number(attr.Range) * IDWorldMap.grid.cellSize
+            IDMainCity.fogOfWarInfluence.ViewDistance = dis
+            fogOfWar.VisibilitySnapshotInterval = 1 -- （秒）值越大，对性能影响越小
+            MyCfg.self.fogOfWar.enabled = true
+        end
     end
     if curMode == GameModeSub.map and (oldMode == GameModeSub.mapBtwncity or oldMode == GameModeSub.city) then
         -- 是从主城切换过来的,强制执行一次fog的SnapshotStampTexture
         fogOfWar:SnapshotStampTexture()
+    end
+end
+
+function IDWorldMap.onTouchRotate(eulerAngles)
+    if IDPMain then
+        IDPMain.refreshPointer(eulerAngles)
     end
 end
 
@@ -348,28 +366,15 @@ end
 
 function IDWorldMap.onDragMove(delta)
     IDWorldMap.oceanTransform.position = lookAtTarget.position + IDWorldMap.offset4Ocean
+    IDWorldMap.recheckCellsVisible()
 
-    if MyCfg.mode == GameMode.map and IDWorldMap.mode ~= GameModeSub.city then
-        -- 取得屏幕中心点下的地块
-        local lastHit =
-            Utl.getRaycastHitInfor(
-            MyCfg.self.mainCamera,
-            Vector3(Screen.width / 2, Screen.height / 2, 0),
-            Utl.getLayer("Water")
-        )
-        if lastHit then
-            local centerPos = lastHit.point
-            local tmpPageIdx = IDWorldMap.getPageIdx(grid:GetCellIndex(centerPos))
-            if tmpPageIdx ~= centerPageIdx then
-                -- 说明已经切换屏了,重新加载数据
-                centerPageIdx = tmpPageIdx
-                -- 通知服务器，我当前所在屏改变了
-                CLLNet.send(NetProtoIsland.send.setPlayerCurrLook4WorldPage(centerPageIdx))
-                IDWorldMap.refreshPagesData()
-            end
+    -- 通知ui
+    if IDWorldMap.mode ~= GameModeSub.city then
+        if IDPMain then
+            local index = grid:GetCellIndex(lookAtTarget.position)
+            IDPMain.refreshPosiont(index)
         end
     end
-    IDWorldMap.recheckCellsVisible()
 end
 
 function IDWorldMap.recheckCellsVisible()
@@ -383,6 +388,7 @@ end
 
 function IDWorldMap.doRecheckCellsVisible()
     local centerPos
+    -- 取得屏幕中心点下的地块
     local lastHit =
         Utl.getRaycastHitInfor(
         MyCfg.self.mainCamera,
@@ -390,8 +396,15 @@ function IDWorldMap.doRecheckCellsVisible()
         Utl.getLayer("Water")
     )
     if lastHit then
-        centerPos = lastHit.point
-
+        local centerPos = lastHit.point
+        local tmpPageIdx = IDWorldMap.getPageIdx(grid:GetCellIndex(centerPos))
+        if tmpPageIdx ~= centerPageIdx then
+            -- 说明已经切换屏了,重新加载数据
+            centerPageIdx = tmpPageIdx
+            -- 通知服务器，我当前所在屏改变了
+            CLLNet.send(NetProtoIsland.send.setPlayerCurrLook4WorldPage(centerPageIdx))
+            IDWorldMap.refreshPagesData()
+        end
         -- 取得最近的influence
         local influences = MyCfg.self.fogOfWar:getInfluences()
         local nearestDis = -1
@@ -880,7 +893,7 @@ function IDWorldMap.refreshFleet(fleet, isRemove)
     if fleet == nil then
         return
     end
-    if IDWorldMap.mode ~= GameModeSub.map and IDWorldMap.mode ~= GameModeSub.fleet then
+    if MyCfg.mode ~= GameMode.map or IDWorldMap.mode == GameModeSub.city then
         return
     end
     if isRemove then
@@ -913,6 +926,9 @@ function IDWorldMap.onLoadFleet(name, go, orgs)
     if (IDWorldMap.mode ~= GameModeSub.map and IDWorldMap.mode ~= GameModeSub.fleet) or fleets[fidx] then
         CLThingsPool.returnObj(go)
         SetActive(go, false)
+        if fleets[fidx] then
+            fleets[fidx].refreshData(fleet)
+        end
         return
     end
     go.transform.parent = transform
@@ -977,12 +993,13 @@ function IDWorldMap.selectFleetMode(fidx)
     end
     ---@type IDWorldFleet
     IDWorldMap.selectedFleet = fleetObj
+    local oldMode = IDWorldMap.mode
     IDWorldMap.mode = GameModeSub.fleet
     dragSetting.scaleMini = 7
     dragSetting.scaleMax = 20
     dragSetting.scaleHeightMini = 51
     dragSetting.scaleHeightMax = 100
-    IDPMain.onChgMode()
+    IDPMain.onChgMode(oldMode, IDWorldMap.mode)
     drag4World.canMove = false
     csSelf:invoke4Lua(
         function()
@@ -999,12 +1016,13 @@ function IDWorldMap.unselectFleet()
         return
     end
     IDWorldMap.selectedFleet = nil
+    local oldMode = IDWorldMap.mode
     IDWorldMap.mode = GameModeSub.map
     dragSetting.scaleMini = 7
     dragSetting.scaleMax = 20
-    dragSetting.scaleHeightMini = 10
+    dragSetting.scaleHeightMini = 7
     dragSetting.scaleHeightMax = 100
-    IDPMain.onChgMode()
+    IDPMain.onChgMode(oldMode, IDWorldMap.mode)
     lookAtTargetFollow.enabled = false
     lookAtTargetFollow.target = nil
     drag4World.canMove = true
@@ -1043,11 +1061,11 @@ function IDWorldMap._doTweenView(newCenter, subMode, callback)
         Utl.getLayer("Water")
     )
     local curCenterPos = Vector3.zero
-    if lastHit then
-        curCenterPos = lastHit.point
-    else
-        curCenterPos = lookAtTarget.position
-    end
+    -- if lastHit then
+    --     curCenterPos = lastHit.point
+    -- else
+    curCenterPos = lookAtTarget.position
+    -- end
 
     local newCenterPos = grid:GetCellCenter(newCenter)
 
@@ -1068,17 +1086,21 @@ function IDWorldMap._doTweenView(newCenter, subMode, callback)
         0,
         IDWorldMap.onDragMove,
         function()
+            -- 设置海面及lookat的坐标
+            lookAtTarget.position = newCenterPos
+            IDWorldMap.oceanTransform.position = lookAtTarget.position + IDWorldMap.offset4Ocean
+            -- 重新加载地图数据
             if outofView and (GameModeSub.map == subMode or GameModeSub.fleet == subMode) then
-                -- 重新加载地图数据
-                lookAtTarget.position = newCenterPos
                 csSelf:invoke4Lua(IDWorldMap.onDragMove, 0.2)
             end
+            -- 回调
             Utl.doCallback(callback)
         end,
         nil,
         true
     )
 end
+
 ---@public 缩放视野
 function IDWorldMap._doScaleView(subMode, callback)
     local scaleView = smoothFollow
@@ -1087,7 +1109,11 @@ function IDWorldMap._doScaleView(subMode, callback)
         local finishCallback = nil
         if subMode == GameModeSub.city then
             finishCallback = IDWorldMap.finisEnterCity
-            toView = Vector2(10, 15)
+            if MyCfg.mode == GameMode.battle then
+                toView = Vector2(20, 30)
+            else
+                toView = Vector2(10, 15)
+            end
         elseif subMode == GameModeSub.map or subMode == GameModeSub.fleet then
             toView = Vector2(20, 80)
         elseif subMode == GameModeSub.mapBtwncity then

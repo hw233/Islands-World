@@ -29,6 +29,7 @@ function IDRShipLandCraft:onFinishLandSoldiers()
     self:onDead()
 end
 
+---@public 取得是近的海岸的index的坐标
 function IDRShipLandCraft:getNearestBeachPos()
     local list
     for i = 2, 50 do

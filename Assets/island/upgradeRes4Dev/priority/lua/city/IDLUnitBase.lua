@@ -31,6 +31,7 @@ IDLUnitBase = class("IDLUnitBase")
 ---@field public HP number 总血量
 ---@field public curHP number 当前血量
 ---@field public damage number 伤害值
+---@field public lootRes table 扣除资源
 
 ---@param csSelf MyUnit
 function IDLUnitBase:ctor(csSelf)

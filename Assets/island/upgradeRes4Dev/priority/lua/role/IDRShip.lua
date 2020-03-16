@@ -150,7 +150,7 @@ function IDRShip:doLandingSoldier(param)
     data.id = 3
     data.lev = number2bio(1) -- //TODO:根据科技来得到等级
     data.num = 1
-    data.type = IDConst.UnitType.ship
+    data.type = IDConst.UnitType.role
 
     CLRolePool.borrowObjAsyn(
         IDUtl.getRolePrefabName(3),
@@ -167,7 +167,7 @@ function IDRShip:doLandingSoldier(param)
                 ship:initGetLuaFunc()
             end
             SetActive(ship.gameObject, true)
-            ship:init(serverData.id, 0, 1, true, {serverData = serverData})
+            ship:init(serverData.id, 0, 1, true, self.orgData)
             ship.transform.position = pos
 
             local toPos = self.transform.forward * 1 + self.transform.position

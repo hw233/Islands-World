@@ -522,10 +522,14 @@ namespace Coolape
                 vectorList.Insert(0, parentNode.position);
                 parentNode = parentNode.getParentNode(key);
             }
-            vectorList.Insert(0, from);
-            if (!notPocSoftenPath)
+            if (vectorList.Count > 0)
             {
-                softenPath(ref vectorList);
+                vectorList.Insert(0, from);
+                canReach = false;
+                if (!notPocSoftenPath)
+                {
+                    softenPath(ref vectorList);
+                }
             }
             return canReach;
         }

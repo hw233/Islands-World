@@ -63,9 +63,10 @@ function IDOcean.onPress()
     if MyCfg.mode == GameMode.city then
         IDMainCity.onPress(true)
     elseif MyCfg.mode == GameMode.map then
-        if IDWorldMap.mode == GameModeSub.map or 
-        IDWorldMap.mode == GameModeSub.mapBtwncity  or
-        IDWorldMap.mode == GameModeSub.fleet then
+        if
+            IDWorldMap.mode == GameModeSub.map or IDWorldMap.mode == GameModeSub.mapBtwncity or
+                IDWorldMap.mode == GameModeSub.fleet
+         then
             IDWorldMap.onPress(true)
         else
             IDMainCity.onPress(true)
@@ -76,9 +77,10 @@ function IDOcean.onRelease()
     if MyCfg.mode == GameMode.city then
         IDMainCity.onPress(false)
     elseif MyCfg.mode == GameMode.map then
-        if IDWorldMap.mode == GameModeSub.map or 
-        IDWorldMap.mode == GameModeSub.mapBtwncity or
-        IDWorldMap.mode == GameModeSub.fleet then
+        if
+            IDWorldMap.mode == GameModeSub.map or IDWorldMap.mode == GameModeSub.mapBtwncity or
+                IDWorldMap.mode == GameModeSub.fleet
+         then
             IDWorldMap.onPress(false)
         else
             IDMainCity.onPress(false)
@@ -87,13 +89,14 @@ function IDOcean.onRelease()
 end
 
 function IDOcean.onClick()
+    SoundEx.playSound("Tap", 1, 1)
     -- 点击了海面
     if MyCfg.mode == GameMode.city then
         IDMainCity.onClickOcean()
     elseif MyCfg.mode == GameMode.map then
-        if IDWorldMap.mode == GameModeSub.map or
-        IDWorldMap.mode == GameModeSub.mapBtwncity or
-        IDWorldMap.mode == GameModeSub.fleet
+        if
+            IDWorldMap.mode == GameModeSub.map or IDWorldMap.mode == GameModeSub.mapBtwncity or
+                IDWorldMap.mode == GameModeSub.fleet
          then
             IDWorldMap.onClickOcean()
         else
@@ -108,9 +111,10 @@ function IDOcean.onDrag()
     if MyCfg.mode == GameMode.city then
         IDMainCity.onDragOcean()
     elseif MyCfg.mode == GameMode.map then
-        if IDWorldMap.mode == GameModeSub.map 
-        or IDWorldMap.mode == GameModeSub.mapBtwncity  or
-        IDWorldMap.mode == GameModeSub.fleet then
+        if
+            IDWorldMap.mode == GameModeSub.map or IDWorldMap.mode == GameModeSub.mapBtwncity or
+                IDWorldMap.mode == GameModeSub.fleet
+         then
             IDWorldMap.onDragOcean()
         else
             IDMainCity.onDragOcean()

@@ -99,6 +99,7 @@ public static class XluaGenCodeConfig
         typeof(UIRichText4Chat),
         typeof(UIRichText4Chat.SpritePool),
         typeof(UIAnchor),
+        typeof(UIButton),
 
 		//Coolape
 		typeof(CLAssetsManager),

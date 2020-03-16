@@ -653,6 +653,7 @@ static public class NGUIMenu
 				if (p.GetComponent<Rigidbody2D>() != null)
 					NGUITools.Destroy(p.GetComponent<Rigidbody2D>());
 
+                /* removed by chenbin
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 				if (p.rigidbody == null)
 #else
@@ -663,6 +664,7 @@ static public class NGUIMenu
 					rb.isKinematic = true;
 					rb.useGravity = false;
 				}
+				*/
 			}
 		}
 	}

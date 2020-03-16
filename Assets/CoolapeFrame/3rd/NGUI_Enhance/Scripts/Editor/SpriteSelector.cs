@@ -27,6 +27,7 @@ public class SpriteSelector : ScriptableWizard
 	Vector2 mPos = Vector2.zero;
 	Callback mCallback;
 	float mClickTime = 0f;
+    bool searchNow = false; // add by chenbin
 
 	/// <summary>
 	/// Draw the custom wizard.
@@ -51,15 +52,27 @@ public class SpriteSelector : ScriptableWizard
 			GUILayout.Space(84f);
 
 			string before = NGUISettings.partialSprite;
-			string after = EditorGUILayout.TextField("", before, "SearchTextField");
-			if (before != after) NGUISettings.partialSprite = after;
+            GUILayout.BeginHorizontal(); // add by chenbin
+            {
+                string after = EditorGUILayout.TextField("", before, "SearchTextField");
+                if(before != after)
+                {
+                    NGUISettings.partialSprite = after;
+                }
+                if (GUILayout.Button("", "SearchCancelButton", GUILayout.Width(18f)))
+    			{
+                    searchNow = false;
+                    NGUISettings.partialSprite = "";
+    				GUIUtility.keyboardControl = 0;
+                }
+                if (GUILayout.Button("Search", GUILayout.Width(60f))) // add by chenbin
+                {
+                    searchNow = true;
+                }
+            }
+            GUILayout.EndHorizontal(); // add by chenbin
 
-			if (GUILayout.Button("", "SearchCancelButton", GUILayout.Width(18f)))
-			{
-				NGUISettings.partialSprite = "";
-				GUIUtility.keyboardControl = 0;
-			}
-			GUILayout.Space(84f);
+            GUILayout.Space(84f);
 			GUILayout.EndHorizontal();
 
 			Texture2D tex = atlas.texture as Texture2D;
@@ -70,7 +83,11 @@ public class SpriteSelector : ScriptableWizard
 				return;
 			}
 
-			BetterList<string> sprites = atlas.GetListOfSprites(NGUISettings.partialSprite);
+            if (!searchNow)
+            {
+                return;
+            }
+            BetterList<string> sprites = atlas.GetListOfSprites(NGUISettings.partialSprite);
 			
 			float size = 80f;
 			float padded = size + 10f;
@@ -205,7 +222,7 @@ public class SpriteSelector : ScriptableWizard
 			GUILayout.EndScrollView();
 
 			if (close) Close();
-		}
+        }
 	}
 
 	/// <summary>

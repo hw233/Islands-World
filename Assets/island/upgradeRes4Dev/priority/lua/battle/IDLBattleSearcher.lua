@@ -36,7 +36,12 @@ end
 function IDLBattleSearcher.wrapBuildingInfor(_buildings)
     ---@param b IDLBuilding
     for k, b in pairs(_buildings) do
-        if not (b.isTrap or b.isTree or bio2number(b.attr.GID) == IDConst.BuildingGID.decorate) then
+        if not 
+            (b.isTrap or b.isTree 
+            or bio2number(b.attr.GID) == IDConst.BuildingGID.decorate
+            or bio2number(b.serverData.state) == IDConst.BuildingState.renew
+            ) 
+        then
             buildings[k] = b
             -- 把建筑距离海边最近的点找到，以方便当舰船无法到达最近目标时，找一个可以到达的目标
             local beachInfor = IDLBattleSearcher.getNearestBeach(b)

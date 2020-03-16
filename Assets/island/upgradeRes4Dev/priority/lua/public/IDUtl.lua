@@ -328,13 +328,13 @@ end
 ---@public 取得资源图标
 function IDUtl.getResIcon(type)
     if type == IDConst.ResType.food then
-        return "res_food"
+        return "public_Icon_ziyuan_liangshi"
     elseif type == IDConst.ResType.gold then
-        return "res_gold"
+        return "public_Icon_ziyuan_jinbi"
     elseif type == IDConst.ResType.oil then
-        return "res_shiyou"
+        return "public_Icon_ziyuan_you"
     elseif type == IDConst.ResType.diam then
-        return "res_diamond"
+        return "public_Icon_ziyuan_zuanshi"
     end
 end
 
@@ -465,6 +465,21 @@ function IDUtl.clean()
         SetActive(IDUtl.popupMenu.gameObject, false)
         IDUtl.popupMenu = nil
     end
+end
+
+---@public 格式化内容
+function LWrap(content, paramsJson)
+    if not isNilOrEmpty(paramsJson) then
+        local paramMap = json.decode(paramsJson)
+        if paramMap then
+            local key
+            for k, v in pairs(paramMap) do
+                key = "${" .. k .. "}"
+                content = string.gsub(content, key, v)
+            end
+        end
+    end
+    return content
 end
 
 --------------------------------------------

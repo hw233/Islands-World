@@ -5,11 +5,12 @@
 ---@field public wwwMap4Get System.Collections.Hashtable
 ---@field public checkTimeOutSec System.Int32
 ---@field public isCheckWWWTimeOut System.Boolean
+---@field public isPrintUrl System.Boolean
 local m = { }
 ---public WWWEx .ctor()
 ---@return WWWEx
 function m.New() end
----public UnityWebRequest get(String url, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout)
+---public UnityWebRequest get(String url, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout, Int32 maxFailTimes)
 ---@return UnityWebRequest
 ---@param optional String url
 ---@param optional CLAssetType t
@@ -17,10 +18,11 @@ function m.New() end
 ---@param optional Object failedCallback
 ---@param optional Object orgs
 ---@param optional Boolean isCheckTimeout
-function m.get(url, type, successCallback, failedCallback, orgs, isCheckTimeout) end
----public UnityWebRequest post(String url, String jsonMap, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout)
----public UnityWebRequest post(String url, Hashtable map, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout)
----public UnityWebRequest post(String url, WWWForm data, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout)
+---@param optional Int32 maxFailTimes
+function m.get(url, type, successCallback, failedCallback, orgs, isCheckTimeout, maxFailTimes) end
+---public UnityWebRequest post(String url, String jsonMap, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout, Int32 maxFailTimes)
+---public UnityWebRequest post(String url, Hashtable map, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout, Int32 maxFailTimes)
+---public UnityWebRequest post(String url, WWWForm data, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout, Int32 maxFailTimes)
 ---@return UnityWebRequest
 ---@param optional String url
 ---@param optional WWWForm data
@@ -29,8 +31,9 @@ function m.get(url, type, successCallback, failedCallback, orgs, isCheckTimeout)
 ---@param optional Object failedCallback
 ---@param optional Object orgs
 ---@param optional Boolean isCheckTimeout
-function m.post(url, data, type, successCallback, failedCallback, orgs, isCheckTimeout) end
----public UnityWebRequest postString(String url, String strData, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout)
+---@param optional Int32 maxFailTimes
+function m.post(url, data, type, successCallback, failedCallback, orgs, isCheckTimeout, maxFailTimes) end
+---public UnityWebRequest postString(String url, String strData, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout, Int32 maxFailTimes)
 ---@return UnityWebRequest
 ---@param optional String url
 ---@param optional String strData
@@ -39,8 +42,9 @@ function m.post(url, data, type, successCallback, failedCallback, orgs, isCheckT
 ---@param optional Object failedCallback
 ---@param optional Object orgs
 ---@param optional Boolean isCheckTimeout
-function m.postString(url, strData, type, successCallback, failedCallback, orgs, isCheckTimeout) end
----public UnityWebRequest postBytes(String url, Byte[] bytes, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout)
+---@param optional Int32 maxFailTimes
+function m.postString(url, strData, type, successCallback, failedCallback, orgs, isCheckTimeout, maxFailTimes) end
+---public UnityWebRequest postBytes(String url, Byte[] bytes, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout, Int32 maxFailTimes)
 ---@return UnityWebRequest
 ---@param optional String url
 ---@param optional Byte[] bytes
@@ -49,9 +53,10 @@ function m.postString(url, strData, type, successCallback, failedCallback, orgs,
 ---@param optional Object failedCallback
 ---@param optional Object orgs
 ---@param optional Boolean isCheckTimeout
-function m.postBytes(url, bytes, type, successCallback, failedCallback, orgs, isCheckTimeout) end
----public UnityWebRequest put(String url, String data, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout)
----public UnityWebRequest put(String url, Byte[] data, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout)
+---@param optional Int32 maxFailTimes
+function m.postBytes(url, bytes, type, successCallback, failedCallback, orgs, isCheckTimeout, maxFailTimes) end
+---public UnityWebRequest put(String url, String data, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout, Int32 maxFailTimes)
+---public UnityWebRequest put(String url, Byte[] data, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout, Int32 maxFailTimes)
 ---@return UnityWebRequest
 ---@param optional String url
 ---@param optional Byte[] data
@@ -60,8 +65,9 @@ function m.postBytes(url, bytes, type, successCallback, failedCallback, orgs, is
 ---@param optional Object failedCallback
 ---@param optional Object orgs
 ---@param optional Boolean isCheckTimeout
-function m.put(url, data, type, successCallback, failedCallback, orgs, isCheckTimeout) end
----public UnityWebRequest uploadFile(String url, String sectionName, String fileName, Byte[] fileContent, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout)
+---@param optional Int32 maxFailTimes
+function m.put(url, data, type, successCallback, failedCallback, orgs, isCheckTimeout, maxFailTimes) end
+---public UnityWebRequest uploadFile(String url, String sectionName, String fileName, Byte[] fileContent, CLAssetType t, Object successCallback, Object failedCallback, Object orgs, Boolean isCheckTimeout, Int32 maxFailTimes)
 ---@return UnityWebRequest
 ---@param optional String url
 ---@param optional String sectionName
@@ -72,14 +78,18 @@ function m.put(url, data, type, successCallback, failedCallback, orgs, isCheckTi
 ---@param optional Object failedCallback
 ---@param optional Object orgs
 ---@param optional Boolean isCheckTimeout
-function m.uploadFile(url, sectionName, fileName, fileContent, type, successCallback, failedCallback, orgs, isCheckTimeout) end
----public Void addCheckWWWTimeout(UnityWebRequest www, String url, Single checkProgressSec, Object timeoutCallback, Object orgs)
+---@param optional Int32 maxFailTimes
+function m.uploadFile(url, sectionName, fileName, fileContent, type, successCallback, failedCallback, orgs, isCheckTimeout, maxFailTimes) end
+---public Void addCheckWWWTimeout(UnityWebRequest www, String url, Single checkProgressSec, Object timeoutCallback, Object orgs, Int32 maxFailTimes, Int32 failedTimes, RedCallback redrectioncallback)
 ---@param optional UnityWebRequest www
 ---@param optional String url
 ---@param optional Single checkProgressSec
 ---@param optional Object timeoutCallback
 ---@param optional Object orgs
-function m.addCheckWWWTimeout(www, url, checkProgressSec, timeoutCallback, orgs) end
+---@param optional Int32 maxFailTimes
+---@param optional Int32 failedTimes
+---@param optional RedCallback redrectioncallback
+function m.addCheckWWWTimeout(www, url, checkProgressSec, timeoutCallback, orgs, maxFailTimes, failedTimes, redrectioncallback) end
 ---public Void checkWWWTimeout()
 function m.checkWWWTimeout() end
 ---public Void doCheckWWWTimeout(UnityWebRequest www, NewList list)

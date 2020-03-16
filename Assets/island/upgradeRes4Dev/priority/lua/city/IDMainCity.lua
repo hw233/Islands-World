@@ -9,6 +9,8 @@ local IDLGridTileSide = require("city.IDLGridTileSide")
 local IDPBuildingInfor = require("ui.panel.IDPBuildingInfor")
 ---@type IDPBuildShip
 local IDPBuildShip = require("ui.panel.IDPBuildShip")
+---@type IDPMails
+local IDPMails = require("ui.panel.IDPMails")
 ---@class IDMainCity
 IDMainCity = class("IDMainCity")
 ---@type Coolape.CLBaseLua
@@ -182,6 +184,13 @@ local function _init()
             nameKey = "Remove",
             callback = IDMainCity.removeBuilding,
             icon = "public_guest_bt_delete",
+            bg = "public_edit_circle_bt_shipshop_n"
+        },
+        mail = {
+            --移除建筑
+            nameKey = "Mail",
+            callback = IDMainCity.mail,
+            icon = "icon_arrow",
             bg = "public_edit_circle_bt_shipshop_n"
         }
     }
@@ -918,6 +927,8 @@ function IDMainCity.prepareData4PopupMenu(building)
                     -- 修复
                     tbInsert(buttonList, PopUpMenus.renew)
                 end
+            elseif attrid == IDConst.BuildingID.MailBoxBuildingID then
+                tbInsert(buttonList, PopUpMenus.mail)
             end
 
             if building == IDMainCity.Headquarters then
@@ -988,6 +999,11 @@ end
 -- 造船
 function IDMainCity.buildShip(building)
     getPanelAsy("PanelBuildShip", onLoadedPanelTT, building, IDPBuildShip)
+end
+
+-- 显示邮件
+function IDMainCity.mail(building)
+    getPanelAsy("PanelMails", onLoadedPanelTT, {type = IDConst.MailType.all, isReceive = true}, IDPMails)
 end
 
 ---@param building IDLBuilding
@@ -1397,13 +1413,19 @@ end
 ---@param ...、 可以是index或x、y
 function IDMainCity.canPlaceTile(...)
     local param = {...}
-    local index
+    local index, x, y
     if #param > 1 then
-        local x = param[1]
-        local y = param[2]
+        x = param[1]
+        y = param[2]
         index = grid:GetCellIndex(x, y)
     else
         index = param[1]
+        x = grid:GetColumn(index)
+        y = grid:GetRow(index)
+    end
+    -- printe(x,y,index)
+    if x < 3 or y < 3 or x > 57 or y > 57 then
+        return false
     end
     if IDMainCity.isSizeInFreeCell(index, 2, false, true) then
         local list = grid:getAroundCells(index, 4)

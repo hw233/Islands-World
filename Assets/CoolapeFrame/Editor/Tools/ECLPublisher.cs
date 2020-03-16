@@ -1203,8 +1203,7 @@ public class ECLPublisher : EditorWindow
         //
         if (currChlData.mPlatform == ChlPlatform.android)
         {
-            //			PlayerSettings.Android.licenseVerification = currChlData.mLicenseVerification;
-            //			PlayerSettings.Android
+            PlayerSettings.Android.useCustomKeystore = currChlData.mLicenseVerification;
             if (currChlData.mLicenseVerification)
             {
                 PlayerSettings.Android.keystoreName = currChlData.mKeystoreNamePath;

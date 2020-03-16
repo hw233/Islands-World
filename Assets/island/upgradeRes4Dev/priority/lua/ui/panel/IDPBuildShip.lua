@@ -365,17 +365,33 @@ end
 -- 网络请求的回调；cmd：指命，succ：成功失败，msg：消息；paras：服务器下行数据
 function IDPBuildShip:procNetwork(cmd, succ, msg, paras)
     if succ == NetSuccess then
-        if cmd == NetProtoIsland.cmds.getShipsByBuildingIdx or cmd == NetProtoIsland.cmds.onBuildingChg then
-            dockyardServerData = IDDBCity.curCity.buildings[bio2number(dockyardServerData.idx)]
-            local list = self:wrapShipList()
-            self:showShipList(list, true)
+        if cmd == NetProtoIsland.cmds.getShipsByBuildingIdx then
+            ---@type NetProtoIsland.RC_getShipsByBuildingIdx
+            local _data = paras
+            if bio2number(_data.dockyardShips.buildingIdx) == bio2number(dockyardServerData.idx) then
+                self:refreshContent()
+            end
+        elseif cmd == NetProtoIsland.cmds.onBuildingChg then
+            ---@type NetProtoIsland.RC_onBuildingChg
+            local _data = paras
+            if bio2number(_data.building.idx) == bio2number(dockyardServerData.idx) then
+                self:refreshContent()
+            end
         elseif cmd == NetProtoIsland.cmds.buildShip then
             hideHotWheel()
-            dockyardServerData = IDDBCity.curCity.buildings[bio2number(dockyardServerData.idx)]
-            local list = self:wrapShipList()
-            self:showShipList(list, true)
+            ---@type NetProtoIsland.RC_buildShip
+            local _data = paras
+            if bio2number(_data.building.idx) == bio2number(dockyardServerData.idx) then
+                self:refreshContent()
+            end
         end
     end
+end
+
+function IDPBuildShip:refreshContent()
+    dockyardServerData = IDDBCity.curCity.buildings[bio2number(dockyardServerData.idx)]
+    local list = self:wrapShipList()
+    self:showShipList(list, true)
 end
 
 function IDPBuildShip:dragShip(go)

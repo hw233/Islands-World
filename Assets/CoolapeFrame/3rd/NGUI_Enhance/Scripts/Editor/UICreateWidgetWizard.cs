@@ -300,9 +300,10 @@ public class UICreateWidgetWizard : EditorWindow
 			// Add a collider
 			NGUITools.AddWidgetCollider(go);
 
-			// Add the scripts
-			go.AddComponent<UIButton>().tweenTarget = bg.gameObject;
-			go.AddComponent<Coolape.CLUIPlaySound>(); // modify by chenbin
+            // Add the scripts
+            go.AddComponent<UIButton>().tweenTarget = bg.gameObject;
+            go.AddComponent<UIButtonScale>();
+            go.AddComponent<Coolape.CLUIPlaySound>(); // modify by chenbin
 
 			Selection.activeGameObject = go;
 		}
@@ -706,7 +707,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 			// Add the scripts
 			go.AddComponent<UIButton>().tweenTarget = sprite.gameObject;
-			go.AddComponent<Coolape.CLUIPlaySound>(); // modify by chenbin
+            go.AddComponent<Coolape.CLUIPlaySound>(); // modify by chenbin
 
 			Selection.activeGameObject = go;
 		}

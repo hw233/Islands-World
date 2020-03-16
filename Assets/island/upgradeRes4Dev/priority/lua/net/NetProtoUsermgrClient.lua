@@ -76,14 +76,14 @@ do
             if m == nil then return r end
             r[10] = m.msg  -- 返回消息 string
             r[11] = m.code  -- 返回值 int
-            return r;
+            return r
         end,
         parse = function(m)
             local r = {}
             if m == nil then return r end
             r.msg = m[10] or m["10"] --  string
             r.code = m[11] or m["11"] --  int
-            return r;
+            return r
         end,
     }
     ---@class NetProtoUsermgr.ST_server 服务器
@@ -107,7 +107,7 @@ do
             r[18] = m.androidVer  -- 客户端android版本 string
             r[19] = m.isnew  -- 新服 boolean
             r[13] = m.status  -- 状态 1:正常; 2:爆满; 3:维护 int
-            return r;
+            return r
         end,
         parse = function(m)
             local r = {}
@@ -120,7 +120,7 @@ do
             r.androidVer = m[18] or m["18"] --  string
             r.isnew = m[19] or m["19"] --  boolean
             r.status = m[13] or m["13"] --  int
-            return r;
+            return r
         end,
     }
     ---@class NetProtoUsermgr.ST_userInfor 用户信息
@@ -130,13 +130,13 @@ do
             local r = {}
             if m == nil then return r end
             r[12] = m.idx  -- 唯一标识 int
-            return r;
+            return r
         end,
         parse = function(m)
             local r = {}
             if m == nil then return r end
             r.idx = m[12] or m["12"] --  int
-            return r;
+            return r
         end,
     }
     --==============================
@@ -163,6 +163,14 @@ do
         ret[1] = NetProtoUsermgr.__sessionID
         ret[24] = appid; -- 应用id
         ret[25] = channel; -- 渠道号
+        setCallback(__callback, __orgs, ret)
+        return ret
+    end,
+    -- session是否有效
+    isSessionAlived = function(__callback, __orgs) -- __callback:接口回调, __orgs:回调参数
+        local ret = {}
+        ret[0] = 41
+        ret[1] = NetProtoUsermgr.__sessionID
         setCallback(__callback, __orgs, ret)
         return ret
     end,
@@ -219,6 +227,7 @@ do
     ---@field public userInfor NetProtoUsermgr.ST_userInfor 用户信息
     ---@field public serverid  服务器id int
     ---@field public systime  系统时间 long
+    ---@field public session  会话id
     registAccount = function(map)
         local ret = {}
         ret.cmd = "registAccount"
@@ -226,6 +235,7 @@ do
         ret.userInfor = NetProtoUsermgr.ST_userInfor.parse(map[28]) -- 用户信息
         ret.serverid = map[29]-- 服务器id int
         ret.systime = map[30]-- 系统时间 long
+        ret.session = map[40]-- 会话id
         doCallback(map, ret)
         return ret
     end,
@@ -237,6 +247,15 @@ do
         ret.cmd = "getServers"
         ret.retInfor = NetProtoUsermgr.ST_retInfor.parse(map[2]) -- 返回信息
         ret.servers = NetProtoUsermgr._parseList(NetProtoUsermgr.ST_server, map[32]) -- 服务器列表
+        doCallback(map, ret)
+        return ret
+    end,
+    ---@class NetProtoUsermgr.RC_isSessionAlived
+    ---@field public retInfor NetProtoUsermgr.ST_retInfor 返回信息
+    isSessionAlived = function(map)
+        local ret = {}
+        ret.cmd = "isSessionAlived"
+        ret.retInfor = NetProtoUsermgr.ST_retInfor.parse(map[2]) -- 返回信息
         doCallback(map, ret)
         return ret
     end,
@@ -265,6 +284,7 @@ do
     ---@field public userInfor NetProtoUsermgr.ST_userInfor 用户信息
     ---@field public serverid  服务器id int
     ---@field public systime  系统时间 long
+    ---@field public session  会话id
     loginAccount = function(map)
         local ret = {}
         ret.cmd = "loginAccount"
@@ -272,6 +292,7 @@ do
         ret.userInfor = NetProtoUsermgr.ST_userInfor.parse(map[28]) -- 用户信息
         ret.serverid = map[29]-- 服务器id int
         ret.systime = map[30]-- 系统时间 long
+        ret.session = map[40]-- 会话id
         doCallback(map, ret)
         return ret
     end,
@@ -280,6 +301,7 @@ do
     ---@field public userInfor NetProtoUsermgr.ST_userInfor 用户信息
     ---@field public serverid  服务器id int
     ---@field public systime  系统时间 long
+    ---@field public session  会话id
     loginAccountChannel = function(map)
         local ret = {}
         ret.cmd = "loginAccountChannel"
@@ -287,6 +309,7 @@ do
         ret.userInfor = NetProtoUsermgr.ST_userInfor.parse(map[28]) -- 用户信息
         ret.serverid = map[29]-- 服务器id int
         ret.systime = map[30]-- 系统时间 long
+        ret.session = map[40]-- 会话id
         doCallback(map, ret)
         return ret
     end,
@@ -294,6 +317,7 @@ do
     --==============================
     NetProtoUsermgr.dispatch[20]={onReceive = NetProtoUsermgr.recive.registAccount, send = NetProtoUsermgr.send.registAccount}
     NetProtoUsermgr.dispatch[31]={onReceive = NetProtoUsermgr.recive.getServers, send = NetProtoUsermgr.send.getServers}
+    NetProtoUsermgr.dispatch[41]={onReceive = NetProtoUsermgr.recive.isSessionAlived, send = NetProtoUsermgr.send.isSessionAlived}
     NetProtoUsermgr.dispatch[33]={onReceive = NetProtoUsermgr.recive.getServerInfor, send = NetProtoUsermgr.send.getServerInfor}
     NetProtoUsermgr.dispatch[35]={onReceive = NetProtoUsermgr.recive.setEnterServer, send = NetProtoUsermgr.send.setEnterServer}
     NetProtoUsermgr.dispatch[38]={onReceive = NetProtoUsermgr.recive.loginAccount, send = NetProtoUsermgr.send.loginAccount}
@@ -302,6 +326,7 @@ do
     NetProtoUsermgr.cmds = {
         registAccount = "registAccount", -- 注册,
         getServers = "getServers", -- 取得服务器列表,
+        isSessionAlived = "isSessionAlived", -- session是否有效,
         getServerInfor = "getServerInfor", -- 取得服务器信息,
         setEnterServer = "setEnterServer", -- 保存所选服务器,
         loginAccount = "loginAccount", -- 登陆,

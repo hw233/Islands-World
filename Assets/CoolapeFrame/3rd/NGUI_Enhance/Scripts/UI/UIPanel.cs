@@ -965,6 +965,7 @@ public class UIPanel : UIRect
 		base.OnInit();
 		FindParent();
 
+        /* removed by chenbin
 		// Apparently having a rigidbody helps
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 		if (rigidbody == null && mParentPanel == null)
@@ -991,6 +992,7 @@ public class UIPanel : UIRect
 				//}
 			}
 		}
+        */
 
 		mRebuild = true;
 		mAlphaFrameID = -1;

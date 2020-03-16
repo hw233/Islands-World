@@ -57,6 +57,7 @@ end
 function _cell.refreshData(data)
     mData = data
     _cell.data = mData
+    
     fleetHudData.target = transform
     fleetHudData.dataFleet = mData
     fleetHudData.offset = Vector3.zero

@@ -37,9 +37,10 @@ namespace Coolape
             self = this;
         }
 
-        public object onDragMoveDelegate = null;
-        public object onDragScaleDelegate = null;
-        public object onEndDragMoveDelegate = null;
+        public object onDragMoveDelegate = null; // 当移动时的代理
+        public object onEndDragMoveDelegate = null; // 当移动结束时的代理
+        public object onDragScaleDelegate = null; // 缩放代理
+        public object onDragAngleViewCallback = null; //旋转回调
         public MyMainCamera main3DCamera;
         /// <summary>
         /// Target object that will be dragged.
@@ -858,7 +859,7 @@ namespace Coolape
 #endif
             target.Rotate (Vector3.up, rotateSpeed * Time.deltaTime * offset * 10);
 			Vector3 ea = target.localEulerAngles;
-			if (rotationMax != 0 && rotationMini != 0) {
+			if (Mathf.Abs(rotationMax) > 0.0001f && Mathf.Abs(rotationMini) > 0.0001f) {
 				if (ea.y >= rotationMax) {
 					ea.y = rotationMax;
 					target.localEulerAngles = ea;
@@ -868,7 +869,13 @@ namespace Coolape
 					target.localEulerAngles = ea;
 				}
 			}
-			limitDisplayView ();
+
+            if (onDragAngleViewCallback != null)
+            {
+                Utl.doCallback(onDragAngleViewCallback, target.localEulerAngles);
+            }
+
+            limitDisplayView ();
 		}
 
 		float oldTowFingersDis = -1;

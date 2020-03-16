@@ -186,6 +186,7 @@ function IDPFleetInfor.wrapSetedFleetsData()
         local d, setNum = v.getData()
         if setNum > 0 then
             unit = {}
+            unit.type = IDConst.UnitType.role
             unit.id = d.id
             unit.num = setNum
             unit.fidx = mData.fleetidx or 0

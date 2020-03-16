@@ -5,6 +5,7 @@ require("net.NetProtoIslandClient")
 require("db.IDDBPlayer")
 require("db.IDDBCity")
 require("db.IDDBWorldMap")
+require("db.IDDBMail")
 CLLNet = {}
 local PanelListener = {}
 ---@type CLLQueue
@@ -33,7 +34,7 @@ end
 --end
 
 local httpPostBio = function(url, postData, callback, orgs)
-    WWWEx.postBytes(Utl.urlAddTimes(url), postData, CLAssetType.bytes, callback, CLLNet.httpError, orgs, true)
+    WWWEx.postBytes(Utl.urlAddTimes(url), postData, CLAssetType.bytes, callback, CLLNet.httpError, orgs, true, 3)
 end
 
 function CLLNet.httpPostUsermgr(data, callback)
@@ -218,6 +219,8 @@ CLLNet.receiveCMDFunc = {
         local systime = bio2number(data.systime)
         DateEx.init(systime)
 
+        -- 初始化邮件
+        IDDBMail.init()
         -- 取得舰队列表
         CLLNet.send(NetProtoIsland.send.getAllFleets(bio2number(city.idx)))
     end,
@@ -329,7 +332,15 @@ CLLNet.receiveCMDFunc = {
                 -- 数据错误
             end
         end
-    end
+    end,
+    ---@param data NetProtoIsland.RC_getMails
+    [NetProtoIsland.cmds.getMails] = function(cmd, data)
+        IDDBMail.onGetMails(data.mails)
+    end,
+    ---@param data NetProtoIsland.RC_onMailChg
+    [NetProtoIsland.cmds.onMailChg] = function(cmd, data)
+        IDDBMail.onMailsChg(data.mails)
+    end,
 }
 
 -- 心跳

@@ -5,10 +5,11 @@ local IDBasePanel = class("IDBasePanel")
 -- 初始化，只会调用一次
 ---@param csObj Coolape.CLPanelLua
 function IDBasePanel:init(csObj)
+	self.uiobjs = {}
 	---@type Coolape.CLPanelLua
 	self.csSelf = csObj
 	---@type UnityEngine.Transform
-    self.transform = csObj.transform
+	self.transform = csObj.transform
 end
 
 ---@public 当有通用背板显示时的回调

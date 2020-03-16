@@ -133,6 +133,7 @@ namespace Coolape
 
         public override List<Vector3> seek(Vector3 toPos)
         {
+            targetPos = toPos;
             canMove = false;
             resetCache();
             begainTime = Time.time;
@@ -566,6 +567,10 @@ namespace Coolape
 
         void OnDrawGizmos()
         {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(targetPos, 0.5f);
+            Gizmos.color = Color.white;
+
             if (!showPath) return;
             nowTime = Time.time;
 
@@ -646,7 +651,7 @@ namespace Coolape
             //		Gizmos.matrix = Matrix4x4.identity;
 
             //		Gizmos.matrix = Matrix4x4.identity;
-            //		Gizmos.color = Color.white;
+    		Gizmos.color = Color.white;
         }
 #endif
     }

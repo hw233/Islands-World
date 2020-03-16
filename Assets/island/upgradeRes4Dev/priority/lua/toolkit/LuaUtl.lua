@@ -309,6 +309,7 @@ function onLoadedPanelTF(p, paras)
 end
 
 function hideTopPanel(p)
+    local p = p or CLPanelManager.topPanel
     CLPanelManager.hideTopPanel(p)
     if CLLNet then
         CLLNet.removePanelListener(p)

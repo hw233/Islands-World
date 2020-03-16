@@ -133,6 +133,8 @@ do
     UITable = CS.UITable
     ---@type UIInput
     UIInput = CS.UIInput
+    ---@type UIButton
+    UIButton = CS.UIButton
     ---@type UIScrollView
     UIScrollView = CS.UIScrollView
     ---@type UITweener
@@ -389,6 +391,7 @@ do
     require("toolkit.CLLUpdateUpgrader")
     require("toolkit.CLLVerManager")
     require("toolkit.BitUtl")
+    json = require("json.json")
     ---@type CLQuickSort
     CLQuickSort = require("toolkit.CLQuickSort")
     -------------------------------------------------------
@@ -502,5 +505,4 @@ do
         end
         return chlCode
     end
-    -------------------------------------------------------
 end

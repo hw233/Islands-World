@@ -87,6 +87,24 @@ function IDLBuildingStore:OnClick()
     end
 end
 
+function IDLBuildingStore:onHurt(damage, attacker)
+    if not self.isDead then
+        -- 处理扣除资源
+        if damage > 0 then
+            local _damage = damage
+            if _damage > bio2number(self.data.curHP) then
+                _damage = bio2number(self.data.curHP)
+            end
+            local resType = IDUtl.getResTypeByBuildingID(bio2number(self.attr.ID))
+            local persent = _damage / bio2number(self.data.HP)
+            -- 只抢仓库的30%资源
+            self.data.lootRes[resType] = persent * bio2number(self.serverData.val) * 0.3 + self.data.lootRes[resType]
+            self:showBeLootResEffect()
+        end
+    end
+    IDLBuildingStore.super.onHurt(self, damage, attacker)
+end
+
 function IDLBuildingStore:clean()
     self.csSelf:cancelInvoke4Lua()
     IDLBuildingStore.super.clean(self)

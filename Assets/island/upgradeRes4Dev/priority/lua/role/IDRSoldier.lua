@@ -13,7 +13,7 @@ end
 function IDRSoldier:init(selfObj, id, star, lev, _isOffense, other)
     IDRSoldier.super.init(self, selfObj, id, star, lev, _isOffense, other)
     self.isSeekUseRay = false
-    self.seeker.endReachedDistance = self.MinAttackRange
+    self.seeker.endReachedDistance = self.MaxAttackRange
     self.seeker.mAStarPathSearch = IDMainCity.astar4Tile
     self.seeker.mAStarPathSearch:addGridStateChgCallback(self:wrapFunction4CS(self.onAstarChgCallback))
     self.grid = IDMainCity.grid.grid
@@ -33,7 +33,7 @@ function IDRSoldier:onCannotReach4AttackTarget()
     if self.target.isBuilding then
         endReachedDistance = endReachedDistance + self.target.size / 2
     end
-    self.seeker:seek(self.target.transform.position, endReachedDistance)
+    self.seeker:seek(self.seeker.targetPos, endReachedDistance)
 end
 
 function IDRSoldier:onSearchPath(pathList, canReach)
@@ -84,6 +84,10 @@ end
 
 ---@param target IDLUnitBase
 function IDRSoldier:fire(target)
+    if self.target then
+        -- 面向目标
+        Utl.RotateTowards(self.transform, self.transform.position, self.target.transform.position)
+    end
     self:playAction(
         "attack",
         ActCBtoList(90, self:wrapFunc(self.onFinsihFire), 100, self:wrapFunc(self.onActionFinish))

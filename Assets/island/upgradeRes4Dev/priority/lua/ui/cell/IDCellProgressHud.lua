@@ -50,7 +50,7 @@ function _cell.show(go, data)
     else
         uiobjs.Label.text = ""
         uiobjs.Progress.value = 0
-        InvokeEx.cancelInvokeByFixedUpdate(_cell.cooldown)
+        InvokeEx.cancelInvokeByUpdate(_cell.cooldown)
     end
     uiobjs.table.repositionNow = true
 end
@@ -64,9 +64,9 @@ function _cell.cooldown()
         uiobjs.Label.text = DateEx.toStrCn(lefttime)
         uiobjs.Progress.value = lefttime / mData.diff
         if lefttime > 10000 then
-            InvokeEx.invokeByFixedUpdate(_cell.cooldown, 1)
+            InvokeEx.invokeByUpdate(_cell.cooldown, 1)
         else
-            InvokeEx.invokeByFixedUpdate(_cell.cooldown, 0.2)
+            InvokeEx.invokeByUpdate(_cell.cooldown, 0.2)
         end
     end
 end

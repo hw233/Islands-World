@@ -233,7 +233,7 @@ namespace Coolape
         }
         //================================================================
         public static Hashtable wwwMap = Hashtable.Synchronized(new Hashtable());
-        public static Hashtable wwwTimesMap = new Hashtable();
+        //public static Hashtable wwwTimesMap = new Hashtable();
 
         /// <summary>
         /// Gets the newest res.取得最新的资源
@@ -409,7 +409,7 @@ namespace Coolape
                     //因为通过DownloadHandlerAssetBundle无法取得bytes，所以只能先改变取得数据类型，然后再通过AssetBundle.LoadFromMemory取得AssetBundle
                     tmptype = CLAssetType.bytes;
                 }
-                www = WWWEx.get(url, tmptype, (Callback)onWWWBack, (Callback)onWWWBack, transParam, true);
+                www = WWWEx.get(url, tmptype, (Callback)onWWWBack, (Callback)onWWWBack, transParam, true, downLoadTimes4Failed);
                 addWWW(www, path, url);
             }
             else
@@ -463,13 +463,13 @@ namespace Coolape
                 if (needSave)
                 {
                     //说明是需要下载的资源
-                    if (www != null && content == null && (MapEx.getInt(wwwTimesMap, path) + 1) < downLoadTimes4Failed)
-                    {
-                        //需要下载资源时，如查下载失败，且少于失败次数，则再次下载
-                        wwwTimesMap[path] = MapEx.getInt(wwwTimesMap, path) + 1;
-                        doGetContent(path, url, needSave, type, onGetAsset, autoRealseAB, originals);
-                        return;
-                    }
+                    //if (www != null && content == null && (MapEx.getInt(wwwTimesMap, path) + 1) < downLoadTimes4Failed)
+                    //{
+                    //    //需要下载资源时，如查下载失败，且少于失败次数，则再次下载
+                    //    wwwTimesMap[path] = MapEx.getInt(wwwTimesMap, path) + 1;
+                    //    doGetContent(path, url, needSave, type, onGetAsset, autoRealseAB, originals);
+                    //    return;
+                    //}
                     rmWWW(url);
                 }
                 if (content == null)
@@ -501,7 +501,7 @@ namespace Coolape
             }
 
             wwwMap[path] = false;
-            wwwTimesMap[path] = 0;
+            //wwwTimesMap[path] = 0;
         }
 
         object addWWWcb;

@@ -192,7 +192,7 @@ do
         local url = Utl.urlAddTimes(PStr.b():a(baseUrl):a("/netState.txt"):e());
         WWWEx.get(url, CLAssetType.text,
         onCheckNetSateSuc,
-        onCheckNetSateFail, nil, true);
+        onCheckNetSateFail, nil, true, 2);
     end
 
 
@@ -230,7 +230,7 @@ do
         WWWEx.get(Utl.urlAddTimes(url),
         CLAssetType.bytes,
         CLLVerManager.onGetServerVerverBuff,
-        CLLVerManager.onGetServerVerverBuff, nil, true);
+        CLLVerManager.onGetServerVerverBuff, nil, true, 2);
     end
 
     function CLLVerManager.onGetServerVerverBuff(content, orgs)
@@ -287,7 +287,7 @@ do
         local url = PStr.b():a(baseUrl):a("/"):a(fPath):a("."):a(verVal):e(); -- 注意是加了版本号的，可以使用cdn
         WWWEx.get(url, CLAssetType.bytes,
         CLLVerManager.onGetVerinfor,
-        CLLVerManager.onGetVerinfor, fPath, true);
+        CLLVerManager.onGetVerinfor, fPath, true, 2);
     end
 
     function CLLVerManager.onGetVerinfor(content, orgs)
@@ -396,7 +396,7 @@ do
 
         WWWEx.get(Url, CLAssetType.bytes,
         CLLVerManager.onGetPriorityFiles,
-        CLLVerManager.initFailed, fPath, true);
+        CLLVerManager.initFailed, fPath, true, 2);
 
         if (progressCallback ~= nil) then
             progressCallback(needUpgradeVerver.Count, progress, WWWEx.getWwwByUrl(Url));

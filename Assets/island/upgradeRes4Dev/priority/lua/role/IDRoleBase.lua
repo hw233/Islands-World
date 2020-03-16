@@ -24,6 +24,14 @@
 --]]
 --//TODO:角色在地表行走时，还要考虑那那个是假地块的情况
 
+---@class _ParamRoleOtherData
+---@field public serverData _ParamBattleUnitData
+---@field public pos UnityEngine.Vector3
+---@field public fakeRandom  number
+---@field public fakeRandom2 number
+---@field public fakeRandom3 number
+---@field public isOffense boolean
+
 require("public.class")
 -- 角色基础相关
 ---@class IDRoleBase:IDLUnitBase
@@ -69,8 +77,10 @@ function IDRoleBase:__init(selfObj, other)
     return false
 end
 
+---@param other _ParamRoleOtherData
 function IDRoleBase:init(selfObj, id, star, lev, _isOffense, other)
     IDRoleBase.super.init(self, selfObj, id, star, lev, _isOffense, other)
+    self.orgData = other
     self.csSelf.isOffense = _isOffense
     self.isOffense = _isOffense
     self.id = id
@@ -81,9 +91,21 @@ function IDRoleBase:init(selfObj, id, star, lev, _isOffense, other)
     self.csSelf.instanceID = self.instanceID
 
     -- 初始化
-    self.csSelf.RandomFactor = self.csSelf:initRandomFactor()
-    self.csSelf.RandomFactor2 = self.csSelf:initRandomFactor2()
-    self.csSelf.RandomFactor3 = self.csSelf:initRandomFactor3()
+    if other.fakeRandom then
+        self.csSelf.RandomFactor = other.fakeRandom / 1000
+    else
+        self.csSelf.RandomFactor = self.csSelf:initRandomFactor()
+    end
+    if other.fakeRandom2 then
+        self.csSelf.RandomFactor2 = other.fakeRandom2 / 1000
+    else
+        self.csSelf.RandomFactor2 = self.csSelf:initRandomFactor3()
+    end
+    if other.fakeRandom3 then
+        self.csSelf.RandomFactor3 = other.fakeRandom / 1000
+    else
+        self.csSelf.RandomFactor3 = self.csSelf:initRandomFactor3()
+    end
     -- 取得属性配置
     if other then
         self.serverData = other.serverData or {}
@@ -139,6 +161,9 @@ function IDRoleBase:init(selfObj, id, star, lev, _isOffense, other)
         -- 战斗时，初始化数据
         ---@type UnitData4Battle
         self.data = {}
+        self.data.lootFood = 0
+        self.data.lootGold = 0
+        self.data.lootOil = 0
         -- 最大血量
         self.data.HP =
             DBCfg.getGrowingVal(
@@ -437,11 +462,15 @@ function IDRoleBase:doAttack()
         pos1.y = 0
         local pos2 = self.target.transform.position
         pos2.y = 0
-        local dis = Vector3.Distance(pos1, pos2)
+        local disOrgs = Vector3.Distance(pos1, pos2)
+        local dis = disOrgs
         if self.target.isBuilding then
-            dis = dis - self.target.size / 2
+            dis = disOrgs - self.target.size / 2
         end
-        if dis <= self.MaxAttackRange and dis >= self.MinAttackRange then
+        
+        if (disOrgs <= self.MaxAttackRange and disOrgs >= self.MinAttackRange)
+            or (dis <= self.MaxAttackRange and dis >= self.MinAttackRange)
+         then
             -- 可以直接攻击到
             self:startFire(self.target)
         else

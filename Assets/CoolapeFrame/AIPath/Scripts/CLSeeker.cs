@@ -222,7 +222,13 @@ namespace Coolape
             canMove = false;
             if (pathList == null || pathList.Count < 2)
             {
+                if (pathList == null)
+                {
+                    Debug.LogError("pathList == null!");
+                }
                 Debug.LogError("Path list error!");
+                stopMove();
+                Utl.doCallback(onArrivedCallback);
                 return;
             }
             if (Vector3.Distance(mTransform.position, pathList[0]) < 0.001f)
@@ -288,6 +294,10 @@ namespace Coolape
             if (pathList == null || nextPahtIndex >= pathList.Count)
             {
                 Debug.LogError("moving error");
+                if (pathList == null)
+                {
+                    Debug.LogError("pathList == null!");
+                }
 
                 stopMove();
                 Utl.doCallback(onArrivedCallback);
@@ -370,6 +380,9 @@ namespace Coolape
 #if UNITY_EDITOR
         void OnDrawGizmos()
         {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(targetPos, 0.5f);
+            Gizmos.color = Color.white;
 
             if (showPath && pathList != null && pathList.Count > 0)
             {

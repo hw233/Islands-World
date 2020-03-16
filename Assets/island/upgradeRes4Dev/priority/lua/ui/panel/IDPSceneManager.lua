@@ -1,4 +1,9 @@
 ﻿-- xx界面
+---@class _ParamIDPSceneManager
+---@field public mode GameMode
+---@field public data table
+---@field public __finishCallback__ function
+
 require("city.IDMainCity")
 require("battle.IDLBattle")
 IDPSceneManager = {}
@@ -10,6 +15,7 @@ local transform = nil
 local lookAtTarget = MyCfg.self.lookAtTarget
 local progressBar
 local LabelTip
+---@type _ParamIDPSceneManager
 local mData
 local _isLoadingScene = false
 local dragSetting = CLUIDrag4World.self
@@ -66,7 +72,17 @@ end
 
 function IDPSceneManager.loadScene()
     IDPSceneManager.beforeLoadScene()
-    csSelf:invoke4Lua(IDPSceneManager.doLoadScene, 0.5)
+    if MyCfg.mode == GameMode.map then
+        IDWorldMap.moveToView(
+            IDWorldMap.getCityIndex(),
+            GameModeSub.map,
+            function()
+                csSelf:invoke4Lua(IDPSceneManager.doLoadScene, 0.3)
+            end
+        )
+    else
+        csSelf:invoke4Lua(IDPSceneManager.doLoadScene, 0.5)
+    end
 end
 
 function IDPSceneManager.doLoadScene()
@@ -132,11 +148,11 @@ function IDPSceneManager.loadCity()
         dragSetting.canScale = true
         dragSetting.scaleMini = 7
         dragSetting.scaleMax = 20
-        dragSetting.scaleHeightMini = 10
+        dragSetting.scaleHeightMini = 7
         dragSetting.scaleHeightMax = 100
         -- dragSetting.viewRadius = 65
         dragSetting.dragMovement = Vector3.one
-         -- * 0.4
+        -- * 0.4
         dragSetting.scaleSpeed = 1
     end
 
@@ -170,11 +186,11 @@ function IDPSceneManager.loadWorldMap()
         dragSetting.canScale = true
         dragSetting.scaleMini = 7
         dragSetting.scaleMax = 20
-        dragSetting.scaleHeightMini = 10
+        dragSetting.scaleHeightMini = 7
         dragSetting.scaleHeightMax = 100
         dragSetting.viewRadius = 15000
         dragSetting.dragMovement = Vector3.one
-         -- * 0.5
+        -- * 0.5
         dragSetting.scaleSpeed = 1
     end
 
@@ -185,10 +201,15 @@ function IDPSceneManager.loadWorldMap()
         bio2number(IDDBCity.curCity.pos),
         function()
             SoundEx.playMainMusic("MainScene_1")
-            getPanelAsy("PanelMain", onLoadedPanel)
+            hideTopPanel(csSelf)
+            IDWorldMap.addFinishEnterCityCallback(IDPSceneManager.onEnterCity)
         end,
         IDPSceneManager.onProgress
     )
+end
+function IDPSceneManager.onEnterCity()
+    getPanelAsy("PanelMain", onLoadedPanel)
+    IDWorldMap.rmFinishEnterCityCallback(IDPSceneManager.onEnterCity)
 end
 
 -- 加载战场
@@ -205,11 +226,11 @@ function IDPSceneManager.loadBattle()
         dragSetting.canScale = true
         dragSetting.scaleMini = 7
         dragSetting.scaleMax = 20
-        dragSetting.scaleHeightMini = 10
+        dragSetting.scaleHeightMini = 7
         dragSetting.scaleHeightMax = 100
         -- dragSetting.viewRadius = 65
         dragSetting.dragMovement = Vector3.one
-         -- * 0.4
+        -- * 0.4
         dragSetting.scaleSpeed = 1
     end
 
@@ -225,8 +246,13 @@ function IDPSceneManager.onLoadBattle()
         IDWorldMap.ocean.luaTable.stopBGM()
     end
     SoundEx.playMainMusic("Fight_before")
-    -- mData.defData, mData.offData
-    getPanelAsy("PanelBattle", onLoadedPanel, mData.data)
+    ---@type _ParamBattleData
+    local data = mData.data
+    if data.isReplay then
+        getPanelAsy("PanelBattleReplay", onLoadedPanel, mData.data)
+    else
+        getPanelAsy("PanelBattle", onLoadedPanel, mData.data)
+    end
 end
 
 --------------------------------------------
