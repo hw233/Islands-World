@@ -36,11 +36,5 @@ function _cell.getData()
     return mData
 end
 
-function _cell.uiEventDelegate(go)
-    if mData.onClick then
-        mData.onClick(mData.params)
-    end
-end
-
 --------------------------------------------
 return _cell

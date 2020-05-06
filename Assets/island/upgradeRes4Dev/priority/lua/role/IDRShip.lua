@@ -14,26 +14,26 @@ function IDRShip:init(selfObj, id, star, lev, _isOffense, other)
     self.searchBuildingWithBeachTimes = 0 -- 寻找离海岸最近建筑次数
     self.isLanded = false -- 是否已经登陆过了
     IDRShip.super.init(self, selfObj, id, star, lev, _isOffense, other)
-    self:chgState(RoleState.idel)
+    self:chgState(IDConst.RoleState.idel)
     if not self.attr.IsFlying then
         self:showTrail() --//TODO:拖尾还需要优化，因为有gc，为卡顿，后续再想办法
     end
 end
 
 function IDRShip:onArrived()
-    if self.state == RoleState.landing then
+    if self.state == IDConst.RoleState.landing then
         self:landingSoldiers()
     else
         IDRShip.super.onArrived(self)
-        if self.state == RoleState.walkAround then
+        if self.state == IDConst.RoleState.walkAround then
             self.csSelf:invoke4Lua(self.dogoAround, NumEx.NextInt(20, 60) / 10)
-        elseif self.state == RoleState.backDockyard then
+        elseif self.state == IDConst.RoleState.backDockyard then
             self.dockyard:onShipBack(self)
         end
     end
 end
 
----@public 显示拖尾
+---public 显示拖尾
 function IDRShip:showTrail()
     if self.trail == nil then
         CLThingsPool.borrowObjAsyn(
@@ -57,27 +57,26 @@ function IDRShip:showTrail()
 end
 
 function IDRShip:chgState(state)
-    if self.state == RoleState.walkAround then
+    if self.state == IDConst.RoleState.walkAround then
         self.csSelf:cancelInvoke4Lua(self.dogoAround)
         self.csSelf:cancelInvoke4Lua(self.backtoDockyard)
     end
-    ---@type RoleState
-    self.state = state
+    IDRShip.super.chgState(self, state)
 end
 
----@public 四处转转
+---public 四处转转
 function IDRShip:goAround(dockyard)
     if MyCfg.mode == GameMode.battle then
         return
     end
     self.dockyard = dockyard
-    self:chgState(RoleState.walkAround)
+    self:chgState(IDConst.RoleState.walkAround)
     self:dogoAround()
     self.csSelf:invoke4Lua(self.backtoDockyard, NumEx.NextInt(600, 1800) / 10)
 end
 
 function IDRShip:backtoDockyard()
-    self:chgState(RoleState.backDockyard)
+    self:chgState(IDConst.RoleState.backDockyard)
     if self.dockyard then
         local toPos = self.dockyard.door.position
         if self.attr.IsFlying then
@@ -101,7 +100,7 @@ function IDRShip:dogoAround()
     end
 end
 
----@public 当不能寻路到可攻击目标时
+---public 当不能寻路到可攻击目标时
 function IDRShip:onCannotReach4AttackTarget()
     if self:canLand() then
         self:gotoLandSoldiers()
@@ -110,9 +109,9 @@ function IDRShip:onCannotReach4AttackTarget()
     end
 end
 
----@public 能否登陆
+---public 能否登陆
 function IDRShip:canLand()
-    if bio2number(self.attr.SolderNum) > 0 and (not self.isLanded) and self.state ~= RoleState.landing then
+    if bio2number(self.attr.SolderNum) > 0 and (not self.isLanded) and self.state ~= IDConst.RoleState.landing then
         return true
     end
     return false
@@ -123,7 +122,7 @@ function IDRShip:gotoLandSoldiers()
         printe("目标为空，进入这里是不应该的，肯定又bug了，噫？为什么要说又呢？")
         return
     end
-    self.state = RoleState.landing
+    self.state = IDConst.RoleState.landing
     ---@type UnityEngine.Vector3
     local dir = self.target.transform.position - self.transform.position
     local ray = Ray(self.transform.position, dir)
@@ -136,10 +135,10 @@ function IDRShip:gotoLandSoldiers()
     end
 end
 
----@public 登陆士兵
+---public 登陆士兵
 function IDRShip:landingSoldiers()
     self.isLanded = true
-    self:chgState(RoleState.idel)
+    self:chgState(IDConst.RoleState.idel)
     self:doLandingSoldier({i = 1, max = bio2Int(self.attr.SolderNum)})
 end
 
@@ -147,8 +146,8 @@ function IDRShip:doLandingSoldier(param)
     local i, max = param.i, param.max
     ---@type _ParamBattleUnitData
     local data = {}
-    data.id = 3
-    data.lev = number2bio(1) -- //TODO:根据科技来得到等级
+    data.id = IDConst.RoleID.Barbarian
+    data.lev = number2bio(IDLBattle.mData.targetCity:getTechLev(IDConst.RoleID.Barbarian))
     data.num = 1
     data.type = IDConst.UnitType.role
 
@@ -192,12 +191,12 @@ function IDRShip:doLandingSoldier(param)
     end
 end
 
----@public 当完成释放登陆士兵的回调
+---public 当完成释放登陆士兵的回调
 function IDRShip:onFinishLandSoldiers()
     self:searchCanReachTarget()
 end
 
----@public 寻找可以到达的目标
+---public 寻找可以到达的目标
 function IDRShip:searchCanReachTarget()
     self:getBuildingWithBeach()
     if self.target then
@@ -210,7 +209,7 @@ function IDRShip:searchCanReachTarget()
     end
 end
 
----@public 取得
+---public 取得
 function IDRShip:getBuildingWithBeach()
     self.searchBuildingWithBeachTimes = self.searchBuildingWithBeachTimes + 1
     local target = IDLBattle.searcher.getNearestBuildingWithBeach(self, self.searchBuildingWithBeach)

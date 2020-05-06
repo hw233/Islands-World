@@ -51,8 +51,11 @@ do
         table.insert(deviceInfor, SystemInfo.maxTextureSize)
         local deiveceInfor = table.concat(deviceInfor, ",")
         local uuid = Utl.uuid
-        local idx = IDDBPlayer.myself and bio2number(IDDBPlayer.myself.idx) or 0
-        local cityidx = IDDBPlayer.myself and bio2number(IDDBPlayer.myself.cityidx) or 0
+        local idx, cityidx = 0, 0
+        if IDDBPlayer then
+            idx = IDDBPlayer.myself and bio2number(IDDBPlayer.myself.idx) or 0
+            cityidx = IDDBPlayer.myself and bio2number(IDDBPlayer.myself.cityidx) or 0
+        end
 
         uiobjs.InputInfor.value =
             joinStr("idx=", idx, ";", "cityidx=", cityidx, ";", "uuid=", uuid, ";\n", "deviceinfor=", deiveceInfor, ";")
@@ -120,7 +123,9 @@ do
         elseif goName == uiobjs.ToggleShadow.name then
             SetActive(MyCfg.self.shadowRoot.gameObject, uiobjs.ToggleShadow.value)
         elseif goName == uiobjs.TogglePostproc.name then
-            CameraMgr.self.maincamera:GetComponent("PostProcessLayer").enabled = uiobjs.TogglePostproc.value
+            if CameraMgr and CameraMgr.self then
+                CameraMgr.self.maincamera:GetComponent("PostProcessLayer").enabled = uiobjs.TogglePostproc.value
+            end
         elseif goName == uiobjs.ToggleUICamera.name then
             MyCfg.self.uiCamera.enabled = (not uiobjs.ToggleUICamera.value)
             csSelf:invoke4Lua(

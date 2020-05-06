@@ -1,10 +1,7 @@
 ---@class UnityEngine.Application
 ---@field public isPlaying System.Boolean
 ---@field public isFocused System.Boolean
----@field public platform UnityEngine.RuntimePlatform
 ---@field public buildGUID System.String
----@field public isMobilePlatform System.Boolean
----@field public isConsolePlatform System.Boolean
 ---@field public runInBackground System.Boolean
 ---@field public isBatchMode System.Boolean
 ---@field public dataPath System.String
@@ -22,12 +19,15 @@
 ---@field public companyName System.String
 ---@field public cloudProjectId System.String
 ---@field public targetFrameRate System.Int32
----@field public systemLanguage UnityEngine.SystemLanguage
 ---@field public consoleLogPath System.String
 ---@field public backgroundLoadingPriority UnityEngine.ThreadPriority
----@field public internetReachability UnityEngine.NetworkReachability
 ---@field public genuine System.Boolean
 ---@field public genuineCheckAvailable System.Boolean
+---@field public platform UnityEngine.RuntimePlatform
+---@field public isMobilePlatform System.Boolean
+---@field public isConsolePlatform System.Boolean
+---@field public systemLanguage UnityEngine.SystemLanguage
+---@field public internetReachability UnityEngine.NetworkReachability
 ---@field public isEditor System.Boolean
 local m = { }
 ---public Application .ctor()

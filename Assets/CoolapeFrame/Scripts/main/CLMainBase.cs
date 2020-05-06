@@ -225,33 +225,6 @@ namespace Coolape
                     call(lfexitGmaeConfirm);
                 }
             }
-            // proc net offline
-            if (isOffLine)
-            {
-                //断线通知
-                isOffLine = false;
-                doOffline();
-            }
-        }
-
-        bool isOffLine = false;
-        //off line
-        public void onOffline()
-        {
-            isOffLine = true;
-        }
-
-        public virtual void doOffline()
-        {
-            if (lua == null)
-            {
-                return;
-            }
-            LuaFunction f = getLuaFunction("onOffline");
-            if (f != null)
-            {
-                call(f);
-            }
         }
 
         public void gc()

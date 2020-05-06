@@ -42,37 +42,57 @@ end
 
 -- 刷新
 function IDPBattle.refresh()
-    IDPBattle.showShips()
+    IDPBattle.showUnits()
 end
 
-function IDPBattle.showShips()
+function IDPBattle.showUnits()
     -- wrap mData
     local list = {}
-    local shipMap = {}
+    local units = {}
     ---@type _ParamBattleUnitData
     local cellData
     ---@param v NetProtoIsland.ST_unitInfor
     for k, v in pairs(mData.fleet.units) do
         local shipId = bio2number(v.id)
-        if shipMap[shipId] == nil then
-            cellData = {}
-            cellData.type = IDConst.UnitType.role
-            cellData.id = shipId
-            cellData.num = v.num
-            local attr = DBCfg.getRoleByID(shipId)
-            cellData.name = LGet(attr.NameKey)
-            cellData.icon = IDUtl.getRoleIcon(shipId)
-            cellData.fidx = mData.fleet.idx
-            shipMap[shipId] = cellData
+        local attr = DBCfg.getRoleByID(shipId)
+        cellData = {}
+        cellData.type = IDConst.UnitType.role
+        cellData.id = shipId
+        cellData.num = v.num
+        cellData.name = LGet(attr.NameKey)
+        cellData.icon = IDUtl.getRoleIcon(shipId)
+        cellData.fidx = mData.fleet.idx
+        if bio2number(attr.GID) ~= IDConst.RoleGID.pet then
+            -- 需要根据科技来设置等级
+            local techId = bio2number(attr.TechID)
+            cellData.lev = number2bio(IDDBCity.curCity:getTechLev(techId))
         else
-            cellData = shipMap[shipId]
-            cellData.num = number2bio(bio2number(v.num) + bio2number(cellData.num))
+            --//TODO: 海怪的等级不是通过科技
         end
-        --//TODO:需要根据科技来设置等级
-        cellData.lev = number2bio(1)
+        table.insert(units, cellData)
     end
 
-    CLUIUtl.resetList4Lua(uiobjs.unitGrid, uiobjs.unitGridPrefab, shipMap, IDPBattle.initUnitCell)
+    -- 设置魔法
+    if IDDBCity.curCity.magicAltar then
+        local list = IDDBCity.curCity:getUnitsByBIdx(bio2number(IDDBCity.curCity.magicAltar.idx))
+        ---@param v NetProtoIsland.ST_unitInfor
+        for i, v in pairs(list) do
+            local id = bio2number(v.id)
+            ---@type DBCFMagicData
+            local attr = DBCfg.getDataById(DBCfg.CfgPath.Magic, id)
+            cellData = {}
+            cellData.type = IDConst.UnitType.skill
+            cellData.id = id
+            cellData.num = v.num
+            cellData.name = LGet(attr.NameKey)
+            cellData.icon = attr.Icon
+            cellData.bidx = IDDBCity.curCity.magicAltar.idx
+            cellData.lev = number2bio(IDDBCity.curCity:getMagicLev(id))
+            table.insert(units, cellData)
+        end
+    end
+
+    CLUIUtl.resetList4Lua(uiobjs.unitGrid, uiobjs.unitGridPrefab, units, IDPBattle.initUnitCell)
 end
 
 function IDPBattle.initUnitCell(cell, data)

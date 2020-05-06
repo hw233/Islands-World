@@ -381,5 +381,9 @@ function m.OverlapCapsuleNonAlloc(point0, point1, radius, results, layerMask, qu
 ---@param optional Bounds worldBounds
 ---@param optional Int32 subdivisions
 function m.RebuildBroadphaseRegions(worldBounds, subdivisions) end
+---public Void BakeMesh(Int32 meshID, Boolean convex)
+---@param optional Int32 meshID
+---@param optional Boolean convex
+function m.BakeMesh(meshID, convex) end
 UnityEngine.Physics = m
 return m

@@ -1,4 +1,4 @@
-﻿---@public 防御建筑
+﻿---public 防御建筑
 require("city.IDLBuilding")
 
 ---@class IDLBuildingDefense:IDLBuilding
@@ -72,7 +72,7 @@ function IDLBuildingDefense:OnPress(go, isPress)
     end
 end
 
----@public 显示攻击范围
+---public 显示攻击范围
 function IDLBuildingDefense:showAttackRang()
     -- 最小攻击范围
     local MinAttackRange = self.MinAttackRange
@@ -116,7 +116,7 @@ function IDLBuildingDefense:showAttackRang()
     end
 end
 
----@public 加载范围圈
+---public 加载范围圈
 function IDLBuildingDefense:loadRang(color, r, callback)
     CLUIOtherObjPool.borrowObjAsyn(
         "Rang",
@@ -192,7 +192,7 @@ function IDLBuildingDefense:doAttack()
     InvokeEx.invokeByFixedUpdate(self:wrapFunc(self.doAttack), bio2number(self.attr.AttackSpeedMS) / 1000)
 end
 
----@public 寻敌，并设置目标
+---public 寻敌，并设置目标
 function IDLBuildingDefense:doSearchTarget()
     local target = self.target
     if target == nil or target.isDead then
@@ -215,7 +215,7 @@ function IDLBuildingDefense:doSearchTarget()
     self:setTarget(target)
 end
 
----@public 开炮
+---public 开炮
 ---@param target IDRoleBase
 function IDLBuildingDefense:fire(target)
     target = target or self.target
@@ -229,13 +229,13 @@ function IDLBuildingDefense:fire(target)
     SoundEx.playSound(self.attr.AttackSound, 1, 3)
 end
 
----@public
+---public
 ---@param bullet Coolape.CLBulletBase
 function IDLBuildingDefense:onBulletHit(bullet)
     IDLBattle.onBulletHit(bullet)
 end
 
----@public 取得伤害值
+---public 取得伤害值
 ---@param target IDRoleBase
 function IDLBuildingDefense:getDamage(target)
     if target == nil then
@@ -250,7 +250,7 @@ function IDLBuildingDefense:getDamage(target)
     return math.floor(damage)
 end
 
----@public 炮口面向目标
+---public 炮口面向目标
 ---@param target IDRoleBase
 function IDLBuildingDefense:lookatTarget(target, imm, callback)
     self.bodyRotate.enabled = false

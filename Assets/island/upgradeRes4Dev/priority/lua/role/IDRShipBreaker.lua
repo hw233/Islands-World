@@ -40,23 +40,29 @@ function IDRShipBreaker:startFire(target)
     self.tweenPos:flyout(target.transform.position, 1.4, 0, nil, self:wrapFunc(self.doBomb), true)
 end
 
----@public 当不能寻路到可攻击目标时
+---public 当不能寻路到可攻击目标时
 function IDRShipBreaker:onCannotReach4AttackTarget()
     self:onDead()
 end
 
 function IDRShipBreaker:doBomb()
-    -- 取得目标
-    local targets = IDLBattle.searcher.getTargetsInRange(self, self.transform.position, bio2number(self.attr.DamageAffectRang)/100)
-
     -- 自爆
     SoundEx.playSound(self.attr.AttackSound, 1, 3)
     CLEffect.play(self.attr.AttackEffect, self.transform.position)
     self:onDead()
 
-    ---@param target IDLUnitBase
-    for i, target in ipairs(targets) do
-        target:onHurt(self:getDamage(target), self)
+    if MyCfg.mode == GameMode.battle then
+        -- 取得目标
+        local targets =
+            IDLBattle.searcher.getTargetsInRange(
+            self,
+            self.transform.position,
+            bio2number(self.attr.DamageAffectRang) / 100
+        )
+        ---@param target IDLUnitBase
+        for i, target in ipairs(targets) do
+            target:onHurt(self:getDamage(target), self)
+        end
     end
 end
 

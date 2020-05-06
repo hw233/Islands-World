@@ -11,6 +11,7 @@
 ---@field public debugLayer UnityEngine.Rendering.PostProcessing.PostProcessDebugLayer
 ---@field public breakBeforeColorGrading System.Boolean
 ---@field public sortedBundles System.Collections.Generic.Dictionary2UnityEngine.Rendering.PostProcessing.PostProcessEventSystem.Collections.Generic.List1UnityEngine.Rendering.PostProcessing.PostProcessLayer.SerializedBundleRef
+---@field public cameraDepthFlags UnityEngine.DepthTextureMode
 ---@field public haveBundlesBeenInited System.Boolean
 local m = { }
 ---public PostProcessLayer .ctor()

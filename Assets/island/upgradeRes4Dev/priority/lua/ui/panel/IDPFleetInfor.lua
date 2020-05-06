@@ -3,7 +3,8 @@
 ---@field public fleetidx number 舰队idx
 ---@field public toPos number 目标坐标
 ---@field public fleetTask IDConst.FleetTask 任务类型
----@field public isAttackIsland boolean 是否功能岛屿
+---@field public isAttackIsland boolean 是否攻击岛屿
+---@field public isAttackFleet boolean 是否攻击舰队
 
 ---@class IDPFleetInfor
 local IDPFleetInfor = {}
@@ -255,7 +256,7 @@ function IDPFleetInfor.uiEventDelegate(go)
                         IDPFleetInfor.onDepartCallback
                     )
                 )
-            else
+            elseif mData.isAttackFleet then
                 CLLNet.send(
                     NetProtoIsland.send.fleetAttackFleet(
                         bio2number(fleetInfor.idx),

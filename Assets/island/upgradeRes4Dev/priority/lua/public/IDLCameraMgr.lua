@@ -1,5 +1,6 @@
 ﻿-- 界面
 IDLCameraMgr = {}
+---@type Coolape.CLSmoothFollow
 IDLCameraMgr.smoothFollow = nil
 
 ---@type CameraMgr

@@ -795,7 +795,7 @@ public class UIInput : MonoBehaviour
 	Rect rect = new Rect(0,0,0,0);
 	GUIStyle gs = new GUIStyle ();
 	BoxCollider _collider;
-	BoxCollider collider {
+	public BoxCollider collider {
 		get {
 			if(_collider == null) {
 				_collider = GetComponent<BoxCollider>();
@@ -1235,7 +1235,7 @@ public class UIInput : MonoBehaviour
 	}
 	*/
 	#region add by chenbin
-	protected virtual void OnClick ()
+	public virtual void OnClick ()
 	{
 		#if MOBILE
 		selection = this;

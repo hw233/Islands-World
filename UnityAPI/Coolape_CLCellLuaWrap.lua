@@ -1,5 +1,6 @@
 ---@class Coolape.CLCellLua : Coolape.CLCellBase
 ---@field public isNeedResetAtlase System.Boolean
+---@field public data System.Object
 local m = { }
 ---public CLCellLua .ctor()
 ---@return CLCellLua

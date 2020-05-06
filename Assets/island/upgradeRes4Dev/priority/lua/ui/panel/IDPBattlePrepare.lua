@@ -67,7 +67,7 @@ function IDPBattlePrepare.startBattle(data)
     ---@type IDDBCity
 	local targetCity = IDDBCity.new(data.city)
 	local cellIndex = bio2number(targetCity.pos)
-    targetCity:setAllUnits2Buildings(data.dockyardShipss)
+    targetCity:setAllUnits2Buildings(data.unitsInBuildings)
 
     ---@type _ParamBattleData
     local battleData = {}

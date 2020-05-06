@@ -1,4 +1,4 @@
-﻿---@public 资源建筑
+﻿---public 资源建筑
 require("city.IDLBuilding")
 
 ---@class IDLBuildingStore:IDLBuilding
@@ -18,7 +18,7 @@ function IDLBuildingStore:init(selfObj, id, star, lev, _isOffense, other)
     end
 end
 
----@public 资源数据
+---public 资源数据
 function IDLBuildingStore:showStoreState()
     if not self.serverData then
         return
@@ -103,6 +103,15 @@ function IDLBuildingStore:onHurt(damage, attacker)
         end
     end
     IDLBuildingStore.super.onHurt(self, damage, attacker)
+end
+
+function IDLBuildingStore:SetActive(active)
+    IDLBuildingStore.super.SetActive(self, active)
+    if active then
+        self:showStoreState()
+    else
+        self:hideFullHud()
+    end
 end
 
 function IDLBuildingStore:clean()

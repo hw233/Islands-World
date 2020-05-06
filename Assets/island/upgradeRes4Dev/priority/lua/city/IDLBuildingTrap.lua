@@ -1,4 +1,4 @@
-﻿---@public 陷阱建筑
+﻿---public 陷阱建筑
 require("city.IDLBuildingDefense")
 
 ---@class IDLBuildingTrap:IDLBuildingDefense
@@ -52,14 +52,14 @@ function IDLBuildingTrap:show()
     self:loadShadow()
 end
 
----@public 把自己隐藏起来
+---public 把自己隐藏起来
 function IDLBuildingTrap:hide()
     SetActive(self.body.gameObject, false)
     self:hideAttackRang()
     self:hideShadow()
 end
 
----@public 显示攻击范围
+---public 显示攻击范围
 function IDLBuildingTrap:showAttackRang()
     if MyCfg.mode == GameMode.battle then
         -- 战斗中不能显示陷阱的范围，不然就穿邦了

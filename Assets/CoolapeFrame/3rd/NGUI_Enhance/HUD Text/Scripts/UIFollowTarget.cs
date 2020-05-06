@@ -118,10 +118,10 @@ public class UIFollowTarget : MonoBehaviour
 			pos.y = Mathf.RoundToInt(pos.y);
 			pos.z = 0f;
 			mTrans.localPosition = pos;
-			//Debug.Log("mTrans.localPosition============" + mTrans.localPosition);
-		} else {
+            //Debug.Log("mTrans.localPosition============" + mTrans.localPosition);
+        } else {
 			mTrans.localPosition = new Vector3(20000, 20000, 0);
-		}
+        }
 	}
 	
 	public Vector3 getViewPos() {

@@ -1,4 +1,4 @@
-﻿---@public 海怪陷阱
+﻿---public 海怪陷阱
 require("city.IDLBuildingTrap")
 
 ---@class IDLBuildingTrapMonster:IDLBuildingTrap

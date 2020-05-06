@@ -1,4 +1,4 @@
----@public 预加载处理
+---public 预加载处理
 ---@class IDPreloadPrefab
 local IDPreloadPrefab = {}
 require("public.CLLQueue")
@@ -10,7 +10,7 @@ IDPreloadPrefab.thingQueue = CLLQueue.new() -- 物件
 IDPreloadPrefab.uiThingQueue = CLLQueue.new() -- ui相关物件
 IDPreloadPrefab.totalAssets = 0 -- 需要预加载资源总量
 
----@public 重置
+---public 重置
 function IDPreloadPrefab.reset()
     IDPreloadPrefab.roleQueue:clear()
     IDPreloadPrefab.soundQueue:clear()
@@ -22,7 +22,7 @@ function IDPreloadPrefab.reset()
     IDPreloadPrefab.currCount = 0
 end
 
----@public 预加载角色
+---public 预加载角色
 function IDPreloadPrefab.preloadRoles(roles, callback, progressCB)
     IDPreloadPrefab.reset()
     IDPreloadPrefab.onFinishCallback = callback
@@ -34,7 +34,7 @@ function IDPreloadPrefab.preloadRoles(roles, callback, progressCB)
     IDPreloadPrefab.startPreload()
 end
 
----@public 预加载建筑
+---public 预加载建筑
 function IDPreloadPrefab.preloadBuildings(buildings, callback, progressCB)
     IDPreloadPrefab.reset()
     IDPreloadPrefab.onFinishCallback = callback
@@ -55,7 +55,7 @@ function IDPreloadPrefab.enQueue(queue, prefabName)
     IDPreloadPrefab.totalAssets = IDPreloadPrefab.totalAssets + 1
 end
 
----@public 提取了角色相关的需要预加载的资源
+---public 提取了角色相关的需要预加载的资源
 function IDPreloadPrefab.extractRole(id)
     local cfg = DBCfg.getRoleByID(id)
     if cfg then
@@ -75,7 +75,7 @@ function IDPreloadPrefab.extractRole(id)
     end
 end
 
----@public 提取了建筑相关的需要预加载的资源
+---public 提取了建筑相关的需要预加载的资源
 function IDPreloadPrefab.extractBuilding(id)
     local cfg = DBCfg.getBuildingByID(id)
     if cfg then
@@ -90,7 +90,7 @@ function IDPreloadPrefab.extractBuilding(id)
     end
 end
 
----@public 子弹
+---public 子弹
 function IDPreloadPrefab.extractBullet(id)
     if id > 0 then
         local attr = DBCfg.getBulletByID(id)

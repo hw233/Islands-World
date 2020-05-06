@@ -24,6 +24,7 @@
 ---@field public selectionStart System.Int32
 ---@field public selectionEnd System.Int32
 ---@field public caret UITexture
+---@field public collider UnityEngine.BoxCollider
 local m = { }
 ---public UIInput .ctor()
 ---@return UIInput
@@ -39,6 +40,8 @@ function m:ProcessEvent(ev) end
 ---public Void Insert(String text)
 ---@param optional String text
 function m:Insert(text) end
+---public Void OnClick()
+function m:OnClick() end
 ---public Void Submit()
 function m:Submit() end
 ---public Void UpdateLabel()

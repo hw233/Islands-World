@@ -62,9 +62,12 @@ function m.SetGlobalColor(nameID, value) end
 function m.SetGlobalMatrix(nameID, value) end
 ---public Void SetGlobalTexture(String name, Texture value)
 ---public Void SetGlobalTexture(Int32 nameID, Texture value)
----@param optional Int32 nameID
----@param optional Texture value
-function m.SetGlobalTexture(nameID, value) end
+---public Void SetGlobalTexture(String name, RenderTexture value, RenderTextureSubElement element)
+---public Void SetGlobalTexture(Int32 nameID, RenderTexture value, RenderTextureSubElement element)
+---@param Int32 nameID
+---@param optional RenderTexture value
+---@param optional RenderTextureSubElement element
+function m.SetGlobalTexture(nameID, value, element) end
 ---public Void SetGlobalBuffer(String name, ComputeBuffer value)
 ---public Void SetGlobalBuffer(Int32 nameID, ComputeBuffer value)
 ---@param optional Int32 nameID
@@ -151,5 +154,56 @@ function m.GetGlobalVectorArray(nameID, values) end
 ---@param Int32 nameID
 ---@param optional List`1 values
 function m.GetGlobalMatrixArray(nameID, values) end
+---public Int32 GetPropertyCount()
+---@return number
+function m:GetPropertyCount() end
+---public Int32 FindPropertyIndex(String propertyName)
+---@return number
+---@param optional String propertyName
+function m:FindPropertyIndex(propertyName) end
+---public String GetPropertyName(Int32 propertyIndex)
+---@return String
+---@param optional Int32 propertyIndex
+function m:GetPropertyName(propertyIndex) end
+---public Int32 GetPropertyNameId(Int32 propertyIndex)
+---@return number
+---@param optional Int32 propertyIndex
+function m:GetPropertyNameId(propertyIndex) end
+---public ShaderPropertyType GetPropertyType(Int32 propertyIndex)
+---@return number
+---@param optional Int32 propertyIndex
+function m:GetPropertyType(propertyIndex) end
+---public String GetPropertyDescription(Int32 propertyIndex)
+---@return String
+---@param optional Int32 propertyIndex
+function m:GetPropertyDescription(propertyIndex) end
+---public ShaderPropertyFlags GetPropertyFlags(Int32 propertyIndex)
+---@return number
+---@param optional Int32 propertyIndex
+function m:GetPropertyFlags(propertyIndex) end
+---public String[] GetPropertyAttributes(Int32 propertyIndex)
+---@return table
+---@param optional Int32 propertyIndex
+function m:GetPropertyAttributes(propertyIndex) end
+---public Single GetPropertyDefaultFloatValue(Int32 propertyIndex)
+---@return number
+---@param optional Int32 propertyIndex
+function m:GetPropertyDefaultFloatValue(propertyIndex) end
+---public Vector4 GetPropertyDefaultVectorValue(Int32 propertyIndex)
+---@return Vector4
+---@param optional Int32 propertyIndex
+function m:GetPropertyDefaultVectorValue(propertyIndex) end
+---public Vector2 GetPropertyRangeLimits(Int32 propertyIndex)
+---@return Vector2
+---@param optional Int32 propertyIndex
+function m:GetPropertyRangeLimits(propertyIndex) end
+---public TextureDimension GetPropertyTextureDimension(Int32 propertyIndex)
+---@return number
+---@param optional Int32 propertyIndex
+function m:GetPropertyTextureDimension(propertyIndex) end
+---public String GetPropertyTextureDefaultName(Int32 propertyIndex)
+---@return String
+---@param optional Int32 propertyIndex
+function m:GetPropertyTextureDefaultName(propertyIndex) end
 UnityEngine.Shader = m
 return m

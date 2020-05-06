@@ -1,4 +1,4 @@
-﻿---@public 防御建筑:烈焰式火箭炮
+﻿---public 防御建筑:烈焰式火箭炮
 require("city.IDLBuildingDefense")
 
 ---@class IDLBuildingDefenseMissile2:IDLBuildingDefense

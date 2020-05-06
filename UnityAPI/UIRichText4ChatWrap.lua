@@ -46,6 +46,8 @@ function m:showFace(faceName, pos) end
 function m:findFace() end
 ---public Void clean()
 function m:clean() end
+---public Void OnDestroy()
+function m:OnDestroy() end
 ---public Void OnDisable()
 function m:OnDisable() end
 ---public Void OnEnable()

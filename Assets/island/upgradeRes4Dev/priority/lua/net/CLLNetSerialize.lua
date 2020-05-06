@@ -26,7 +26,7 @@ local EncryptType = {
     clientEncrypt = 1,
     serverEncrypt = 2,
     both = 3,
-    none = 0,
+    none = 0
 }
 function CLLNetSerialize.setCfg(cfg)
     --[[
@@ -38,7 +38,7 @@ function CLLNetSerialize.setCfg(cfg)
     netCfg = cfg
 end
 
----@public 添加时间戳
+---public 添加时间戳
 function CLLNetSerialize.addTimestamp(bytes)
     if bytes == nil then
         return nil
@@ -51,7 +51,7 @@ function CLLNetSerialize.addTimestamp(bytes)
     return BioUtl.number2bio(ts) .. bytes
 end
 
----@public 安全加固
+---public 安全加固
 local securityReinforce = function(bytes)
     if netCfg.checkTimeStamp then
         bytes = CLLNetSerialize.addTimestamp(bytes)
@@ -108,7 +108,7 @@ end
 --============================================================
 -- 完整的接口都是table，当有分包的时候会收到list。list[1]=共有几个分包，list[2]＝第几个分包，list[3]＝ 内容
 local function isSubPackage(m)
-    if m.__isSubPack then
+    if m and type(m) == "table" and m.__isSubPack then
         --判断有没有cmd
         return true
     end
@@ -134,7 +134,7 @@ local function unPackSubMsg(m)
 end
 
 --============================================================
----@public 解包
+---public 解包
 function CLLNetSerialize.unpackMsg(buffer, tcp)
     local ret = nil
     local oldPos = buffer.Position
@@ -168,12 +168,12 @@ end
 
 --============================================================
 local secretKey = ""
----@public 加密
+---public 加密
 function CLLNetSerialize.encrypt(bytes, key)
     return CLLNetSerialize.xor(bytes, key)
 end
 
----@public 解密
+---public 解密
 function CLLNetSerialize.decrypt(bytes, key)
     return CLLNetSerialize.xor(bytes, key)
 end

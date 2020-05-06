@@ -5,7 +5,5 @@ local m = { }
 function m.New() end
 ---public Void init()
 function m:init() end
----public Void doOffline()
-function m:doOffline() end
 MyMain = m
 return m

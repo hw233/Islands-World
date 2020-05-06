@@ -1,4 +1,4 @@
-﻿---@public 冰冻地雷
+﻿---public 冰冻地雷
 require("city.IDLBuildingTrap")
 
 ---@class IDLBuildingTrapFrozen:IDLBuildingTrap

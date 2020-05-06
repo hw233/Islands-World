@@ -1,4 +1,4 @@
-﻿---@public 防御建筑:末日之门
+﻿---public 防御建筑:末日之门
 require("city.IDLBuildingDefense")
 
 ---@class IDLBuildingDefenseLightning2:IDLBuildingDefense

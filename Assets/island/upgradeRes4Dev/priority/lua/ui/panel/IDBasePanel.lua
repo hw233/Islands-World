@@ -12,7 +12,7 @@ function IDBasePanel:init(csObj)
 	self.transform = csObj.transform
 end
 
----@public 当有通用背板显示时的回调
+---public 当有通用背板显示时的回调
 ---@param cs Coolape.CLPanelLua
 function IDBasePanel:onShowFrame(cs)
 	if cs.frameObj then

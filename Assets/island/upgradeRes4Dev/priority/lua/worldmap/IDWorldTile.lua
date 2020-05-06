@@ -92,7 +92,7 @@ function IDWorldTile:hideHud()
     end
 end
 
----@public 加载影子
+---public 加载影子
 function IDWorldTile:loadShadow()
     if self.shadow == nil then
         CLUIOtherObjPool.borrowObjAsyn(

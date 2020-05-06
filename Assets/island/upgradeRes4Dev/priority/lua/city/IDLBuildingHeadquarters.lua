@@ -1,4 +1,4 @@
-﻿---@public 资源建筑
+﻿---public 资源建筑
 require("city.IDLBuilding")
 
 ---@class IDLBuildingHeadquarters:IDLBuilding
@@ -36,7 +36,7 @@ function IDLBuildingHeadquarters:OnClick()
     end
 end
 
----@public 当屏幕缩放时的逻辑处理
+---public 当屏幕缩放时的逻辑处理
 function IDLBuildingHeadquarters:onScaleScreen(scaleVal)
     local pos = self.transform.position
     if self.shadow then
@@ -139,17 +139,17 @@ function IDLBuildingHeadquarters:showBeLootResEffect(force)
     end
 end
 
----@public 显示隐藏（可能为连带做一些其它的处理）
+---public 显示隐藏（可能为连带做一些其它的处理）
 function IDLBuildingHeadquarters:SetActive(active)
     if active then
         -- self:loadFloor()
-        self:upgrading()
+        self:showBuildingStateFlags()
     else
         -- if self.floor then
         --     SetActive(self.floor, active)
         -- end
         self:fireWorker(true)
-        self:unLoadProgressHud()
+        self:hideBuildingStateFlags()
     end
 end
 

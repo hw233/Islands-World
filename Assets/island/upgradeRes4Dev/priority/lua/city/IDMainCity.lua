@@ -11,6 +11,11 @@ local IDPBuildingInfor = require("ui.panel.IDPBuildingInfor")
 local IDPBuildShip = require("ui.panel.IDPBuildShip")
 ---@type IDPMails
 local IDPMails = require("ui.panel.IDPMails")
+---@type IDPTechList
+local IDPTechList = require("ui.panel.IDPTechList")
+---@type IDPMagics
+local IDPMagics = require("ui.panel.IDPMagics")
+
 ---@class IDMainCity
 IDMainCity = class("IDMainCity")
 ---@type Coolape.CLBaseLua
@@ -187,11 +192,25 @@ local function _init()
             bg = "public_edit_circle_bt_shipshop_n"
         },
         mail = {
-            --移除建筑
+            --邮件
             nameKey = "Mail",
             callback = IDMainCity.mail,
             icon = "icon_arrow",
             bg = "public_edit_circle_bt_shipshop_n"
+        },
+        researchTech = {
+            --研究
+            nameKey = "Research",
+            callback = IDMainCity.researchTech,
+            icon = "icon_arrow",
+            bg = "public_edit_circle_bt_shipshop_n" -- //TODO:
+        },
+        summonMagic = {
+            --召唤魔法
+            nameKey = "Summon",
+            callback = IDMainCity.summonMagic,
+            icon = "icon_arrow",
+            bg = "public_edit_circle_bt_shipshop_n" -- //TODO:
         }
     }
 end
@@ -300,7 +319,7 @@ function IDMainCity.init(cityData, onFinishCallback, onProgress, isForceInitASta
     )
 end
 
----@public 当主城数据列新时处理
+---public 当主城数据列新时处理
 function IDMainCity.refreshData(cityData)
     if cityData then
         IDMainCity.cityData = cityData
@@ -309,7 +328,7 @@ function IDMainCity.refreshData(cityData)
     end
 end
 
----@public 迁城处理
+---public 迁城处理
 function IDMainCity.onMoveCity()
     local gridIndex = bio2number(IDMainCity.cityData.pos)
     transform.position = IDWorldMap.grid.grid:GetCellCenter(gridIndex)
@@ -344,16 +363,16 @@ function IDMainCity.onScaleScreen(delta, offset)
     IDMainCity.scaleHeadquarters()
 end
 
----@public 添加改变模式的回调
+---public 添加改变模式的回调
 function IDMainCity.addChgModeCallback(func)
     IDMainCity.chgModeCallbacks[func] = func
 end
----@public remove改变模式的回调
+---public remove改变模式的回调
 function IDMainCity.rmChgModeCallback(func)
     IDMainCity.chgModeCallbacks[func] = nil
 end
 
----@public 改变在大地图的子模式
+---public 改变在大地图的子模式
 function IDMainCity.onChgMode(oldMode, curMode)
     local isShowBuilding = true
     local isShowTile = true
@@ -447,7 +466,7 @@ function IDMainCity.scaleCity()
     end
 end
 
----@public 当缩放屏幕时缩放主基地
+---public 当缩放屏幕时缩放主基地
 function IDMainCity.scaleHeadquarters()
     local maxVal = scaleCityHeighMax
     local minVal = scaleCityHeighMin
@@ -479,7 +498,7 @@ function IDMainCity.scaleHeadquarters()
     IDMainCity.Headquarters:onScaleScreen(scaleBaseVal * scaleCityVal)
 end
 
----@public 加载地块
+---public 加载地块
 function IDMainCity.loadTiles(cb)
     local list = {}
     local tiles = IDMainCity.cityData.tiles
@@ -538,7 +557,7 @@ function IDMainCity.onLoadTile(name, obj, orgs)
     end
 end
 
----@public 取得建筑列表
+---public 取得建筑列表
 function IDMainCity.getBuildings()
     return buildings
 end
@@ -615,8 +634,11 @@ function IDMainCity.onLoadBuilding(name, obj, param)
         else
             buildingLua = unit.luaTable
         end
-
-        buildingLua:init(unit, bio2number(d.attrid), 0, bio2number(d.lev), false, {index = index, serverData = d})
+        local orgs = {index = index, serverData = d}
+        if MyCfg.mode == GameMode.battle then
+            orgs.battle = IDLBattle
+        end
+        buildingLua:init(unit, bio2number(d.attrid), 0, bio2number(d.lev), false, orgs)
 
         local attr = DBCfg.getBuildingByID(bio2number(d.attrid))
         IDMainCity.refreshGridState(index, bio2number(attr.Size), bio2number(d.idx), gridState4Building)
@@ -653,7 +675,7 @@ function IDMainCity.onLoadBuilding(name, obj, param)
     end
 end
 
----@public 新建筑
+---public 新建筑
 function IDMainCity.createBuilding(data)
     showHotWheel()
     IDMainCity.onClickOcean()
@@ -684,7 +706,7 @@ function IDMainCity.onGetBuilding4New(name, obj, orgs)
     hideHotWheel()
 end
 
----@public 取得网格
+---public 取得网格
 function IDMainCity.getGrid()
     return grid
 end
@@ -746,6 +768,10 @@ function IDMainCity.clean()
 end
 
 function IDMainCity.destory()
+    IDMainCity.astar4Ocean.transform.parent = MyMain.self.transform
+    IDMainCity.astar4Tile.transform.parent = MyMain.self.transform
+    IDMainCity.astar4Worker.transform.parent = MyMain.self.transform
+
     IDMainCity.clean()
     if SFourWayArrow.self ~= nil then
         CLThingsPool.returnObj(SFourWayArrow.self.gameObject)
@@ -757,7 +783,7 @@ end
 function IDMainCity.onPress(isPressed)
 end
 
----@public 点击了海
+---public 点击了海
 function IDMainCity.onClickOcean()
     if IDMainCity.ExtendTile then
         SetActive(IDMainCity.ExtendTile.gameObject, false)
@@ -777,10 +803,12 @@ function IDMainCity.onClickOcean()
         IDMainCity.selectedUnit = nil
     end
 
-    IDLGridTileSide.show()
+    if IDWorldMap.mode == GameModeSub.city then
+        IDLGridTileSide.show()
+    end
 end
 
----@public 点击了建筑
+---public 点击了建筑
 function IDMainCity.onClickBuilding(building)
     if (IDMainCity.selectedUnit == building) then
         return
@@ -807,7 +835,7 @@ function IDMainCity.onClickBuilding(building)
     IDMainCity.showhhideBuildingProc(building)
 end
 
----@public 点击地块
+---public 点击地块
 function IDMainCity.onClickTile(tile)
     if (IDMainCity.selectedUnit == tile) then
         return
@@ -861,7 +889,7 @@ end
 function IDMainCity.onDragOcean()
 end
 
----@public 显示建筑操作hud
+---public 显示建筑操作hud
 function IDMainCity.showhhideBuildingProc(building)
     if building == nil then
         IDUtl.hidePopupMenus()
@@ -885,7 +913,7 @@ function IDMainCity.showhhideBuildingProc(building)
     end
 end
 
----@public 准备点击了建筑后的显示按键数据
+---public 准备点击了建筑后的显示按键数据
 function IDMainCity.prepareData4PopupMenu(building)
     local buttonList = {}
     local isTile = building.isTile
@@ -909,40 +937,40 @@ function IDMainCity.prepareData4PopupMenu(building)
             -- 详情
             tbInsert(buttonList, PopUpMenus.detail)
 
+            local state = bio2number(serverData.state)
             -- 升级加速
             if
-                attrid ~= IDConst.BuildingID.activityCenterBuildingID and attrid ~= IDConst.BuildingID.MailBoxBuildingID and
+                attrid ~= IDConst.BuildingID.activityCenter and attrid ~= IDConst.BuildingID.MailBox and
                     attrgid ~= IDConst.BuildingGID.tree
              then
                 -- 活动中心、邮箱 不需要升级
-                if bio2number(serverData.state) == IDConst.BuildingState.normal then
+                if state == IDConst.BuildingState.normal then
                     if bio2number(serverData.lev) < bio2number(attr.MaxLev) then
                         -- 升级
                         tbInsert(buttonList, PopUpMenus.upgrade)
                     end
-                elseif bio2number(serverData.state) == IDConst.BuildingState.upgrade then
+                elseif state == IDConst.BuildingState.upgrade then
                     -- 立即
                     tbInsert(buttonList, PopUpMenus.buildSpeedUp)
-                elseif bio2number(serverData.state) == IDConst.BuildingState.renew then
+                elseif state == IDConst.BuildingState.renew then
                     -- 修复
                     tbInsert(buttonList, PopUpMenus.renew)
                 end
-            elseif attrid == IDConst.BuildingID.MailBoxBuildingID then
+            end
+
+            if attrid == IDConst.BuildingID.MailBox then -- 邮箱
                 tbInsert(buttonList, PopUpMenus.mail)
             end
 
-            if building == IDMainCity.Headquarters then
-            -- 说明是主基地
-            --//TODO:说明是主基地
-            end
-            if attrid == 6 or attrid == 8 or attrid == 10 then
-            -- 收集
-            --table.insert(mData.buttonList, { nameKey = "Renew", callback = nil, icon = "icon_build", bg = "public_edit_circle_bt_management" })
-            end
-            if attrid == 2 then
-                -- 造船厂
-                if bio2number(serverData.lev) > 0 then
-                    tbInsert(buttonList, PopUpMenus.buildShip)
+            if bio2number(serverData.lev) > 0 then -- 有等级才能操作
+                if state == IDConst.BuildingState.normal or state == IDConst.BuildingState.working then -- 只有空闲时，才可以操作
+                    if attrid == IDConst.BuildingID.TechCenter then -- 研究中心
+                        tbInsert(buttonList, PopUpMenus.researchTech)
+                    elseif attrid == IDConst.BuildingID.dockyardBuildingID then -- 造船厂
+                        tbInsert(buttonList, PopUpMenus.buildShip)
+                    elseif attrid == IDConst.BuildingID.MagicAltar then -- 魔法坛
+                        tbInsert(buttonList, PopUpMenus.summonMagic)
+                    end
                 end
             end
 
@@ -1006,6 +1034,15 @@ function IDMainCity.mail(building)
     getPanelAsy("PanelMails", onLoadedPanelTT, {type = IDConst.MailType.all, isReceive = true}, IDPMails)
 end
 
+function IDMainCity.researchTech(building)
+    getPanelAsy("PanelTechList", onLoadedPanelTT, nil, IDPTechList)
+end
+
+---public 召唤魔法
+function IDMainCity.summonMagic(building)
+    getPanelAsy("PanelMagics", onLoadedPanelTT, nil, IDPMagics)
+end
+
 ---@param building IDLBuilding
 function IDMainCity.doCreateBuilding(building)
     showHotWheel()
@@ -1045,7 +1082,7 @@ function IDMainCity.cancelCreateBuilding(d)
     IDMainCity.onClickBuilding(nil)
 end
 
----@public 释放建筑
+---public 释放建筑
 function IDMainCity.onReleaseBuilding(building, hadMoved)
     if IDMainCity.newBuildUnit == building then
     elseif IDMainCity.selectedUnit == building then
@@ -1125,7 +1162,7 @@ function IDMainCity.getState4Tile()
     return gridState4Tile
 end
 
----@public 选中状态
+---public 选中状态
 function IDMainCity.setSelected(unit, selected)
     if unit == nil then
         return
@@ -1244,7 +1281,7 @@ function IDMainCity.setOtherUnitsColiderState(target, activeCollider)
     end
 end
 
----@public 刷新网格的状态
+---public 刷新网格的状态
 function IDMainCity.refreshGridState(center, size, val, gridstate)
     --gridstate = gridstate or gridState4Building
     local list = IDMainCity.grid:getOwnGrids(center, size)
@@ -1254,10 +1291,13 @@ function IDMainCity.refreshGridState(center, size, val, gridstate)
     end
 end
 
----@public grid中index位置在的size个格子是都是空闲的
+---public grid中index位置在的size个格子是都是空闲的
 function IDMainCity.isSizeInFreeCell(index, size, canOnLand, canOnWater)
     local list = IDMainCity.grid:getOwnGrids(index, size)
     local count = list.Count
+    if count ~= size * size then
+        return false
+    end
     local cellIndex = 0
     local haveland = false
     local havewater = false
@@ -1298,7 +1338,7 @@ function IDMainCity.showGrid(callback)
     IDMainCity.grid:showRect()
 end
 
----@public 取得空闲的位置
+---public 取得空闲的位置
 function IDMainCity.getFreePos(size, canOnLand, canOnWater)
     local center = MyCfg.self.lookAtTarget.position
     local list = {}
@@ -1333,12 +1373,12 @@ function IDMainCity.getFreePos(size, canOnLand, canOnWater)
     return ret
 end
 
----@public 取得某种建筑的数量
+---public 取得某种建筑的数量
 function IDMainCity.getBuildingCountByID(id)
     return buildingsCount[id] or 0
 end
 
----@public 取得当前主基地开放的最大的建筑id=xx的数量
+---public 取得当前主基地开放的最大的建筑id=xx的数量
 function IDMainCity.getMaxNumOfCurrHeadLev4Building(id)
     local d = IDMainCity.Headquarters.serverData
     local cfg = DBCfg.getHeadquartersLevsDataByLev(bio2number(d.lev))
@@ -1348,7 +1388,7 @@ function IDMainCity.getMaxNumOfCurrHeadLev4Building(id)
     return 1
 end
 
----@public 当建筑有变化时
+---public 当建筑有变化时
 function IDMainCity.onBuildingChg(data)
     local idx = bio2number(data.idx)
     ---@type NetProtoIsland.ST_building
@@ -1375,7 +1415,7 @@ function IDMainCity.onBuildingChg(data)
     )
 end
 
----@public 扩建地块
+---public 扩建地块
 function IDMainCity.showExtendTile(data)
     IDUtl.hidePopupMenus()
     SFourWayArrow.hide()
@@ -1409,7 +1449,7 @@ function IDMainCity.showExtendTile(data)
     end
 end
 
----@public 能否放在一个地块
+---public 能否放在一个地块
 ---@param ...、 可以是index或x、y
 function IDMainCity.canPlaceTile(...)
     local param = {...}
@@ -1441,10 +1481,13 @@ function IDMainCity.canPlaceTile(...)
     end
 end
 
----@public 给定的中心index及size后判断是否在陆地上
+---public 给定的中心index及size后判断是否在陆地上
 function IDMainCity.isOnTheLand(center, size)
     local list = IDMainCity.grid:getOwnGrids(center, size)
     local count = list.Count
+    if count ~= size * size then
+        return false
+    end
     local cellIndex = 0
     for i = 0, count - 1 do
         cellIndex = NumEx.getIntPart(list[i])
@@ -1455,7 +1498,7 @@ function IDMainCity.isOnTheLand(center, size)
     return true
 end
 
----@public 给定的index判断是否在陆地及沙地上
+---public 给定的index判断是否在陆地及沙地上
 function IDMainCity.isIndexOnTheLand(index)
     if gridState4Tile[index] then
         return true
@@ -1476,7 +1519,7 @@ function IDMainCity.isOnTheLandOrBeach(index)
     return false
 end
 
----@public 取得数据
+---public 取得数据
 function IDMainCity.getPosOffset(index)
     if IDLGridTileSide.isOnTheBeach(index) then
         if IDLGridTileSide.isFourSide(index) then
@@ -1491,7 +1534,7 @@ function IDMainCity.getPosOffset(index)
     return IDWorldMap.offset4Ocean
 end
 
----@public 添加地块
+---public 添加地块
 function IDMainCity.addTile(d)
     local idx = bio2number(d.idx)
     local data = IDDBCity.curCity.tiles[idx]
@@ -1519,7 +1562,7 @@ function IDMainCity.addTile(d)
     end
 end
 
----@public 移除地块
+---public 移除地块
 function IDMainCity.doRemoveTile(idx)
     IDUtl.hidePopupMenus()
     SFourWayArrow.hide()
@@ -1561,7 +1604,7 @@ function IDMainCity.doRemoveBuilding(idx)
     IDDBCity.curCity.buildings[idx] = nil
 end
 
----@public 当有建筑完成升级
+---public 当有建筑完成升级
 function IDMainCity.onFinishBuildingUpgrade(bData)
     local idx = bio2number(bData.idx)
     ---@type IDLBuilding
@@ -1582,7 +1625,7 @@ function IDMainCity.onFinishBuildingUpgrade(bData)
     IDMainCity.onClickOcean()
 end
 
----@public 雇佣工人
+---public 雇佣工人
 function IDMainCity.employWorker(building, callback)
     ---@type IDLBuilding
     local idx = bio2number(building.serverData.idx)
@@ -1639,7 +1682,7 @@ function IDMainCity.employWorker(building, callback)
     end
 end
 
----@public 解雇工人
+---public 解雇工人
 function IDMainCity.fireWorker(building)
     ---@type IDLBuilding
     local idx = bio2number(building.serverData.idx)
@@ -1664,12 +1707,12 @@ function IDMainCity.onFinishCollectRes(b)
     building:playCollectResEffect()
 end
 
----@public 取得所有地块对象
+---public 取得所有地块对象
 function IDMainCity.getTiles()
     return tiles
 end
 
----@public 能否投兵
+---public 能否投兵
 ---@param pos UnityEngine.Vector3
 function IDMainCity.canDeploy(pos)
     local index = grid:GetCellIndex(pos)
@@ -1683,7 +1726,7 @@ function IDMainCity.canDeploy(pos)
     return false
 end
 
----@public 是否是不可以投兵的边缘网格
+---public 是否是不可以投兵的边缘网格
 function IDMainCity.isCannotDeploySide(index)
     if needshowTileRedCells[index] or cannotDeploySideCells[index] then
         return false
@@ -1705,7 +1748,7 @@ function IDMainCity.isCannotDeploySide(index)
     return false
 end
 
----@public 设置不可投兵网格
+---public 设置不可投兵网格
 function IDMainCity.setCannotDeploySideCells()
     cannotDeploySideCells = {}
     needshowTileRedCells = {}

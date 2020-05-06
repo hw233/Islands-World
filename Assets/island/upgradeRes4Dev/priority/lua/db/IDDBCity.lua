@@ -14,16 +14,26 @@ function IDDBCity:ctor(d)
     -- end
     ---@type NetProtoIsland.ST_building  主基地
     self.headquarters = nil
+    ---@type NetProtoIsland.ST_building  科技中心
+    self.techCenter = nil
+    ---@type NetProtoIsland.ST_building  魔法坛
+    self.magicAltar = nil
     self.buildings = {} -- 建筑信息 key=idx, map
     ---@param v NetProtoIsland.ST_building
     for k, v in pairs(d.buildings) do
-        self.buildings[k] = v
-        if self.headquarters == nil and bio2number(v.attrid) == IDConst.BuildingID.headquartersBuildingID then
-            self.headquarters = self.buildings[k]
-        end
+        -- self.buildings[k] = v
+        -- if self.headquarters == nil and bio2number(v.attrid) == IDConst.BuildingID.headquartersBuildingID then
+        --     self.headquarters = self.buildings[k]
+        -- elseif self.techCenter == nil and bio2number(v.attrid) == IDConst.BuildingID.TechCenter then
+        --     self.techCenter = self.buildings[k]
+        -- end
+        self:onBuildingChg(v)
     end
     ---@type table 舰队列表[NetProtoIsland.ST_fleetinfor]
     self.fleets = {}
+
+    -- 科技信息
+    self.techMap = {}
 end
 
 ---@param d NetProtoIsland.ST_city
@@ -40,20 +50,22 @@ function IDDBCity:setBaseData(d)
     self.protectEndTime = d.protectEndTime
 end
 
----@public 初始化造船厂数据
-function IDDBCity:initDockyardShips()
+---public 初始化造船厂数据
+function IDDBCity:initUnitsInBuildings()
     ---@param v NetProtoIsland.ST_building
     for k, v in pairs(self.buildings) do
-        if bio2number(v.attrid) == IDConst.BuildingID.dockyardBuildingID then
-            -- 取得造船厂的航船数据
-            CLLNet.send(NetProtoIsland.send.getShipsByBuildingIdx(bio2number(v.idx)))
+        if
+            bio2number(v.attrid) == IDConst.BuildingID.dockyardBuildingID or
+                bio2number(v.attrid) == IDConst.BuildingID.MagicAltar
+         then
+            CLLNet.send(NetProtoIsland.send.getUnitsInBuilding(bio2number(v.idx)))
         end
     end
 end
 
----@public 设置所有造船厂的舰船数据
+---public 设置所有造船厂的舰船数据
 function IDDBCity:setAllUnits2Buildings(list)
-    ---@param v NetProtoIsland.ST_dockyardShips
+    ---@param v NetProtoIsland.ST_unitsInBuilding
     for i, v in ipairs(list) do
         self:onGetUnits4Building(v)
     end
@@ -63,7 +75,7 @@ function IDDBCity:toMap()
     return self._data
 end
 
----@public 取得资源（food，gold，oil）
+---public 取得资源（food，gold，oil）
 function IDDBCity:getRes()
     local ret = {}
     local food = 0
@@ -139,14 +151,20 @@ function IDDBCity:getRes()
     return ret
 end
 
----@public 当建筑数据有变化时
-function IDDBCity:onBuildingChg(data)
-    ---@type NetProtoIsland.ST_building
-    local b = data
+---public 当建筑数据有变化时
+---@param b NetProtoIsland.ST_building
+function IDDBCity:onBuildingChg(b)
     self.buildings[bio2number(b.idx)] = b
-    if bio2number(b.attrid) == IDConst.BuildingID.dockyardBuildingID then
-        -- 取得造船厂的航船数据
-        CLLNet.send(NetProtoIsland.send.getShipsByBuildingIdx(bio2number(b.idx)))
+    if bio2number(b.attrid) == IDConst.BuildingID.headquartersBuildingID then
+        self.headquarters = b
+    elseif bio2number(b.attrid) == IDConst.BuildingID.TechCenter then
+        self.techCenter = b -- 科技中心
+    elseif bio2number(b.attrid) == IDConst.BuildingID.MagicAltar then
+        self.magicAltar = b -- 魔法坛
+    -- CLLNet.send(NetProtoIsland.send.getUnitsInBuilding(bio2number(b.idx)))
+    -- elseif bio2number(b.attrid) == IDConst.BuildingID.dockyardBuildingID then
+    -- 取得造船厂的航船数据
+    -- CLLNet.send(NetProtoIsland.send.getUnitsInBuilding(bio2number(b.idx)))
     end
 end
 
@@ -155,13 +173,13 @@ function IDDBCity:onTileChg(tile)
     self.tiles[bio2number(tile.idx)] = tile
 end
 
----@public 取得造船厂的航船数据
+---public 取得造船厂的航船数据
 ---@param idx number 造船厂的idx
-function IDDBCity:getShipsByBIdx(idx)
+function IDDBCity:getUnitsByBIdx(idx)
     return self.buildingWithUnits[idx]
 end
 
----@public 取得所有的舰船数据
+---public 取得所有的舰船数据
 ---@return table key:id, val:num
 function IDDBCity:getAllDockyardShips()
     local shipMap = {}
@@ -182,7 +200,7 @@ function IDDBCity:getAllDockyardShips()
     return shipMap
 end
 
----@public 取得造船厂的已经使用了的
+---public 取得造船厂的已经使用了的
 ---@param idx number 造船厂的idx
 function IDDBCity:getDockyardUsedSpace(idx)
     ---@type NetProtoIsland.ST_building
@@ -193,7 +211,7 @@ function IDDBCity:getDockyardUsedSpace(idx)
     end
 
     --已经造好的
-    local shipsMap = self:getShipsByBIdx(idx)
+    local shipsMap = self:getUnitsByBIdx(idx)
     local ret = 0
     local attr
     if shipsMap then
@@ -214,19 +232,19 @@ function IDDBCity:getDockyardUsedSpace(idx)
     return ret
 end
 
----@public 当取得造船厂的舰船数据
----@param data NetProtoIsland.ST_dockyardShips
+---public 当取得造船厂的舰船数据
+---@param data NetProtoIsland.ST_unitsInBuilding
 function IDDBCity:onGetUnits4Building(data)
     local bidx = bio2number(data.buildingIdx)
-    local shipsMap = {}
+    local unitsMap = {}
     ---@param v NetProtoIsland.ST_unitInfor
-    for i, v in ipairs(data.ships or {}) do
-        shipsMap[bio2number(v.id)] = v
+    for i, v in ipairs(data.units or {}) do
+        unitsMap[bio2number(v.id)] = v
     end
-    self.buildingWithUnits[bidx] = shipsMap
+    self.buildingWithUnits[bidx] = unitsMap
 end
 
----@public 当主城变化时
+---public 当主城变化时
 function IDDBCity:onMyselfCityChg(d)
     self:setBaseData(d)
     if MyCfg.mode == GameMode.map or MyCfg.mode == GameMode.city then
@@ -236,6 +254,20 @@ function IDDBCity:onMyselfCityChg(d)
     end
 end
 
+---public 取得建筑列表by配置id
+function IDDBCity:getBuildingsByID(attrID)
+    local list = {}
+    ---@param b NetProtoIsland.ST_building
+    for i, b in pairs(self.buildings) do
+        if bio2number(b.attrid) == attrID then
+            table.insert(list, b)
+        end
+    end
+    return list
+end
+--------------------------------------------
+--------------------------------------------
+--舰队相关处理
 function IDDBCity:setFleets(list)
     ---@param v NetProtoIsland.ST_fleetinfor
     for i, v in ipairs(list) do
@@ -258,5 +290,108 @@ function IDDBCity:onFleetChg(fleet, isRemove)
         self.fleets[bio2number(fleet.idx)] = fleet
     end
 end
+
+--------------------------------------------
+--------------------------------------------
+--科技相关处理
+function IDDBCity:onGetTechs(list)
+    ---@param v NetProtoIsland.ST_techInfor
+    for i, v in ipairs(list) do
+        self.techMap[bio2number(v.id)] = v
+    end
+end
+
+---@param tech NetProtoIsland.ST_techInfor
+function IDDBCity:onTechChg(tech)
+    self.techMap[bio2number(tech.id)] = tech
+end
+
+---@return NetProtoIsland.ST_techInfor
+function IDDBCity:getTechByID(id)
+    return self.techMap[id]
+end
+---@return NetProtoIsland.ST_techInfor
+function IDDBCity:getTechByIdx(idx)
+    ---@param v NetProtoIsland.ST_techInfor
+    for k, v in pairs(self.techMap) do
+        if bio2number(v.idx) == idx then
+            return v
+        end
+    end
+end
+---public 科技是解锁
+function IDDBCity:isTechUnlocked(id)
+    ---@type DBCFTechData
+    local attr = DBCfg.getDataById(DBCfg.CfgPath.Tech, id)
+    if self.techCenter and attr and bio2number(attr.NeedTechCenterLev) <= bio2number(self.techCenter.lev) then
+        return true
+    end
+    return false
+end
+
+---public 科技的等级
+function IDDBCity:getTechLev(id)
+    if self:isTechUnlocked(id) then
+        local d = self:getTechByID(id)
+        return (d and bio2number(d.lev) or 0)
+    else
+        return 0
+    end
+end
+---public 取得战斗单元的等级
+function IDDBCity:getUnitLev(id)
+    ---@type DBCFRoleData
+    local attr = DBCfg.getRoleByID(id)
+    if attr.GID == IDConst.RoleGID.pet then
+        --//TODO:海怪等级不是通过等级
+    else
+        local techId = bio2number(attr.TechID)
+        return self:getTechLev(techId)
+    end
+end
+
+---public 取得魔法的等级
+function IDDBCity:getMagicLev(id)
+    ---@type DBCFMagicData
+    local attr = DBCfg.getDataById(DBCfg.CfgPath.Magic, id)
+    local techId = bio2number(attr.TechID)
+    return self:getTechLev(techId)
+end
+
+---public 科技正在升级中
+function IDDBCity:isTechUpgrading(id)
+    local tech = self:getTechByID(id)
+    if
+        self.techCenter and bio2number(self.techCenter.state) == IDConst.BuildingState.working and tech and
+            bio2number(self.techCenter.val) == bio2number(tech.idx)
+     then
+        return true
+    end
+    return false
+end
+
+---public 魔法正在召唤中
+---@return boolean
+---@return number 结束时间
+function IDDBCity:isMagicSummoning(id)
+    if
+        self.magicAltar and bio2number(self.magicAltar.state) == IDConst.BuildingState.working and
+            bio2number(self.magicAltar.val) == id
+     then
+        return true, bio2number(self.magicAltar.endtime)
+    end
+    return false
+end
+
+---public 取得魔法数据
+function IDDBCity:getMagicById(id)
+    if self.magicAltar == nil then
+        return nil
+    end
+    local bidx = bio2number(self.magicAltar.idx)
+    local m = self:getUnitsByBIdx(bidx) or {}
+    return m[id]
+end
+--------------------------------------------
 --------------------------------------------
 return IDDBCity

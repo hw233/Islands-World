@@ -11,6 +11,7 @@ end
 
 function IDLBuilding:__init(selfObj, other)
     if IDLBuilding.super.__init(self, selfObj, other) then
+        self.oldState = IDConst.BuildingState.normal
         ---@type UnityEngine.Transform
         self.body = selfObj.mbody
         ---@type TweenScale
@@ -77,27 +78,68 @@ function IDLBuilding:init(selfObj, id, star, lev, _isOffense, other)
         self:loadShadow()
     end
     self:loadFloor()
-    self:upgrading()
 end
 
----@public 显示建筑的各种状态标识
+---public 显示建筑的各种状态标识
 function IDLBuilding:showBuildingStateFlags()
+    if GameMode.map ~= MyCfg.mode or IDWorldMap.mode ~= GameModeSub.city then
+        return
+    end
     if self.serverData == nil then
         return
     end
-    --//TODO:显示建筑的不同状态表现
+
+    --//TODO:显示建筑的不同状态表现,以及空闲状态、爆仓
     local state = bio2number(self.serverData.state)
-    if state == IDConst.BuildingState.renew then
+    if self.oldState ~= state then
+        -- 先清理老的状态
+        if self.oldState == IDConst.BuildingState.normal then
+            -- 空闲时
+        elseif self.oldState == IDConst.BuildingState.renew then
+            -- 修复
+        elseif self.oldState == IDConst.BuildingState.upgrade then
+            -- 升级
+            self:upgrading()
+        elseif self.oldState == IDConst.BuildingState.working then
+            -- 工作中
+            self:unLoadProgressHud()
+        end
+        self.oldState = state
+    end
+
+    if state == IDConst.BuildingState.normal then
+        -- 空闲时(科技中心、魔法坛、造船厂)
+    elseif state == IDConst.BuildingState.renew then
+        -- 修复
     elseif state == IDConst.BuildingState.upgrade then
+        -- 升级
+        self:upgrading()
     elseif state == IDConst.BuildingState.working then
+        -- 工作中
+        self:loadProgressHud()
     end
 end
 
 function IDLBuilding:hideBuildingStateFlags()
+    if self.serverData == nil then
+        return
+    end
+
     --//TODO:
+    local state = bio2number(self.serverData.state)
+    if state == IDConst.BuildingState.renew then
+        -- 修复
+    elseif state == IDConst.BuildingState.upgrade then
+        -- 升级
+        self:unLoadProgressHud()
+        self:fireWorker()
+    elseif state == IDConst.BuildingState.working then
+        -- 工作中
+        self:unLoadProgressHud()
+    end
 end
 
----@public 加载影子
+---public 加载影子
 function IDLBuilding:loadShadow()
     if self.shadow == nil then
         local shadowType = bio2number(self.attr.ShadowType)
@@ -336,7 +378,7 @@ function IDLBuilding:setCollider(val)
     self.canClick = val
 end
 
----@public 加载地表
+---public 加载地表
 function IDLBuilding:loadFloor()
     if self.attr.DontNeedFloor then
         return
@@ -380,7 +422,7 @@ function IDLBuilding:onFinishBuildingUpgrade()
     SoundEx.playSound("building_finished")
 end
 
----@public 升级处理
+---public 升级处理
 function IDLBuilding:upgrading()
     if GameMode.map ~= MyCfg.mode or IDWorldMap.mode ~= GameModeSub.city then
         return
@@ -392,8 +434,6 @@ function IDLBuilding:upgrading()
             -- 说明正在升级
             self:loadProgressHud()
             self:employWorker()
-        elseif bio2number(serverData.state) == IDConst.BuildingState.renew then
-            -- 恢复
         else
             self:unLoadProgressHud()
             self:fireWorker()
@@ -404,7 +444,7 @@ function IDLBuilding:upgrading()
     end
 end
 
----@public 加载进度
+---public 加载进度
 function IDLBuilding:loadProgressHud()
     if self.progressObj == nil then
         CLUIOtherObjPool.borrowObjAsyn(
@@ -433,7 +473,7 @@ function IDLBuilding:loadProgressHud()
     end
 end
 
----@public 释放进度
+---public 释放进度
 function IDLBuilding:unLoadProgressHud()
     if self.progressObj then
         CLUIOtherObjPool.returnObj(self.progressObj.gameObject)
@@ -442,7 +482,7 @@ function IDLBuilding:unLoadProgressHud()
     end
 end
 
----@public 加载工人
+---public 加载工人
 function IDLBuilding:employWorker()
     if self.worker == nil then
         IDMainCity.employWorker(
@@ -454,7 +494,7 @@ function IDLBuilding:employWorker()
     end
 end
 
----@public 解雇工人
+---public 解雇工人
 function IDLBuilding:fireWorker(immd)
     if self.worker ~= nil then
         IDMainCity.fireWorker(self)
@@ -465,16 +505,15 @@ function IDLBuilding:fireWorker(immd)
     end
 end
 
----@public 显示隐藏（可能为连带做一些其它的处理）
+---public 显示隐藏（可能为连带做一些其它的处理）
 function IDLBuilding:SetActive(active)
     IDLBuilding.super.SetActive(self, active)
     if active then
-        self:upgrading()
+        self:showBuildingStateFlags()
         self:loadFloor()
         self:loadShadow()
     else
-        self:fireWorker(true)
-        self:unLoadProgressHud()
+        self:hideBuildingStateFlags()
         if self.floor then
             SetActive(self.floor, active)
         end
@@ -482,7 +521,7 @@ function IDLBuilding:SetActive(active)
     end
 end
 
----@public 返回自己可被攻击的点坐标 //TODO:这个函数里算出来的点是有问题的
+---public 返回自己可被攻击的点坐标 //TODO:这个函数里算出来的点是有问题的
 ---@param attacker IDRoleBase
 function IDLBuilding:getAttackPoint(attacker)
     local r = self.size / 2
@@ -501,14 +540,14 @@ function IDLBuilding:getAttackPoint(attacker)
     return topos
 end
 
----@public 被击中
+---public 被击中
 ---@param damage number 伤害值
 ---@param attacker IDLUnitBase 攻击方
 function IDLBuilding:onHurt(damage, attacker)
     IDLBuilding.super.onHurt(self, damage, attacker)
 end
 
----@public 处理被掠夺资源的处理
+---public 处理被掠夺资源的处理
 function IDLBuilding:showBeLootResEffect(force)
     if force or DateEx.nowMS - self.lastshowBeLootResEffect >= 3000 then
         self.lastshowBeLootResEffect = DateEx.nowMS

@@ -10,13 +10,11 @@ local uiobjs = {}
 function _cell.init(csObj)
     csSelf = csObj
     transform = csSelf.transform
-    --[[
-    上的组件：getChild(transform, "offset", "Progress BarHong"):GetComponent("UISlider");
-	--]]
     uiobjs.toggle = csSelf:GetComponent("UIToggle")
     uiobjs.SpriteIcon = getCC(transform, "SpriteIcon", "UISprite")
     uiobjs.LabelName = getCC(transform, "LabelName", "UILabel")
     uiobjs.LabelNum = getCC(transform, "LabelNum", "UILabel")
+    uiobjs.LabelLev = getCC(transform, "LabelLev", "UILabel")
 end
 
 -- 显示，
@@ -26,17 +24,7 @@ function _cell.show(go, data)
     uiobjs.SpriteIcon.spriteName = mData.icon
     uiobjs.LabelName.text = mData.name
     uiobjs.LabelNum.text = joinStr(bio2number(mData.num), "")
-end
-
--- 注意，c#侧不会在调用show时，调用refresh
-function _cell.refresh(paras)
-    --[[
-    if(paras == 1) then   -- 刷新血
-      -- TODO:
-    elseif(paras == 2) then -- 刷新状态
-      -- TODO:
-    end
-    --]]
+    uiobjs.LabelLev.text = LGetFmt("LevelWithNum", bio2number(mData.lev))
 end
 
 -- 取得数据

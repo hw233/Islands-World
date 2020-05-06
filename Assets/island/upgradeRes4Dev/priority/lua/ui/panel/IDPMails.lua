@@ -2,6 +2,8 @@
 ---@field public isReceive boolean 显示收件箱(可为空)
 ---@field public type IDConst.MailType 默认显示的类型（可为空）
 
+---@type CLQuickSort
+local Sort = require "toolkit.CLQuickSort"
 ---@type IDBasePanel
 local IDBasePanel = require("ui.panel.IDBasePanel")
 ---@class IDPMails:IDBasePanel 邮件列表
@@ -58,8 +60,8 @@ function IDPMails:init(csObj)
     uiobjs.GridAttachment = getCC(uiobjs.Content, "Attachment/GridAttachment", "UIGrid")
     uiobjs.ButtonReward = getCC(uiobjs.Content, "Attachment/ButtonReward", "UIButton")
     uiobjs.ButtonReplay = getCC(uiobjs.Content, "Attachment/ButtonReplay", "UIButton")
+    uiobjs.ButtonReply = getCC(uiobjs.Content, "Attachment/ButtonReply", "UIButton")
     uiobjs.ButtonOneKey = getChild(self.transform, "ButtonOneKey")
-    uiobjs.ButtonWriteMail = getChild(self.transform, "ButtonWriteMail")
     uiobjs.ButtonGM = getChild(self.transform, "ButtonGM")
     -- 设置ui事件代理
     self:setEventDelegate()
@@ -73,6 +75,19 @@ function IDPMails:setData(paras)
         uiobjs.ToggleReceive.value = paras.isReceive
     end
     self.selectedIdx = 0 -- 当前选中的邮件
+end
+
+---public 当有通用背板显示时的回调
+---@param cs Coolape.CLPanelLua
+function IDPMails:onShowFrame(cs)
+	if cs.frameObj then
+		---@type _ParamFrameData
+		local d = {}
+        d.title = LGet(cs.titleKeyName)
+        d.hideContentBg = true
+		d.panel = cs
+		cs.frameObj:init(d)
+	end
 end
 
 -- 显示，在c#中。show为调用refresh，show和refresh的区别在于，当页面已经显示了的情况，当页面再次出现在最上层时，只会调用refresh
@@ -90,11 +105,10 @@ end
 function IDPMails:refresh()
 end
 
----@public 显示收件箱
+---public 显示收件箱
 function IDPMails:showReceives(isRefresh)
     SetActive(uiobjs.Types.root.gameObject, true)
     SetActive(uiobjs.ButtonOneKey.gameObject, true)
-    SetActive(uiobjs.ButtonWriteMail.gameObject, false)
     SetActive(uiobjs.ButtonGM.gameObject, false)
     local typeName = TypeToggleName[self.currType]
     uiobjs.Types[typeName].Toggle.value = true
@@ -114,9 +128,18 @@ function IDPMails:showReceives(isRefresh)
     self:setMailList(isRefresh)
 end
 
----@public 邮件列表
+-- IDPMails.sortMail = function(a, b)
+--     local mail1 = IDDBMail.getMailByIndex(a)
+--     local mail2 = IDDBMail.getMailByIndex(b)
+--     return bio2number(mail1.date) > bio2number(mail2.date)
+-- end
+
+---public 邮件列表
 function IDPMails:setMailList(isRefresh)
     local mails = IDDBMail.getMailsByType(self.currType)
+    -- 邮件要倒序显示
+    -- Sort.quickSort(mails, IDPMails.sortMail)
+
     -- 设置初始选中邮件
     if #mails > 0 then
         ---@type NetProtoIsland.ST_mail
@@ -153,10 +176,12 @@ function IDPMails:releaseSelected()
         for i = 0, count - 1 do
             child = uiobjs.gridList.transform:GetChild(i)
             cell = child.gameObject:GetComponent("CLCellLua")
-            celldata = cell.luaTable.getData()
-            if celldata and bio2number(celldata.idx) == self.selectedIdx then
-                cell.luaTable.selected(false)
-                break
+            if cell.luaTable then
+                celldata = cell.luaTable.getData()
+                if celldata and bio2number(celldata.idx) == self.selectedIdx then
+                    cell.luaTable.selected(false)
+                    break
+                end
             end
         end
         mail = IDDBMail.getMailByIdx(self.selectedIdx)
@@ -192,11 +217,10 @@ function IDPMails:onClickMailCell(cell)
     end
 end
 
----@public 显示已发送
+---public 显示已发送
 function IDPMails:showSendeds(isRefresh)
     SetActive(uiobjs.Types.root.gameObject, false)
     SetActive(uiobjs.ButtonOneKey.gameObject, false)
-    SetActive(uiobjs.ButtonWriteMail.gameObject, true)
     SetActive(uiobjs.ButtonGM.gameObject, true)
 
     local mails = IDDBMail.getSendedMails()
@@ -221,7 +245,12 @@ function IDPMails:showMailContent(mail)
     SetActive(uiobjs.Content.gameObject, true)
 
     local type = bio2number(mail.type)
-    uiobjs.LabelTitle.text = LWrap(mail.title, mail.titleParams)
+    local title = LWrap(mail.title, mail.titleParams)
+    if #(mail.historyList) > 1 then
+        uiobjs.LabelTitle.text = joinStr("Re:", title)
+    else
+        uiobjs.LabelTitle.text = title
+    end
     uiobjs.LabelType.text = LGet(IDConst.MailTypeName[type])
     if type == IDConst.MailType.report then
         self:showBattleReport(mail)
@@ -238,8 +267,22 @@ function IDPMails:showComContent(mail)
     SetActive(uiobjs.TableCom.gameObject, true)
     SetActive(uiobjs.TableReport.gameObject, false)
     local list = IDDBMail.getMailHistoryList(bio2number(mail.idx))
-    table.insert(list, 1, mail)
-    CLUIUtl.resetList4Lua(uiobjs.TableCom, uiobjs.TableComPrefab, list, self:wrapFunc(self.intCellComContent))
+    local i = 0
+    CLUIUtl.resetList4Lua(
+        uiobjs.TableCom,
+        uiobjs.TableComPrefab,
+        list,
+        function(cell, data)
+            if i > 0 then
+                data.lineSize = #list - i
+            else
+                data.lineSize = 0
+            end
+            i = i + 1
+            cell:init(data, nil)
+        end
+        -- self:wrapFunc(self.intCellComContent)
+    )
 end
 
 function IDPMails:intCellComContent(cell, data)
@@ -256,40 +299,61 @@ end
 function IDPMails:showAttachment(mail)
     --//TODO:
     local type = bio2number(mail.type)
-    local comIdx = bio2number(mail.comIdx)
-    if comIdx > 0 then
-        if type == IDConst.MailType.report then
-            SetActive(uiobjs.ButtonReward.gameObject, false)
-            SetActive(uiobjs.ButtonReplay.gameObject, true)
-        else
-            SetActive(uiobjs.ButtonReplay.gameObject, false)
-        end
-    else
-        -- 没有附件
+    if type == IDConst.MailType.private then
         SetActive(uiobjs.ButtonReward.gameObject, false)
         SetActive(uiobjs.ButtonReplay.gameObject, false)
+        SetActive(uiobjs.ButtonReply.gameObject, true)
+    else
+        SetActive(uiobjs.ButtonReply.gameObject, false)
+        local comIdx = bio2number(mail.comIdx)
+        if comIdx > 0 then
+            if type == IDConst.MailType.report then
+                SetActive(uiobjs.ButtonReward.gameObject, false)
+                SetActive(uiobjs.ButtonReplay.gameObject, true)
+            else
+                SetActive(uiobjs.ButtonReplay.gameObject, false)
+            end
+        else
+            -- 没有附件
+            SetActive(uiobjs.ButtonReward.gameObject, false)
+            SetActive(uiobjs.ButtonReplay.gameObject, false)
+        end
     end
 end
 
 ---@param data NetProtoIsland.RC_getReportDetail
+function IDPMails:replayBattleFleet(data)
+    ---@type _ParamBattleFleetData
+    local battleData = {}
+    battleData.type = IDConst.BattleType.attackFleet
+    battleData.battleData = data.battleFleetDetail
+    battleData.result = data.battleresult
+
+    hideTopPanel(self.csSelf)
+    IDUtl.chgScene(GameMode.battleFleet, battleData, nil)
+end
+
+---@param data NetProtoIsland.RC_getReportDetail
 function IDPMails:replayBattle(data)
+    ---@type NetProtoIsland.ST_battleDetail
+    local report = data.battleDetail
     ---@type IDDBPlayer
-    local targetPlayer = IDDBPlayer.new(data.player)
+    local targetPlayer = IDDBPlayer.new(report.target)
     ---@type IDDBCity
-    local targetCity = IDDBCity.new(data.city)
+    local targetCity = IDDBCity.new(report.targetCity)
     local cellIndex = bio2number(targetCity.pos)
-    targetCity:setAllUnits2Buildings(data.dockyardShipss)
+    targetCity:setAllUnits2Buildings(report.targetUnits)
 
     ---@type _ParamBattleData
     local battleData = {}
     battleData.type = IDConst.BattleType.attackIsland
-    battleData.attackPlayer = data.player2
+    battleData.attackPlayer = report.attacker
     battleData.targetPlayer = targetPlayer
     battleData.targetCity = targetCity
-    battleData.fleet = data.fleetinfor
+    battleData.fleet = report.fleet
     battleData.isReplay = true
-    battleData.deployQueue = data.deployUnitInfors
-    battleData.endFrames = data.endFrames
+    battleData.deployQueue = report.deployQueue
+    battleData.endFrames = report.endFrames
     battleData.result = data.battleresult
 
     hideTopPanel(self.csSelf)
@@ -354,7 +418,13 @@ function IDPMails:setEventDelegate()
                         bio2number(mail.comIdx),
                         ---@param result NetProtoIsland.RC_getReportDetail
                         function(org, result)
-                            self:replayBattle(result)
+                            if bio2Int(result.battleType) == IDConst.BattleType.attackIsland then
+                                -- 攻岛战
+                                self:replayBattle(result)
+                            else
+                                -- 舰队对战
+                                self:replayBattleFleet(result)
+                            end
                             hideHotWheel()
                         end,
                         mail
@@ -366,7 +436,19 @@ function IDPMails:setEventDelegate()
         end,
         ["ButtonOneKey"] = function()
         end,
-        ["ButtonWriteMail"] = function()
+        ["ButtonReply"] = function()
+            -- 回复
+            if self.selectedIdx == nil or self.selectedIdx <= 0 then
+                --//TODO:
+                return
+            end
+            ---@type NetProtoIsland.ST_mail
+            local mail = IDDBMail.getMailByIdx(self.selectedIdx)
+            ---@type _ParamPWriteMail
+            local d = {}
+            d.mail = mail
+            d.targetPidx = bio2number(mail.fromPidx)
+            getPanelAsy("PanelWriteMail", onLoadedPanelTT, d)
         end,
         ["ButtonGM"] = function()
         end

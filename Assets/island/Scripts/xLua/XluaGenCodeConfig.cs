@@ -65,12 +65,14 @@ public static class XluaGenCodeConfig
         typeof(Physics),
 
 		//NGUI
-		typeof(UICamera),
+        typeof(UIRoot),
+        typeof(UICamera),
         typeof(UIPanel),
         typeof(Localization),
         typeof(NGUITools),
         typeof(UIRect),
         typeof(UIWidget),
+        typeof(UIWidget.Pivot),
         typeof(UIWidgetContainer),
         typeof(UILabel),
         typeof(UIToggle),

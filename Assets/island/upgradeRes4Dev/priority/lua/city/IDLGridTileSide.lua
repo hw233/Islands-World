@@ -63,7 +63,7 @@ function IDLGridTileSide.init(grid, waveUvAn)
     cache.waveUvAn.singleY = 1
 end
 
----@public 隐藏边（只隐藏，不释放）
+---public 隐藏边（只隐藏，不释放）
 function IDLGridTileSide.hide()
     if IDLGridTileSide.state == IDLGridTileSide.StateEnum.showing then
         for k, v in pairs(tileSides) do
@@ -74,7 +74,7 @@ function IDLGridTileSide.hide()
     end
 end
 
----@public 显示边，如果还没有加载过则调用refreshAndShow方法把边加载了显示出来
+---public 显示边，如果还没有加载过则调用refreshAndShow方法把边加载了显示出来
 function IDLGridTileSide.show()
     if IDLGridTileSide.state == IDLGridTileSide.StateEnum.none then
         IDLGridTileSide.refreshAndShow(nil, nil, true)
@@ -89,7 +89,7 @@ function IDLGridTileSide.show()
     end
 end
 
----@public 根据地块加载地块的四周的边缘
+---public 根据地块加载地块的四周的边缘
 ---@param callback function 完成回调
 ---@param progressCB function 进度回调
 ---@param imm bool 是否立即处理
@@ -100,7 +100,7 @@ function IDLGridTileSide.refreshAndShow(callback, progressCB, imm)
     CLMaterialPool.borrowObjAsyn("Tiles.bolang", IDLGridTileSide.onSetMaterial, {callback, progressCB, imm})
 end
 
----@public 加载海浪的material
+---public 加载海浪的material
 function IDLGridTileSide.onSetMaterial(name, material, orgs)
     cache.waveUvAn.material = material
     cache.waveUvAn.isStop = false
@@ -230,7 +230,7 @@ function IDLGridTileSide.set4Sides(i)
     end
 end
 
----@public 处理一个地块的四边，left,right,up,down
+---public 处理一个地块的四边，left,right,up,down
 ---@param tile IDLTile
 function IDLGridTileSide.procOneCellSide(tile, callback, orgs, imm)
     if tile == nil then
@@ -515,7 +515,7 @@ function IDLGridTileSide.set4SidesAngle(i)
     end
 end
 
----@public 处理一个地块的四个角，leftUp, leftDown, rightUp, rightDown
+---public 处理一个地块的四个角，leftUp, leftDown, rightUp, rightDown
 function IDLGridTileSide.procOneCellSideAngle(tile, callback, orgs, imm)
     if tile == IDMainCity.selectedUnit then
         if (not IDMainCity.isSizeInFreeCell(tile.getPosIndex(), tile.size, false, true)) then
@@ -554,7 +554,7 @@ function IDLGridTileSide.procOneCellSideAngle(tile, callback, orgs, imm)
     end
 end
 
----@public 处理左上角
+---public 处理左上角
 function IDLGridTileSide.setLeftUpAngle(index, callback, orgs, imm)
     if not IDLGridTileSide.isNeedSetAngel(index) then
         if callback then
@@ -716,7 +716,7 @@ function IDLGridTileSide.setLeftUpAngle(index, callback, orgs, imm)
     end
 end
 
----@public 处理左下角
+---public 处理左下角
 function IDLGridTileSide.setLeftDownAngle(index, callback, orgs, imm)
     if not IDLGridTileSide.isNeedSetAngel(index) then
         if callback then
@@ -879,7 +879,7 @@ function IDLGridTileSide.setLeftDownAngle(index, callback, orgs, imm)
     end
 end
 
----@public 处理右上角
+---public 处理右上角
 function IDLGridTileSide.setRightUpAngle(index, callback, orgs, imm)
     if not IDLGridTileSide.isNeedSetAngel(index) then
         if callback then
@@ -1042,7 +1042,7 @@ function IDLGridTileSide.setRightUpAngle(index, callback, orgs, imm)
     end
 end
 
----@public 处理右下角
+---public 处理右下角
 function IDLGridTileSide.setRightDownAngle(index, callback, orgs, imm)
     if not IDLGridTileSide.isNeedSetAngel(index) then
         if callback then
@@ -1289,7 +1289,7 @@ function IDLGridTileSide.isEmpty(index)
     return false
 end
 
----@public index是否在沙滩上
+---public index是否在沙滩上
 function IDLGridTileSide.isOnTheBeach(index)
     if tileSides[index] then
         return true

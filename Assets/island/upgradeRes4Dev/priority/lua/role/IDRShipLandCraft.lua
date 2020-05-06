@@ -9,13 +9,12 @@ function IDRShipLandCraft:doAttack()
     -- 取得最近的海岸
     local pos = self:getNearestBeachPos()
     if pos then
-        self.state = RoleState.landing
+        self.state = IDConst.RoleState.landing
         self.seeker:seekAsyn(pos)
     else
         printe("取得最近海岸为 nil")
     end
 end
-
 
 function IDRShipLandCraft:onSearchPath(pathList, canReach)
     if MyCfg.mode == GameMode.battle then
@@ -29,7 +28,7 @@ function IDRShipLandCraft:onFinishLandSoldiers()
     self:onDead()
 end
 
----@public 取得是近的海岸的index的坐标
+---public 取得是近的海岸的index的坐标
 function IDRShipLandCraft:getNearestBeachPos()
     local list
     for i = 2, 50 do

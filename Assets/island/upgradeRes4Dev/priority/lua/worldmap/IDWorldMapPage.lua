@@ -23,14 +23,14 @@ function IDWorldMapPage:init(pageIdx)
     InvokeEx.invoke(self:wrapFunction4CS(self.checkDataTimeout), IDDBWorldMap.ConstTimeOutSec)
 end
 
----@public 检测数据是否超时
+---public 检测数据是否超时
 function IDWorldMapPage:checkDataTimeout()
     IDDBWorldMap.getDataByPageIdx(self.pageIdx)
     InvokeEx.cancelInvoke(self:wrapFunction4CS(self.checkDataTimeout))
     InvokeEx.invoke(self:wrapFunction4CS(self.checkDataTimeout), IDDBWorldMap.ConstTimeOutSec)
 end
 
----@public 包装数据
+---public 包装数据
 function IDWorldMapPage:wrapPageData()
     ---@param d WordlTileCfg
     for i, d in ipairs(self.baseData.list) do
@@ -102,7 +102,7 @@ function IDWorldMapPage:refreshTiles()
     self:checkVisible(centerPos)
 end
 
----@public 地块的显示与隐藏
+---public 地块的显示与隐藏
 function IDWorldMapPage:checkVisible(centerPos)
     local debugIndex = nil -- 648632
     local pos
@@ -133,7 +133,7 @@ function IDWorldMapPage:checkVisible(centerPos)
             end
 
             -- 把位置向最近的influence靠拢一点
-            if IDWorldMap.nearestInfluence then
+            if IDWorldMap.nearestInfluence and (not IDWorldMap.nearestInfluence:IsNull()) then
                 diff = (IDWorldMap.nearestInfluence.transform.position - d.position)
                 pos = d.position + diff.normalized * 5 * self.grid.CellSize
             else
@@ -156,7 +156,7 @@ function IDWorldMapPage:checkVisible(centerPos)
     end
 end
 
----@public 刷新一个单元格
+---public 刷新一个单元格
 ---@param cellData NetProtoIsland.ST_mapCell
 function IDWorldMapPage:refreshOneCell(cellData, isRemove)
     local index = bio2number(cellData.idx)
@@ -319,7 +319,7 @@ function IDWorldMapPage:onLoadOneMapTile(name, obj, params)
     Utl.doCallback(callback, orgs)
 end
 
----@public 当缩放屏幕时
+---public 当缩放屏幕时
 -- function IDWorldMapPage:onScaleScreen(delta, offset)
 --     self:checkVisible()
 -- end

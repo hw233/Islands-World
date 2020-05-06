@@ -8,7 +8,7 @@ do
     NetProtoUsermgr.dispatch = {}
     local __callbackInfor = {} -- 回调信息
     local __callTimes = 1
-    ---@public 设计回调信息
+    ---public 设计回调信息
     local setCallback = function (callback, orgs, ret)
        if callback then
            local callbackKey = os.time() + __callTimes
@@ -17,7 +17,7 @@ do
            ret[3] = callbackKey
         end
     end
-    ---@public 处理回调
+    ---public 处理回调
     local doCallback = function(map, result)
         local callbackKey = map[3]
         if callbackKey then

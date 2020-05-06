@@ -19,7 +19,7 @@
 -- //                   `=---='
 -- //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 -- //           佛祖保佑       永无BUG
--- //           游戏大卖       公司腾飞
+-- //           游戏大卖       经济自由
 -- //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 --]]
 ---@class _ParamBattleData 战场数据
@@ -29,6 +29,7 @@
 ---@field public targetCity IDDBCity 被攻击方主城信息(舰船数据已经在city结构里)
 ---@field public fleet NetProtoIsland.ST_fleetinfor 进攻舰队数据
 ---@field public isReplay boolean 是否回放
+---@field public isWatching boolean 是否观看模式
 ---@field public deployQueue table 投放战斗单元(回放时用)
 ---@field public endFrames number 结束时的帧数(回放时用)
 ---@field public result NetProtoIsland.ST_battleresult 结果(回放时用)
@@ -63,8 +64,10 @@ local EachDeployNum = 1
 -- 进攻舰船
 IDLBattle.offShips = {}
 IDLBattle.defShips = {}
+IDLBattle.skills = {}
 local __isInited = false
 IDLBattle.isDebug = false
+IDLBattle.isEnterCity = false
 
 --------------------------------------------
 function IDLBattle._init()
@@ -86,13 +89,14 @@ function IDLBattle._init()
     IDLBattle.transform.localScale = Vector3.one
 end
 
----@public 初始化
+---public 初始化
 ---@param data _ParamBattleData 进攻方数据
 ---@param callback 回调
 ---@param progressCB 进度回调
 function IDLBattle.init(data, callback, progressCB)
     IDLBattle._init()
     IDLBattle.isStoped = false
+    IDLBattle.isEnterCity = false
     IDLBattle.mData = data
     -- 先暂停资源释放
     CLAssetsManager.self:pause()
@@ -125,6 +129,7 @@ function IDLBattle.init(data, callback, progressCB)
 end
 
 function IDLBattle.onEnterCity()
+    IDLBattle.isEnterCity = true
     -- 初始化寻敌器
     IDLBattleSearcher.init(city)
     city.grid:showRect()
@@ -133,25 +138,45 @@ function IDLBattle.onEnterCity()
     MyCfg.self.fogOfWar.enabled = false
 
     if IDLBattle.mData.isReplay then
-        -- 回放
-        IDLBattle.startEeplay()
+        getPanelAsy(
+            "PanelBattleReplay",
+            function(p)
+                onLoadedPanel(p, IDLBattle.mData)
+                -- 回放
+                IDLBattle.startReplay()
+            end,
+            IDLBattle.mData
+        )
+    elseif IDLBattle.mData.isWatching then
+        getPanelAsy(
+            "PanelBeingAttacked",
+            function(p)
+                onLoadedPanel(p, IDLBattle.mData)
+                p.luaTable.setCanDragScreem()
+            end,
+            IDLBattle.mData
+        )
     else
         IDMainCity.showDeployRange()
+        getPanelAsy("PanelBattle", onLoadedPanel, IDLBattle.mData)
     end
 end
 
----@public 预加载进攻方兵种
+---public 预加载进攻方兵种
 function IDLBattle.prepareSoliders(data, callback, progressCB)
     IDPreloadPrefab.preloadRoles(data, callback, progressCB)
 end
 
----@public 设置当前选择的战斗单元
+---public 设置当前选择的战斗单元
 function IDLBattle.setSelectedUnit(data)
     IDLBattle.currSelectedUnit = data
 end
 
----@public 点击了海面
+---public 点击了海面
 function IDLBattle.onClickOcean()
+    if IDLBattle.mData.isReplay or IDLBattle.mData.isWatching then
+        return
+    end
     local clickPos = MyMainCamera.lastHit.point
     local index = grid.grid:GetCellIndex(clickPos)
     if index < 0 then
@@ -167,15 +192,18 @@ end
 -- city.grid:hideRect()
 -- end
 
----@public 通知战场，玩家点击了我
+---public 通知战场，玩家点击了我
 function IDLBattle.onClickSomeObj(obj, pos)
+    if IDLBattle.mData.isReplay or IDLBattle.mData.isWatching then
+        return
+    end
     if IDLBattle.isDebug and obj.isBuilding then
         IDLBattleSearcher.debugBuildingAttackRange(obj)
     end
     IDLBattle.deployBattleUnit()
 end
 
----@public 开始战斗
+---public 开始战斗
 function IDLBattle.begain()
     local buildings = city.getBuildings()
     ---@param v IDLBuilding
@@ -186,7 +214,7 @@ function IDLBattle.begain()
     end
 end
 
----@public 投放兵
+---public 投放兵
 function IDLBattle.deployBattleUnit()
     if IDLBattle.currSelectedUnit == nil then
         CLAlert.add(LGet("MsgSelectBattleUnit"), Color.yellow, 1)
@@ -230,7 +258,7 @@ function IDLBattle.doDeployUnit(pos, unitData, fakeRandom, fakeRandom2, fakeRand
     IDMainCity.hideDeployRange()
 
     if unitData.type == IDConst.UnitType.role then
-        if not IDLBattle.mData.isReplay then
+        if (not IDLBattle.mData.isReplay) and (not IDLBattle.mData.isWatching) then
             fakeRandom = NumEx.NextInt(0, 1001)
             fakeRandom2 = NumEx.NextInt(0, 1001)
             fakeRandom3 = NumEx.NextInt(0, 1001)
@@ -247,7 +275,8 @@ function IDLBattle.doDeployUnit(pos, unitData, fakeRandom, fakeRandom2, fakeRand
         -- 投放兵
         IDLBattle.DeployRole(unitData, pos, fakeRandom, fakeRandom2, fakeRandom3, true)
     elseif unitData.type == IDConst.UnitType.skill then
-    --//TODO: 技能释放
+        -- 技能释放
+        IDLBattle.DeploySkill(IDLBattle.currSelectedUnit, pos)
     end
 end
 
@@ -256,10 +285,11 @@ function IDLBattle.sendDeployInfor2Server(shipData, pos, fakeRandom, fakeRandom2
     local id = shipData.id
     ---@type NetProtoIsland.ST_unitInfor
     local unit = {}
-    unit.fidx = bio2number(IDLBattle.mData.fleet.idx)
+    unit.fidx = bio2number(shipData.fidx)
+    unit.bidx = bio2number(shipData.bidx)
     unit.id = id
     unit.num = EachDeployNum
-    unit.type = IDConst.UnitType.role
+    unit.type = shipData.type
 
     ---@type NetProtoIsland.ST_vector3
     local v3 = {}
@@ -281,7 +311,53 @@ function IDLBattle.sendDeployInfor2Server(shipData, pos, fakeRandom, fakeRandom2
     )
 end
 
----@public 部署舰船
+---@param unitInfor _ParamBattleUnitData
+function IDLBattle.DeploySkill(unitInfor, pos)
+    unitInfor.num = number2bio(bio2number(unitInfor.num) - 1)
+    if (not IDLBattle.mData.isReplay) and (not IDLBattle.mData.isWatching) then
+        -- 通知服务器
+        IDLBattle.sendDeployInfor2Server(unitInfor, pos, 0, 0, 0, true)
+        -- 通知ui
+        if IDPBattle then
+            IDPBattle.onDeployBattleUnit(unitInfor)
+        end
+    end
+    local index = city.grid.grid:GetCellIndex(pos)
+    local offset = city.getPosOffset(index)
+    pos = pos + offset
+
+    ---@type DBCFMagicData
+    local attr = DBCfg.getDataById(DBCfg.CfgPath.Magic, unitInfor.id)
+    -- 播放技能效果
+    CLThingsPool.borrowObjAsyn(
+        attr.Prefab,
+        function(name, go, orgs)
+            ---@type MyUnit
+            local cell = go:GetComponent("MyUnit")
+            cell.transform.localScale = Vector3.one
+            cell.transform.eulerAngles = Vector3.zero
+            cell.transform.position = pos
+            if cell.luaTable == nil then
+                ---@type IDLSkillBase
+                cell.luaTable = IDUtl.newSkillLua(unitInfor.id)
+            end
+            SetActive(go, true)
+            cell.luaTable:init(cell, unitInfor.id, unitInfor.lev, pos, IDLBattle)
+            IDLBattle.skills[cell.instanceID] = cell.luaTable
+            cell.luaTable:startAttack()
+        end
+    )
+end
+
+---@param skill IDLSkillBase
+function IDLBattle.onFinishSkillAttack(skill)
+    skill:clean()
+    CLThingsPool.returnObj(skill.csSelf.gameObject)
+    SetActive(skill.csSelf.gameObject, false)
+    IDLBattle.skills[skill.csSelf.instanceID] = nil
+end
+
+---public 部署舰船
 ---@param shipData _ParamBattleUnitData
 ---@param pos UnityEngine.Vector3
 function IDLBattle.DeployRole(shipData, pos, fakeRandom, fakeRandom2, fakeRandom3, isOffense, needDeployNum)
@@ -304,7 +380,7 @@ function IDLBattle.DeployRole(shipData, pos, fakeRandom, fakeRandom2, fakeRandom
         shipData.num = int2Bio(num - deployNum)
 
         -- 通知ui
-        if IDPBattle and IDPBattle.csSelf and IDPBattle.csSelf.gameObject.activeInHierarchy then
+        if (not IDLBattle.mData.isReplay) and (not IDLBattle.mData.isWatching) and IDPBattle then
             IDPBattle.onDeployBattleUnit(shipData)
         end
     end
@@ -332,6 +408,7 @@ function IDLBattle.onLoadShip(name, ship, orgs)
     local serverData = orgs.serverData
     local pos = orgs.pos
     local isOffense = orgs.isOffense
+    orgs.battle = IDLBattle
     ship.transform.parent = transform
     ship.transform.localScale = Vector3.one
     -- ship.transform.localEulerAngles = Vector3.zero
@@ -398,7 +475,7 @@ function IDLBattle.someOneDead(unit)
         if role.id ~= IDConst.RoleID.Barbarian then
             -- 通知服务器
             -- 陆战兵死亡不用通知服务器
-            if not IDLBattle.mData.isReplay then
+            if (not IDLBattle.mData.isReplay) and (not IDLBattle.mData.isWatching) then
                 CLLNet.send(NetProtoIsland.send.onBattleUnitDie(bio2number(IDLBattle.mData.fleet.idx), unitInfor))
             end
         end
@@ -410,7 +487,7 @@ function IDLBattle.someOneDead(unit)
         city.astar4Ocean:scanRange(unit.transform.position, 6)
 
         -- 通知服务器
-        if not IDLBattle.mData.isReplay then
+        if (not IDLBattle.mData.isReplay) and (not IDLBattle.mData.isWatching) then
             CLLNet.send(
                 NetProtoIsland.send.onBattleBuildingDie(
                     bio2number(IDLBattle.mData.fleet.idx),
@@ -425,18 +502,18 @@ function IDLBattle.someOneDead(unit)
     end
 end
 
----@public 掠夺资源
+---public 掠夺资源
 function IDLBattle.onLootRes(bidx, type, val)
     if IDLBattle.isStoped then
         return
     end
-    if val > 0 and (not IDLBattle.mData.isReplay) then
+    if val > 0 and (not IDLBattle.mData.isReplay) and (not IDLBattle.mData.isWatching) then
         local fidx = bio2number(IDLBattle.mData.fleet.idx)
         CLLNet.send(NetProtoIsland.send.onBattleLootRes(fidx, bidx, type, val))
     end
 end
 
----@public 能否结束战斗
+---public 能否结束战斗
 function IDLBattle.needEndBattle()
     if not IDLBattleSearcher.hadBuildingAlive() then
         return true
@@ -455,7 +532,7 @@ end
 function IDLBattle.onPressRole(isPress, role, pos)
 end
 
----@public 通用子弹击中效果
+---public 通用子弹击中效果
 ---@param bullet Coolape.CLBulletBase
 function IDLBattle.onBulletHit(bullet)
     ---@type DBCFBulletData
@@ -505,20 +582,20 @@ function IDLBattle.onBulletHit(bullet)
     end
 end
 
----@public 寻敌
+---public 寻敌
 ---@param targetsNum number 目标数量
 function IDLBattle.searchTarget(unit, targetsNum)
     return IDLBattleSearcher.searchTarget(unit, targetsNum)
 end
 
----@public 结束战斗
+---public 结束战斗
 function IDLBattle.endBattle()
     if IDLBattle.isStoped then
         return
     end
-    if IDLBattle.mData.isReplay then
+    if IDLBattle.mData.isReplay or IDLBattle.mData.isWatching then
         InvokeEx.cancelInvokeByFixedUpdate(IDLBattle.endBattle)
-        InvokeEx.cancelInvokeByFixedUpdate(IDLBattle.delplay4Replay)
+        InvokeEx.cancelInvokeByFixedUpdate(IDLBattle.doplay4Replay)
     end
     IDLBattle.isStoped = true
     --//TODO:end battle
@@ -527,20 +604,20 @@ function IDLBattle.endBattle()
 end
 
 -- 回放
-function IDLBattle.startEeplay()
+function IDLBattle.startReplay()
     local panel = CLPanelManager.getPanel("PanelBattleReplay")
     panel.luaTable.startReplay()
     ---@param v NetProtoIsland.ST_deployUnitInfor
     for i, v in ipairs(IDLBattle.mData.deployQueue) do
         local delayTime = bio2number(v.frames) * Time.fixedDeltaTime
-        InvokeEx.invokeByFixedUpdate(IDLBattle.delplay4Replay, v, delayTime)
+        InvokeEx.invokeByFixedUpdate(IDLBattle.doplay4Replay, v, delayTime)
     end
     local endTime = bio2number(IDLBattle.mData.endFrames) * Time.fixedDeltaTime
     InvokeEx.invokeByFixedUpdate(IDLBattle.endBattle, endTime)
 end
 
 ---@param data NetProtoIsland.ST_deployUnitInfor
-function IDLBattle.delplay4Replay(data)
+function IDLBattle.doplay4Replay(data)
     local pos = Vector3(bio2number(data.pos.x) / 1000, bio2number(data.pos.y) / 1000, bio2number(data.pos.z) / 1000)
     ---@type _ParamBattleUnitData
     local d = {}
@@ -548,13 +625,17 @@ function IDLBattle.delplay4Replay(data)
     d.id = bio2number(data.unitInfor.id)
     d.num = data.unitInfor.num
     d.lev = data.unitInfor.lev
-    IDLBattle.doDeployUnit(
-        pos,
-        d,
-        bio2number(data.fakeRandom),
-        bio2number(data.fakeRandom2),
-        bio2number(data.fakeRandom3)
-    )
+    if d.type == IDConst.UnitType.role then
+        IDLBattle.doDeployUnit(
+            pos,
+            d,
+            bio2number(data.fakeRandom),
+            bio2number(data.fakeRandom2),
+            bio2number(data.fakeRandom3)
+        )
+    elseif d.type == IDConst.UnitType.skill then
+        IDLBattle.DeploySkill(d, pos)
+    end
 end
 
 function IDLBattle.clean()
@@ -582,6 +663,13 @@ function IDLBattle.clean()
         SetActive(v.gameObject, false)
     end
     IDLBattle.defShips = {}
+
+    for k, v in pairs(IDLBattle.skills) do
+        v:clean()
+        CLThingsPool.returnObj(v.csSelf.gameObject)
+        SetActive(v.csSelf.gameObject, false)
+    end
+    IDLBattle.skills = {}
 
     -- 城市清理
     if city then

@@ -255,7 +255,9 @@ public class ECLProjectManager : EditorWindow
                                 if (EditorUtility.DisplayDialog("Alert", "Really want to refresh all assetbundles!", "Okey", "cancel"))
                                 {
                                     EditorApplication.delayCall += refreshAllAssetbundlesSkipCollect;
+                                    GUIUtility.ExitGUI();
                                 }
+                                GUIUtility.ExitGUI();
                             }
                             GUI.color = Color.yellow;
                             if (GUILayout.Button("One Key Refresh All AssetBundles\n(Collect Assets)", GUILayout.Width(300), GUILayout.Height(50)))
@@ -263,7 +265,9 @@ public class ECLProjectManager : EditorWindow
                                 if (EditorUtility.DisplayDialog("Alert", "Really want to refresh all assetbundles and collect Assets!", "Okey", "cancel"))
                                 {
                                     EditorApplication.delayCall += onRefreshAllAssetbundles;
+                                    GUIUtility.ExitGUI();
                                 }
+                                GUIUtility.ExitGUI();
                             }
                             GUILayout.Space(10);
                             GUI.color = Color.white;
@@ -282,8 +286,10 @@ public class ECLProjectManager : EditorWindow
                                             if (EditorUtility.DisplayDialog("Alert", "OKay, let me confirm again:)\n Really want to Refresh & Publish all assetbundles!", "Do it now!", "cancel"))
                                             {
                                                 EditorApplication.delayCall += upgrade4Publish;
+                                                GUIUtility.ExitGUI();
                                             }
                                         }
+                                        GUIUtility.ExitGUI();
                                     }
                                 }
 
@@ -293,6 +299,7 @@ public class ECLProjectManager : EditorWindow
                                     if (GUILayout.Button("Show Upgrade Res Package\n(需要手工处理)", GUILayout.Width(300)))
                                     {
                                         ECLUpgradeListProc.show4UpgradeList(ver4UpgradeList);
+                                        GUIUtility.ExitGUI();
                                     }
                                 }
 
@@ -304,6 +311,7 @@ public class ECLProjectManager : EditorWindow
                                         if (GUILayout.Button("Server Binding Upgrade Res Package Md5\n(需要手工处理)", GUILayout.Width(300)))
                                         {
                                             ECLUpgradeBindingServer.show();
+                                            GUIUtility.ExitGUI();
                                         }
                                     }
                                 }
@@ -316,7 +324,8 @@ public class ECLProjectManager : EditorWindow
                                     {
                                         if (GUILayout.Button("热更新前需要更新的列表\n(需要手工处理)", GUILayout.Width(300)))
                                         {
-                                            EditorApplication.delayCall += onShowPreugradeFiles;
+                                            onShowPreugradeFiles();
+                                            GUIUtility.ExitGUI();
                                         }
                                     }
                                 }
@@ -366,6 +375,7 @@ public class ECLProjectManager : EditorWindow
                                     if (EditorUtility.DisplayDialog("Alert", "打包配置（每次打包前先执行一次）!", "Okey", "cancel"))
                                     {
                                         publishSetting(sepecificPublishConfig);
+                                        GUIUtility.ExitGUI();
                                     }
                                 }
 
@@ -390,6 +400,7 @@ public class ECLProjectManager : EditorWindow
                                 if (GUILayout.Button("Move Priority Files to StreamingAssets", GUILayout.Width(250)))
                                 {
                                     CreateStreamingAssets();
+                                    GUIUtility.ExitGUI();
                                 }
                                 isDone4BuildStep(Path.Combine(Application.streamingAssetsPath, "priority.r"), 3);
                                 GUI.color = Color.yellow;
@@ -403,6 +414,7 @@ public class ECLProjectManager : EditorWindow
                                 if (GUILayout.Button("Move Other Files to StreamingAssets", GUILayout.Width(250)))
                                 {
                                     MoveOtherToStreamingAssets();
+                                    GUIUtility.ExitGUI();
                                 }
 
                                 isDone4BuildStep(Path.Combine(rootPath, "upgradeRes/other"), 3);
@@ -911,7 +923,11 @@ public class ECLProjectManager : EditorWindow
         PrefabUtility.SavePrefabAsset(go);
         string dir = Application.dataPath + "/" + ECLEditorUtl.getPathByObject(go);
         dir = Path.GetDirectoryName(dir);
-        ECLCreatAssetBundle4Update.createAssets4Upgrade(dir, go, true);
+        if(!ECLCreatAssetBundle4Update.createAssets4Upgrade(dir, go, true))
+        {
+            Debug.LogError("打包资源报错了，请检测并重新打包==" + dir);
+            return;
+        }
 
         // 必须再取一次，好像执行了上面一句方法后，cell就会变成null
         cell = go.GetComponent<CLCellLua>();
@@ -1202,7 +1218,11 @@ public class ECLProjectManager : EditorWindow
                 resultPstr.a(path).a("\n");
                 if (callCustomPublish(path))
                 {
-                    ECLCreatAssetBundle4Update.createAssets4Upgrade(PStr.b().a("Assets/").a(path).e());
+                    if (!ECLCreatAssetBundle4Update.createAssets4Upgrade(PStr.b().a("Assets/").a(path).e()))
+                    {
+                        Debug.LogError("打包资源报错了，请检测并重新打包==" + path);
+                        return "";
+                    }
                 }
             }
         }
@@ -1230,7 +1250,11 @@ public class ECLProjectManager : EditorWindow
                     resultPstr.a(path).a("\n");
                     if (callCustomPublish(path))
                     {
-                        ECLCreatAssetBundle4Update.createAssets4Upgrade("Assets/" + path, true);
+                        if(!ECLCreatAssetBundle4Update.createAssets4Upgrade("Assets/" + path, true))
+                        {
+                            Debug.LogError("打包资源报错了，请检测并重新打包=="+ path);
+                            return "";
+                        }
                     }
                 }
             }
@@ -1243,7 +1267,11 @@ public class ECLProjectManager : EditorWindow
                     resultPstr.a(path).a("\n");
                     if (callCustomPublish(path))
                     {
-                        ECLCreatAssetBundle4Update.createAssets4Upgrade("Assets/" + path);
+                        if(!ECLCreatAssetBundle4Update.createAssets4Upgrade("Assets/" + path))
+                        {
+                            Debug.LogError("打包资源报错了，请检测并重新打包==" + path);
+                            return "";
+                        }
                     }
                 }
             }

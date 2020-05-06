@@ -8,14 +8,14 @@ IDDBMail.mailsType = {} -- 邮件类型列表
 IDDBMail.mailsUnreadNum = {} -- 发件箱
 IDDBMail.reports = {} -- 战报记录
 
----@public 初始化
+---public 初始化
 IDDBMail.init = function()
     IDDBMail.clean()
     -- 取是全部邮件
     CLLNet.send(NetProtoIsland.send.getMails())
 end
 
----@public 当取得所有邮件时
+---public 当取得所有邮件时
 IDDBMail.onGetMails = function(mails)
     IDDBMail.mails = mails
     ---@param m NetProtoIsland.ST_mail
@@ -26,7 +26,7 @@ IDDBMail.onGetMails = function(mails)
     end
 end
 
----@public 当有邮件推送时
+---public 当有邮件推送时
 IDDBMail.onMailsChg = function(mails)
     ---@param m NetProtoIsland.ST_mail
     local index = 0
@@ -42,8 +42,7 @@ IDDBMail.onMailsChg = function(mails)
         else
             ---@type NetProtoIsland.ST_mail
             local oldMail = IDDBMail.getMailByIndex(index)
-            if bio2number(oldMail.state) == IDConst.MailState.unread 
-                and bio2number(m.state) ~= IDConst.MailState.unread then
+            if bio2number(oldMail.state) == IDConst.MailState.unread and bio2number(m.state) ~= IDConst.MailState.unread then
                 IDDBMail.onReadMail(m)
             end
             -- 刷新数据
@@ -52,7 +51,7 @@ IDDBMail.onMailsChg = function(mails)
     end
 end
 
----@public 包装邮件列表
+---public 包装邮件列表
 ---@param mail NetProtoIsland.ST_mail
 IDDBMail.wrapData = function(mail)
     -- 邮件的索引
@@ -61,17 +60,17 @@ IDDBMail.wrapData = function(mail)
     local fromPidx = mail.fromPidx
     if bio2number(fromPidx) == bio2number(IDDBPlayer.myself.idx) then
         -- 说明是自己的发的邮件,记录到已发送
-        table.insert(IDDBMail.mailsSend, index)
+        table.insert(IDDBMail.mailsSend, 1, index)
     else
         -- 记录到收件箱
-        table.insert(IDDBMail.mailsReceive, index)
+        table.insert(IDDBMail.mailsReceive, 1, index)
         -- 记录分类数据
         local list = IDDBMail.mailsType[IDConst.MailType.all] or {}
-        table.insert(list, index)
+        table.insert(list, 1, index)
         IDDBMail.mailsType[IDConst.MailType.all] = list
 
         list = IDDBMail.mailsType[bio2number(mail.type)] or {}
-        table.insert(list, index)
+        table.insert(list, 1, index)
         IDDBMail.mailsType[bio2number(mail.type)] = list
         -- 未读邮件计数
         if
@@ -92,23 +91,24 @@ IDDBMail.onReadMail = function(mail)
     IDDBMail.mailsUnreadNum[type] = (IDDBMail.mailsUnreadNum[type] or 0) - 1
 end
 
----@public 取得已发送邮件
+---public 取得已发送邮件
 IDDBMail.getSendedMails = function()
     return IDDBMail.mailsSend
 end
 
----@public 根据类型得邮件列表
+---public 根据类型得邮件列表
 IDDBMail.getMailsByType = function(type)
     local ret = {}
     return IDDBMail.mailsType[type] or {}
 end
 
----@public 通过索引取得邮件，注意不是邮件的idx
+---public 通过索引取得邮件，注意不是邮件的idx
 IDDBMail.getMailByIndex = function(index)
     return IDDBMail.mails[index]
 end
 
----@public 通过邮件的idx取得邮件
+---public 通过邮件的idx取得邮件
+---@return NetProtoIsland.ST_mail
 IDDBMail.getMailByIdx = function(idx)
     local index = IDDBMail.mailsIndexMap[idx]
     if index == nil then
@@ -117,7 +117,7 @@ IDDBMail.getMailByIdx = function(idx)
     return IDDBMail.mails[index]
 end
 
----@public 取得邮件的历史记录列表
+---public 取得邮件的历史记录列表
 IDDBMail.getMailHistoryList = function(idx)
     ---@type NetProtoIsland.ST_mail
     local mail = IDDBMail.getMailByIdx(idx)
@@ -127,13 +127,13 @@ IDDBMail.getMailHistoryList = function(idx)
     local hList = {}
     if mail.historyList then
         for i, _idx in ipairs(mail.historyList) do
-            table.insert(hList, IDDBMail.getMailByIdx(bio2number(_idx)))
+            table.insert(hList, IDDBMail.getMailByIdx(_idx))
         end
     end
     return hList
 end
 
----@public 取得未读邮件数量
+---public 取得未读邮件数量
 IDDBMail.getUnreadNum = function(type)
     return IDDBMail.mailsUnreadNum[type] or 0
 end

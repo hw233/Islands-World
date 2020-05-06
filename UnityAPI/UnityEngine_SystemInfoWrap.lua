@@ -27,6 +27,7 @@
 ---@field public graphicsDeviceVersion System.String
 ---@field public graphicsShaderLevel System.Int32
 ---@field public graphicsMultiThreaded System.Boolean
+---@field public renderingThreadingMode UnityEngine.Rendering.RenderingThreadingMode
 ---@field public hasHiddenSurfaceRemovalOnGPU System.Boolean
 ---@field public hasDynamicUniformArrayIndexingInFragmentShaders System.Boolean
 ---@field public supportsShadows System.Boolean
@@ -38,12 +39,15 @@
 ---@field public supportsCubemapArrayTextures System.Boolean
 ---@field public copyTextureSupport UnityEngine.Rendering.CopyTextureSupport
 ---@field public supportsComputeShaders System.Boolean
+---@field public supportsGeometryShaders System.Boolean
+---@field public supportsTessellationShaders System.Boolean
 ---@field public supportsInstancing System.Boolean
 ---@field public supportsHardwareQuadTopology System.Boolean
 ---@field public supports32bitsIndexBuffer System.Boolean
 ---@field public supportsSparseTextures System.Boolean
 ---@field public supportedRenderTargetCount System.Int32
 ---@field public supportsSeparatedRenderTargetsBlend System.Boolean
+---@field public supportedRandomWriteTargetCount System.Int32
 ---@field public supportsMultisampledTextures System.Int32
 ---@field public supportsMultisampleAutoResolve System.Boolean
 ---@field public supportsTextureWrapMirrorOnce System.Int32
@@ -51,13 +55,25 @@
 ---@field public npotSupport UnityEngine.NPOTSupport
 ---@field public maxTextureSize System.Int32
 ---@field public maxCubemapSize System.Int32
+---@field public maxComputeBufferInputsVertex System.Int32
+---@field public maxComputeBufferInputsFragment System.Int32
+---@field public maxComputeBufferInputsGeometry System.Int32
+---@field public maxComputeBufferInputsDomain System.Int32
+---@field public maxComputeBufferInputsHull System.Int32
+---@field public maxComputeBufferInputsCompute System.Int32
+---@field public maxComputeWorkGroupSize System.Int32
+---@field public maxComputeWorkGroupSizeX System.Int32
+---@field public maxComputeWorkGroupSizeY System.Int32
+---@field public maxComputeWorkGroupSizeZ System.Int32
 ---@field public supportsAsyncCompute System.Boolean
 ---@field public supportsGraphicsFence System.Boolean
 ---@field public supportsAsyncGPUReadback System.Boolean
+---@field public supportsRayTracing System.Boolean
 ---@field public supportsSetConstantBuffer System.Boolean
 ---@field public minConstantBufferOffsetAlignment System.Boolean
 ---@field public hasMipMaxLevel System.Boolean
 ---@field public supportsMipStreaming System.Boolean
+---@field public usesLoadStoreActions System.Boolean
 local m = { }
 ---public SystemInfo .ctor()
 ---@return SystemInfo
@@ -74,6 +90,11 @@ function m.SupportsBlendingOnRenderTextureFormat(format) end
 ---@return bool
 ---@param optional TextureFormat format
 function m.SupportsTextureFormat(format) end
+---public Boolean SupportsVertexAttributeFormat(VertexAttributeFormat format, Int32 dimension)
+---@return bool
+---@param optional VertexAttributeFormat format
+---@param optional Int32 dimension
+function m.SupportsVertexAttributeFormat(format, dimension) end
 ---public Boolean IsFormatSupported(GraphicsFormat format, FormatUsage usage)
 ---@return bool
 ---@param optional GraphicsFormat format

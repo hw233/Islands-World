@@ -55,7 +55,7 @@ local scale = 100
 local pageSize = 10
 local mapAreaInfor
 
----@public 取得网格id对应的分区id
+---public 取得网格id对应的分区id
 function IDDBWorldMap.getAreaId(index)
     if mapAreaInfor == nil then
         local cfgPath = joinStr(cfgWorldBasePath, "maparea.cfg")
@@ -66,7 +66,7 @@ function IDDBWorldMap.getAreaId(index)
     return mapAreaInfor[areaIdx]
 end
 
----@public 取得大图的index映射到分区网格的index
+---public 取得大图的index映射到分区网格的index
 ---@param index
 function IDDBWorldMap.mapIndex2AreaIndex(index)
     local areaIndex = -1
@@ -79,7 +79,7 @@ function IDDBWorldMap.mapIndex2AreaIndex(index)
     return areaIndex
 end
 
----@public 分区网格的index转成大地图每屏的index
+---public 分区网格的index转成大地图每屏的index
 function IDDBWorldMap.areaIndex2MapPageIndexs(areaIndex)
     local ret = {}
     local col = gridArea:GetColumn(areaIndex)
@@ -94,7 +94,7 @@ function IDDBWorldMap.areaIndex2MapPageIndexs(areaIndex)
     return ret
 end
 
----@public 取得一屏的配置数据
+---public 取得一屏的配置数据
 function IDDBWorldMap.getCfgByPageIdx(pageIdx)
     if pageIdx < 0 then
         return
@@ -129,7 +129,7 @@ function IDDBWorldMap.getCfgByPageIdx(pageIdx)
 end
 --=========================================
 --=========================================
----@public 取得一屏的数据
+---public 取得一屏的数据
 function IDDBWorldMap.getDataByPageIdx(pageIdx)
     if pageIdx == nil then
         return nil
@@ -158,7 +158,7 @@ function IDDBWorldMap.unlockLoadingMapPageData(pageIdx)
     InvokeEx.cancelInvoke(IDDBWorldMap.unlockLoadingMapPageData)
 end
 
----@public 取得一屏数据
+---public 取得一屏数据
 ---@param data NetProtoIsland.ST_mapPage
 function IDDBWorldMap.onGetMapPageData(data)
     local pageIdx = bio2number(data.pageIdx)
@@ -231,7 +231,7 @@ function IDDBWorldMap.getFleet(fidx)
     return IDDBWorldMap.fleets[fidx]
 end
 
----@public 取得舰队当前的真实位置
+---public 取得舰队当前的真实位置
 ---@param fleet NetProtoIsland.ST_fleetinfor
 function IDDBWorldMap.getFleetRealCurPos(fleet)
     if fleet == nil then

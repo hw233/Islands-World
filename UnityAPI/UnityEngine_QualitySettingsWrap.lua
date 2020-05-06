@@ -24,6 +24,7 @@
 ---@field public realtimeReflectionProbes System.Boolean
 ---@field public billboardsFaceCameraPosition System.Boolean
 ---@field public resolutionScalingFixedDPIFactor System.Single
+---@field public renderPipeline UnityEngine.Rendering.RenderPipelineAsset
 ---@field public skinWeights UnityEngine.SkinWeights
 ---@field public streamingMipmapsActive System.Boolean
 ---@field public streamingMipmapsMemoryBudget System.Single
@@ -49,6 +50,10 @@ function m.DecreaseLevel(applyExpensiveChanges) end
 ---@param Int32 index
 ---@param optional Boolean applyExpensiveChanges
 function m.SetQualityLevel(index, applyExpensiveChanges) end
+---public RenderPipelineAsset GetRenderPipelineAssetAt(Int32 index)
+---@return RenderPipelineAsset
+---@param optional Int32 index
+function m.GetRenderPipelineAssetAt(index) end
 ---public Int32 GetQualityLevel()
 ---@return number
 function m.GetQualityLevel() end

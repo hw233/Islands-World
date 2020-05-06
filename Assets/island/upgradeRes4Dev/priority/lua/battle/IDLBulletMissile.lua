@@ -1,11 +1,11 @@
-﻿-- 导弹
+﻿-- 导弹 //TODO:性能好像有问题
 local _cell = {}
 local csSelf = nil
 local transform = nil
 local mData = nil
 local lastSearchTime = 0
 
----@public 重新设置目标
+---public 重新设置目标
 ---@param bullet Coolape.CLBulletBase
 function _cell.resetTarget(bullet)
     if MyCfg.mode ~= GameMode.battle then

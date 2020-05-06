@@ -30,10 +30,8 @@ namespace Coolape
 			}
 		}
 
-		public object attr;
-		//子弹悔恨
-		public object data = null;
-		//可以理解为透传参数
+		public object attr; //子弹
+		public object data = null; //可以理解为透传参数
 		public bool isFireNow = false;
 		public bool isFollow = false;
 		public bool isMulHit = false;
@@ -229,21 +227,21 @@ namespace Coolape
 					onFinishFire (true);
 				}
 			} else {
-				if (target == null || target.isDead ||
-                    (RefreshTargetMSec > 0 && 
-                    (DateEx.nowMS - lastResetTargetTime >= RefreshTargetMSec))
+				if (target == null || target.isDead 
+                    //|| (RefreshTargetMSec > 0 && 
+                    //(DateEx.nowMS - lastResetTargetTime >= RefreshTargetMSec))
                     ){
-                    lastResetTargetTime = DateEx.nowMS;
+                    //lastResetTargetTime = DateEx.nowMS;
                     resetTarget ();
 				}
-				subDiff = CalculateVelocity (transform.position);
 				if (!isMulHit) {
 					if (Physics.Raycast (transform.position, v3Diff, out hitInfor, 1f)) {
                         OnTriggerEnter (hitInfor.collider);
 					}
-				}
-				//Rotate towards targetDirection (filled in by CalculateVelocity)
-				if (targetDirection != Vector3.zero) {
+                }
+                subDiff = CalculateVelocity(transform.position);
+                //Rotate towards targetDirection (filled in by CalculateVelocity)
+                if (targetDirection != Vector3.zero) {
 					Utl.RotateTowards (transform, targetDirection, turningSpeed);
 				}
 				transform.Translate (subDiff.normalized * Time.fixedDeltaTime * speed * 10, Space.World);
@@ -288,21 +286,21 @@ namespace Coolape
                 {
                     mToPos = target.transform.position;
                 }
-                else
-                {
-                    if (RefreshTargetMSec > 0 &&
-                    (DateEx.nowMS - lastResetToPosTime >= RefreshTargetMSec)
-                    ){
-                        lastResetToPosTime = DateEx.nowMS;
-                        int x = attacker.fakeRandom(-10, 10);
-                        int z = attacker.fakeRandom2(-10, 10);
-                        mToPos = transform.position + new Vector3(x, 0, z);
-                    }
-                    else
-                    {
-                        mToPos = Vector3.zero;
-                    }
-                }
+                //else
+                //{
+                    //if (RefreshTargetMSec > 0 &&
+                    //(DateEx.nowMS - lastResetToPosTime >= RefreshTargetMSec)
+                    //){
+                    //    lastResetToPosTime = DateEx.nowMS;
+                    //    int x = attacker.fakeRandom(-10, 10);
+                    //    int z = attacker.fakeRandom2(-10, 10);
+                    //    mToPos = transform.position + new Vector3(x, 0, z);
+                    //}
+                    //else
+                    //{
+                    //    mToPos = Vector3.zero;
+                    //}
+                //}
             }
 			dir = mToPos - fromPos;
 			targetDist = dir.magnitude;

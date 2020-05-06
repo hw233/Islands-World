@@ -1,4 +1,4 @@
-﻿---@public 造船厂
+﻿---public 造船厂
 require("city.IDLBuilding")
 
 ---@class IDLBuildingDockyard:IDLBuilding
@@ -23,33 +23,20 @@ function IDLBuildingDockyard:init(selfObj, id, star, lev, _isOffense, other)
     IDLBuildingDockyard.super.init(self, selfObj, id, star, lev, _isOffense, other)
     self:showShipsInPort()
     if MyCfg.mode ~= GameMode.battle then
-        self:buildShip()
         self.csSelf:invoke4Lua(self.showShipsInOcean, 1)
     end
 end
 
----@public 造船
-function IDLBuildingDockyard:buildShip()
-    local serverData = self.serverData
-    if serverData then
-        if bio2number(serverData.state) == IDConst.BuildingState.working then
-            self:loadProgressHud()
-        else
-            self:unLoadProgressHud()
-        end
-    else
-        self:unLoadProgressHud()
-    end
-end
----@public 显示舰船停泊在港口
+---public 显示舰船停泊在港口
 function IDLBuildingDockyard:showShipsInPort()
     if self.serverData == nil or MyCfg.mode == GameMode.battle then
         return
     end
-    local shipsMap = IDDBCity.curCity:getShipsByBIdx(bio2number(self.serverData.idx))
+    local shipsMap = IDDBCity.curCity:getUnitsByBIdx(bio2number(self.serverData.idx))
     if shipsMap then
+        ---@type v NetProtoIsland.ST_unitInfor
         for k, v in pairs(shipsMap) do
-            if self.shipsInPorts[k] == nil then
+            if self.shipsInPorts[k] == nil and bio2number(v.num) > 0 then
                 CLRolePool.borrowObjAsyn(IDUtl.getRolePrefabName(k), self:wrapFunction4CS(self.onLoadShip), k)
             end
         end
@@ -60,6 +47,10 @@ function IDLBuildingDockyard:onLoadShip(name, ship, shipAttrId)
     if not self.gameObject.activeInHierarchy then
         CLRolePool.returnObj(ship)
         SetActive(ship.gameObject, false)
+        return
+    end
+    if ship == nil then
+        printe("borrow ship is nil, name==" .. name or "")
         return
     end
     self.shipsInPorts[shipAttrId] = ship
@@ -76,7 +67,7 @@ function IDLBuildingDockyard:onLoadShip(name, ship, shipAttrId)
     SetActive(ship.gameObject, true)
 end
 
----@public 取得空闲的停泊点
+---public 取得空闲的停泊点
 function IDLBuildingDockyard:getFreePort()
     for i, v in ipairs(self.ports) do
         if v.isFree then
@@ -86,14 +77,14 @@ function IDLBuildingDockyard:getFreePort()
     end
 end
 
----@public 让舰船在海航行
+---public 让舰船在海航行
 function IDLBuildingDockyard:showShipsInOcean()
     self.csSelf:cancelInvoke4Lua(self.showShipsInOcean)
     if self.serverData == nil or MyCfg.mode == GameMode.battle then
         return
     end
     -- 取得一个舰船id及数量
-    local ships = IDDBCity.curCity:getShipsByBIdx(bio2number(self.serverData.idx))
+    local ships = IDDBCity.curCity:getUnitsByBIdx(bio2number(self.serverData.idx))
     if ships then
         local num = 0
         ---@param unit NetProtoIsland.ST_unitInfor

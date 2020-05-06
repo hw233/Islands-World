@@ -1,4 +1,4 @@
-﻿---@public 资源建筑
+﻿---public 资源建筑
 require("city.IDLBuilding")
 
 ---@class IDLBuildingRes:IDLBuilding
@@ -19,7 +19,7 @@ function IDLBuildingRes:init(selfObj, id, star, lev, _isOffense, other)
     end
 end
 
----@public 收集资源
+---public 收集资源
 function IDLBuildingRes:showCollect()
     if (not self.serverData) or GameMode.map ~= MyCfg.mode then
         return
@@ -34,7 +34,8 @@ function IDLBuildingRes:showCollect()
             self.csSelf:invoke4Lua(self.showCollect, 60)
         end
     else
-        printe("当前建筑不可收集资源！")
+        self:hideCollectHud()
+        printe("当前建筑不可收集资源！state==" .. bio2number(self.serverData.state))
     end
 end
 
@@ -64,7 +65,7 @@ function IDLBuildingRes:showCollectHud()
                         offset = Vector3(0, 2, 0),
                         icon = IDUtl.getResIcon(self.resType),
                         bgColor = color,
-                        onClick = self.OnClick
+                        onClick = self.collectRes
                     }
                 )
             end
@@ -85,11 +86,14 @@ end
 
 function IDLBuildingRes:OnClick()
     IDLBuildingRes.super.OnClick(self)
+    self:collectRes()
+end
+
+function IDLBuildingRes:collectRes()
     if self.tipHud then
         if self:canCollect() then
-            showHotWheel()
+            -- showHotWheel()
             self:hideCollectHud()
-            --self:playCollectResEffect()
             CLLNet.send(NetProtoIsland.send.collectRes(bio2number(self.serverData.idx)))
         else
             CLAlert.add(LGet("MsgCollectResIsFull"), Color.yellow, 1)
@@ -97,7 +101,7 @@ function IDLBuildingRes:OnClick()
     end
 end
 
----@public 播放收集资源图标飞的效果
+---public 播放收集资源图标飞的效果
 function IDLBuildingRes:playCollectResEffect()
     local to = nil
     if IDPMain then
@@ -111,7 +115,7 @@ function IDLBuildingRes:playCollectResEffect()
     end
 end
 
----@public 预估产量
+---public 预估产量
 function IDLBuildingRes:estimateYield()
     local proTime = DateEx.nowMS - bio2number(self.serverData.starttime)
     proTime = NumEx.getIntPart(proTime / 60000)
@@ -133,7 +137,7 @@ function IDLBuildingRes:estimateYield()
     return yieldsPerMinutes * proTime
 end
 
----@public 是否可以收集
+---public 是否可以收集
 function IDLBuildingRes:canCollect()
     -- 状态必须是空间
     if bio2number(self.serverData.state) == IDConst.BuildingState.normal then

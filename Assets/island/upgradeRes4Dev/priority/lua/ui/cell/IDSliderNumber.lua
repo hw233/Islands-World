@@ -1,4 +1,4 @@
-﻿---@public 数据number通用
+﻿---public 数据number通用
 ---@class _Param4SliderNumber
 ---@field public min number 最小值
 ---@field public max number 最大值

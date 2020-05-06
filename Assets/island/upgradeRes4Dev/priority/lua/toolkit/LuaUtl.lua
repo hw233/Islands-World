@@ -323,6 +323,7 @@ function SetActive(go, isActive)
     NGUITools.SetActive(go, isActive)
 end
 
+---@return UnityEngine.MonoBehaviour
 function getCC(transform, path, com)
     if not transform then
         return
@@ -349,7 +350,7 @@ end
 --     return table.concat(paras)
 -- end
 
----@public 拼接字符串
+---public 拼接字符串
 function joinStr(...)
     -- local paras = {...}
     local tb = {}
@@ -363,7 +364,7 @@ function joinStr(...)
     return table.concat(tb)
 end
 
----@public 保留小数位位数
+---public 保留小数位位数
 function getPreciseDecimal(nNum, n)
     if type(nNum) ~= "number" then
         return nNum
@@ -379,7 +380,7 @@ function getPreciseDecimal(nNum, n)
     return nRet
 end
 
----@public 截取指定长度字符，注意：英文个数为E，汉字或韩文或其他个数为C，E*1 + C*2 <= 14
+---public 截取指定长度字符，注意：英文个数为E，汉字或韩文或其他个数为C，E*1 + C*2 <= 14
 function cutStr_utf8(str, max)
     if not max then
         max = 14
@@ -433,14 +434,14 @@ function cutStr_utf8(str, max)
     return name_substr, isSub
 end
 
----@public 离线处理
+---public 离线处理
 function procOffLine()
     if MyCfg.mode == GameMode.none or IDUtl.isLoadingScene then
         return
     end
 
     -- CLAlert.add(LGet("MsgOffline"), Color.yellow, 1)
-    printe(LGet("MsgOffline"))
+    printw(LGet("MsgOffline"))
     InvokeEx.cancelInvoke() -- 放在前面，后面马上就要用到invoke
     local ok, result = pcall(doReleaseAllRes)
     if not ok then
@@ -505,7 +506,7 @@ function doReleaseAllRes()
     hideHotWheel()
 end
 
----@public 重新启动前的处理
+---public 重新启动前的处理
 function doSomethingBeforeRestart()
     local ok, result = pcall(doReleaseAllRes)
     if not ok then
@@ -533,7 +534,7 @@ function doSomethingBeforeRestart()
     SoundEx.clean()
 end
 
----@public gc
+---public gc
 function releaseRes4GC(releaseRes)
     if releaseRes then
         CLUIInit.self.emptAtlas:releaseAllTexturesImm()
@@ -625,7 +626,7 @@ function onBorrowedSpriteCB(atlas, spData)
     m.times = m.times + 1
     borrowedSpList[spData.name] = m
 end
----@public
+---public
 function onApplicationPauseCallback4CountAtlas()
     local jstr = json.encode(borrowedSpList)
     local path =
@@ -634,4 +635,27 @@ function onApplicationPauseCallback4CountAtlas()
     File.WriteAllText(path, jstr)
 end
 --*******************************************************************
+--*******************************************************************
+
+local _TopHeight_ = 130
+local _BottomHeight_ = 150
+local _ContentRect
+local _sizeAdjust
+---@return UnityEngine.Vector4
+GetUIContentRect = function(panel, top, bottom)
+    -- if _ContentRect then
+    --     return _ContentRect
+    -- end
+    top = top or _TopHeight_
+    bottom = bottom or _BottomHeight_
+    local sizeAdjust = UIRoot.GetPixelSizeAdjustment(panel.gameObject)
+    _sizeAdjust = sizeAdjust
+    _ContentRect =
+        Vector4(0, (bottom - top) / 2, Screen.width * sizeAdjust, Screen.height * sizeAdjust - (bottom + top))
+    return _ContentRect
+end
+
+GetUISizeAdjust = function()
+    return _sizeAdjust
+end
 --*******************************************************************

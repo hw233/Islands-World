@@ -79,7 +79,7 @@ end
 
 -- 当按了返回键时，关闭自己（返值为true时关闭）
 function IDPBattleReplay.hideSelfOnKeyBack()
-    return true
+    return false
 end
 
 --------------------------------------------

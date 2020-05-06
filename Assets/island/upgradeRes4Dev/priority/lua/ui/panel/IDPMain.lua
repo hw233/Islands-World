@@ -36,18 +36,25 @@ function IDPMain.init(csObj)
     uiobjs.resObjs.LabelDiam = getCC(TableRes, "ProgressBarDiam/Label", "UILabel")
     uiobjs.resObjs.spriteDiam = getCC(TableRes, "ProgressBarDiam/SpriteIcon", "UISprite")
 
+    local PlayerInfor = getChild(uiobjs.publicRoot, "AnchorTopLeft/PlayerInfor")
+    uiobjs.player = {}
+    uiobjs.player.SpriteHeadIcon = getCC(PlayerInfor, "SpriteHeadIcon", "UISprite")
+    uiobjs.player.LabelPlayerName = getCC(PlayerInfor, "LabelPlayerName", "UILabel")
+
     -- 功能相关
     local AnchorBottomRight = getChild(transform, "public/AnchorBottomRight")
     uiobjs.ButtonFunc = getChild(AnchorBottomRight, "ButtonFunc")
     uiobjs.funcObjs = {}
-    ---@type UIGrid
-    uiobjs.funcObjs.TableFuncs = getCC(AnchorBottomRight, "TableFuncs", "UIGrid")
+    ---@type Coolape.CLUILoopGrid
+    uiobjs.funcObjs.TableFuncs = getCC(AnchorBottomRight, "TableFuncs", "CLUILoopGrid")
     uiobjs.funcObjs.TableFuncsPrefab = getChild(uiobjs.funcObjs.TableFuncs.transform, "00000").gameObject
 
     local AnchorBottomLeft = getChild(uiobjs.publicRoot, "AnchorBottomLeft")
     uiobjs.ButtonSwitchModeIcon = getCC(AnchorBottomLeft, "ButtonSwitchMode/Sprite", "UISprite")
     uiobjs.ButtonSwitchModeLabel = getCC(AnchorBottomLeft, "ButtonSwitchMode/Label", "UILabel")
-    uiobjs.ChatLabel = getCC(AnchorBottomLeft, "ButtonChat/Label", "UIRichText4Chat")
+    ---@type UIRichText4Chat
+    uiobjs.newestChatLabel = getCC(AnchorBottomLeft, "ButtonChat/Label", "UIRichText4Chat")
+    uiobjs.chatReddot = getChild(AnchorBottomLeft, "ButtonChat/SpriteReddot").gameObject
 
     -- 位置相关
     local AnchorBottom = getChild(transform, "public/AnchorBottom")
@@ -55,9 +62,11 @@ function IDPMain.init(csObj)
     uiobjs.posObjs.root = getChild(AnchorBottom, "Position")
     uiobjs.posObjs.SpritePointer = getChild(uiobjs.posObjs.root, "SpritePointer")
     uiobjs.posObjs.LabelPos = getCC(uiobjs.posObjs.root, "LabelPos", "UILabel")
-    uiobjs.SpriteRudder = getChild(AnchorBottom, "SpriteRudder")
+    uiobjs.SpriteRudder = getChild(AnchorBottom, "SpriteRudder") -- 方向舵
     ---@type TweenPosition
     uiobjs.SpriteRudderTwPos = uiobjs.SpriteRudder:GetComponent("TweenPosition")
+    uiobjs.SpriteRudderTwPos:ResetToBeginning()
+    ---@type TweenRotation
     uiobjs.SpriteRudderTwRot = uiobjs.SpriteRudder:GetComponent("TweenRotation")
 
     -- 距离方向相关
@@ -173,17 +182,24 @@ end
 
 -- 显示，在c#中。show为调用refresh，show和refresh的区别在于，当页面已经显示了的情况，当页面再次出现在最上层时，只会调用refresh
 function IDPMain.show()
-    uiobjs.SpriteRudderTwPos:ResetToBeginning()
     CLUIDrag4World.setCanClickPanel(csSelf.name)
+    IDPMain.onGetChat(IDDBChat.getNestChat())
     IDPMain.onChgMode(IDWorldMap.mode, IDWorldMap.mode)
 end
 
 -- 刷新
 function IDPMain.refresh()
+    IDPMain.refreshPlayerInfor()
     IDPMain.refreshRes()
+    IDPMain.refreshReddot()
 end
 
----@public 刷新资源
+function IDPMain.refreshPlayerInfor()
+    uiobjs.player.LabelPlayerName.text = IDDBPlayer.myself.name
+    uiobjs.player.SpriteHeadIcon.spriteName = joinStr("playerIcon_", bio2number(IDDBPlayer.myself.icon))
+end
+
+---public 刷新资源
 function IDPMain.refreshRes()
     uiobjs.resObjs.LabelDiam.text = tostring(bio2number(IDDBPlayer.myself.diam))
     local res = IDDBCity.curCity:getRes()
@@ -198,10 +214,11 @@ end
 -- 关闭页面
 function IDPMain.hide()
     CLUIDrag4World.removeCanClickPanel(csSelf.name)
+    InvokeEx.cancelInvokeByUpdate(IDPMain.doRefreshDir)
     isShowFuncBtns = true
 end
 
----@public 当游戏模式变化（主要是从世界到主城的切换时ui的变化）
+---public 当游戏模式变化（主要是从世界到主城的切换时ui的变化）
 function IDPMain.onChgMode(oldMode, currMode)
     if IDWorldMap.mode == GameModeSub.city then
         IDPMain.enterCityMode(oldMode)
@@ -213,34 +230,35 @@ function IDPMain.onChgMode(oldMode, currMode)
     IDPMain.showFuncBtns()
 end
 
----@public 刷新主城信息
+---public 刷新主城信息
 function IDPMain.enterCityMode(oldMode)
     -- uiobjs.ButtonSwitchModeIcon.spriteName = ""
     uiobjs.ButtonSwitchModeLabel.text = LGet("World")
-    IDPMain.refreshPosiont(bio2number(IDDBCity.curCity.pos))
+    IDPMain.refreshPosInfor(bio2number(IDDBCity.curCity.pos))
     IDPMain.refreshPointer(MyCfg.self.lookAtTarget.localEulerAngles)
-    if oldMode == GameModeSub.fleet then
-        uiobjs.SpriteRudderTwPos:Play(false)
-    end
+    -- if oldMode == GameModeSub.fleet then
+    uiobjs.SpriteRudderTwPos:Play(false)
+    -- end
 end
 
----@public 刷新世界信息
+---public 刷新世界信息
 function IDPMain.enterWorldMode(oldMode)
     -- uiobjs.ButtonSwitchModeIcon.spriteName = ""
     uiobjs.ButtonSwitchModeLabel.text = LGet("BaseCamp")
-    if oldMode == GameModeSub.fleet then
-        uiobjs.SpriteRudderTwPos:Play(false)
-    end
+    -- if oldMode == GameModeSub.fleet then
+    uiobjs.SpriteRudderTwPos:Play(false)
+    -- end
 end
 
----@public 舰队模式
+---public 舰队模式
 function IDPMain.enterFleetMode(oldMode)
     -- uiobjs.ButtonSwitchModeIcon.spriteName = ""
     uiobjs.ButtonSwitchModeLabel.text = LGet("Quit")
     uiobjs.SpriteRudderTwPos:Play(true)
 end
 
-function IDPMain.refreshPosiont(index)
+---public 刷新当前的坐标
+function IDPMain.refreshPosInfor(index)
     if currCenterIndex ~= index then
         -- 缓存index
         currCenterIndex = index
@@ -256,6 +274,7 @@ function IDPMain.refreshPosiont(index)
     end
 end
 
+---public 刷新当前位置与基地距离及方向
 function IDPMain.refreshDir()
     if not uiobjs.ButtonDir.gameObject.activeInHierarchy then
         -- 如果方向指针是显示出来时，会有invoke处理刷新
@@ -272,7 +291,8 @@ function IDPMain.doRefreshDir()
     local from = MyCfg.self.lookAtTarget.position
     local to = IDWorldMap.grid.grid:GetCellCenter(bio2number(IDDBCity.curCity.pos))
     local dis = NumEx.getIntPart(Vector3.Distance(from, to) / IDWorldMap.grid.cellSize)
-    if dis <= 10 then
+    local limiDis = 8 * IDLCameraMgr.smoothFollow.height / 80
+    if dis <= limiDis then
         SetActive(uiobjs.ButtonDir.gameObject, false)
         InvokeEx.cancelInvokeByUpdate(IDPMain.doRefreshDir)
     else
@@ -309,6 +329,22 @@ function IDPMain.doRefreshDir()
     end
 end
 
+--@public 转动方向舵
+function IDPMain.refreshRudder()
+    if IDWorldMap.selectedFleet then
+        local toPos = IDWorldMap.grid.grid:GetCellCenter(bio2number(IDWorldMap.selectedFleet.data.topos))
+        local toAngle = Utl.getAngle(IDWorldMap.selectedFleet.transform.position, toPos)
+        toAngle.z = -toAngle.y
+        toAngle.z = toAngle.z < 0 and 360 + toAngle.z or toAngle.z
+        toAngle.y = 0
+        uiobjs.SpriteRudderTwRot.from = uiobjs.SpriteRudderTwRot.transform.localEulerAngles
+        uiobjs.SpriteRudderTwRot.to = toAngle
+        uiobjs.SpriteRudderTwRot:ResetToBeginning()
+        uiobjs.SpriteRudderTwRot:Play(true)
+    end
+end
+
+---public 刷新指南针
 function IDPMain.refreshPointer(eulerAngles)
     local v3 = uiobjs.posObjs.SpritePointer.localEulerAngles
     v3.x = eulerAngles.x
@@ -319,7 +355,7 @@ function IDPMain.refreshPointer(eulerAngles)
     IDPMain.refreshDir()
 end
 
---- 刷新功能按键列表
+---public 刷新功能按键列表
 function IDPMain.showFuncBtns(isShowBtns)
     isShowFuncBtns = isShowBtns
     funcBtnList = nil
@@ -332,6 +368,7 @@ function IDPMain.showFuncBtns(isShowBtns)
     else
         funcBtnList = {}
         if IDWorldMap.mode == GameModeSub.city then
+            --//TODO:显示有红点的功能，最多显示3个
             table.insert(funcBtnList, FuncBtnsMapCfg.Build)
             table.insert(funcBtnList, FuncBtnsMapCfg.Setting)
         elseif IDWorldMap.mode == GameModeSub.map or IDWorldMap.mode == GameModeSub.mapBtwncity then
@@ -346,15 +383,50 @@ function IDPMain.showFuncBtns(isShowBtns)
         SetActive(uiobjs.ButtonFunc.gameObject, true)
     end
 
-    CLUIUtl.resetList4Lua(
-        uiobjs.funcObjs.TableFuncs,
-        uiobjs.funcObjs.TableFuncsPrefab,
-        funcBtnList,
-        IDPMain.initBtnCell
-    )
+    uiobjs.funcObjs.TableFuncs:setList(funcBtnList, IDPMain.initBtnCell)
+    -- CLUIUtl.resetList4Lua(
+    --     uiobjs.funcObjs.TableFuncs,
+    --     uiobjs.funcObjs.TableFuncsPrefab,
+    --     funcBtnList,
+    --     IDPMain.initBtnCell
+    -- )
 end
 function IDPMain.initBtnCell(cell, data)
-    cell:init(data, nil)
+    cell:init(data, IDPMain.onClickFuncBtn)
+end
+
+function IDPMain.onClickFuncBtn(cell)
+    ---@type _ParamCellFuncBtn
+    local data = cell.luaTable.getData()
+    if data and data.onClick then
+        data.onClick(data.params)
+    end
+end
+
+---public 刷新红点
+function IDPMain.refreshReddot()
+    local hadReddot =
+        IDDBChat.hadReddotByType(IDConst.ChatType.union) or IDDBChat.hadReddotByType(IDConst.ChatType.private)
+    SetActive(uiobjs.chatReddot, hadReddot or false)
+end
+
+---@param chat NetProtoIsland.ST_chatInfor
+function IDPMain.onGetChat(chat)
+    IDPMain.refreshReddot()
+    if chat == nil then
+        return
+    end
+    IDDBPlayer.getPlayerSimple(bio2number(chat.fromPidx), IDPMain.refreshGetChat, chat)
+end
+
+---@param player NetProtoIsland.NetProtoIsland.ST_playerSimple
+---@param chat NetProtoIsland.ST_chatInfor
+function IDPMain.refreshGetChat(player, chat)
+    if bio2number(chat.fromPidx) == IDConst.sysPidx or bio2number(chat.fromPidx) == IDConst.gmPidx then
+        uiobjs.newestChatLabel.value = joinStr("[ff0000]", player.name, ":", chat.content, "[-]")
+    else
+        uiobjs.newestChatLabel.value = joinStr("[00ffff]", player.name, "[-]", ":", chat.content)
+    end
 end
 
 -- 网络请求的回调；cmd：指命，succ：成功失败，msg：消息；paras：服务器下行数据
@@ -387,7 +459,7 @@ function IDPMain.procNetwork(cmd, succ, msg, paras)
         elseif cmd == NetProtoIsland.cmds.onFinishBuildingUpgrade then
             IDMainCity.onFinishBuildingUpgrade(paras.building)
         elseif cmd == NetProtoIsland.cmds.collectRes then
-            hideHotWheel()
+            -- hideHotWheel()
             if bio2number(paras.resVal) > 0 then
                 local msg = joinStr(IDUtl.getResNameByType(bio2number(paras.resType)), " +", bio2number(paras.resVal))
                 CLAlert.add(msg, Color.green, 1)
@@ -423,6 +495,9 @@ function IDPMain.initEventDelegate()
         end,
         ["SpriteHeadIcon"] = function()
             CLAlert.add("暂未开放", Color.yellow, 1)
+        end,
+        ["ButtonChat"] = function()
+            getPanelAsy("PanelChats", onLoadedPanelTT)
         end
     }
 end
@@ -440,7 +515,7 @@ function IDPMain.hideSelfOnKeyBack()
     return false
 end
 
----@public 取得资源图标对像
+---public 取得资源图标对像
 function IDPMain.getResIconObj(resType)
     if resType == IDConst.ResType.food then
         return uiobjs.resObjs.spriteFood

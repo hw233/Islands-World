@@ -79,6 +79,8 @@ do
                 getPanelAsy("PanelDebugMgr", onLoadedPanel)
             end
         elseif goName == "ButtonQuit" then
+            Application.Quit()
+        elseif goName == "ButtonLogout" then
             if CLLNet then
                 CLLNet.stop()
             end

@@ -1,4 +1,4 @@
-﻿---@public 放空气球
+﻿---public 放空气球
 require("city.IDLBuildingTrap")
 
 ---@class IDLBuildingTrapAirBomb:IDLBuildingTrap

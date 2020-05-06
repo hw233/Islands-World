@@ -1,4 +1,4 @@
-﻿---@public 暴风控制器
+﻿---public 暴风控制器
 require("city.IDLBuildingTrap")
 
 ---@class IDLBuildingTrapIceStorm:IDLBuildingTrap

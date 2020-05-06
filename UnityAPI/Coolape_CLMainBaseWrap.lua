@@ -35,10 +35,6 @@ function m:setLua() end
 function m:initGetLuaFunc() end
 ---public Void Update()
 function m:Update() end
----public Void onOffline()
-function m:onOffline() end
----public Void doOffline()
-function m:doOffline() end
 ---public Void gc()
 function m:gc() end
 Coolape.CLMainBase = m

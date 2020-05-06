@@ -1,9 +1,9 @@
 ﻿-- xx单元
 do
     local _cell = {}
-    local csSelf = nil;
-    local transform = nil;
-    local mData = nil; --[[
+    local csSelf = nil
+    local transform = nil
+    local mData = nil --[[
     mData.target : gameobject
     mData.data:数据
     mData.offset:位置偏移
@@ -13,9 +13,9 @@ do
     local attr
 
     -- 初始化，只调用一次
-    function _cell.init (csObj)
-        csSelf = csObj;
-        transform = csSelf.transform;
+    function _cell.init(csObj)
+        csSelf = csObj
+        transform = csSelf.transform
         --[[
         上的组件：getChild(transform, "offset", "Progress BarHong"):GetComponent("UISlider");
         --]]
@@ -30,8 +30,8 @@ do
 
     -- 显示，
     -- 注意，c#侧不会在调用show时，调用refresh
-    function _cell.show (go, data)
-        mData = data;
+    function _cell.show(go, data)
+        mData = data
         ---@type NetProtoIsland.ST_building
         serverData = mData.data
         local attrid = bio2number(serverData.attrid)
@@ -46,17 +46,17 @@ do
         end
 
         if isNilOrEmpty(mData.label) then
-            SetActive(uiobjs.Label.gameObject, false)
+            uiobjs.Label.enabled = false
         else
-            SetActive(uiobjs.Label.gameObject, true)
+            uiobjs.Label.enabled = true
             uiobjs.Label.text = mData.label
         end
 
         if isNilOrEmpty(mData.icon) then
-            SetActive(uiobjs.spriteIcon.gameObject, false)
+            uiobjs.spriteIcon.enabled = false
         else
             CLUIUtl.setSpriteFit(uiobjs.spriteIcon, mData.icon, 60)
-            SetActive(uiobjs.spriteIcon.gameObject, true)
+            uiobjs.spriteIcon.enabled = true
         end
     end
 
@@ -67,10 +67,10 @@ do
     end
 
     -- 取得数据
-    function _cell.getData ()
-        return mData;
+    function _cell.getData()
+        return mData
     end
 
     --------------------------------------------
-    return _cell;
+    return _cell
 end

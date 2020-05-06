@@ -1955,14 +1955,16 @@ public class UICamera : MonoBehaviour
 					float time = RealTime.time;
 
 					if (onClick != null) onClick(currentTouch.pressed);
+                    if (currentTouch == null) return; //add by chenbin
 					Notify(currentTouch.pressed, "OnClick", null);
-
-					if (currentTouch.clickTime + 0.35f > time)
+                    if (currentTouch == null) return; //add by chenbin
+                    if (currentTouch.clickTime + 0.35f > time)
 					{
 						if (onDoubleClick != null) onDoubleClick(currentTouch.pressed);
 						Notify(currentTouch.pressed, "OnDoubleClick", null);
-					}
-					currentTouch.clickTime = time;
+                    }
+                    if (currentTouch == null) return; //add by chenbin
+                    currentTouch.clickTime = time;
 				}
 			}
 			else if (currentTouch.dragStarted) // The button/touch was released on a different object

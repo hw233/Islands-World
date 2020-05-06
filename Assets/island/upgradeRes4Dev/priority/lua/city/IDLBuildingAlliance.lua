@@ -1,4 +1,4 @@
-﻿---@public 联盟港口
+﻿---public 联盟港口
 require("city.IDLBuildingDefense")
 
 ---@class IDLBuildingAlliance:IDLBuildingDefense
@@ -23,7 +23,7 @@ function IDLBuildingAlliance:init(selfObj, id, star, lev, _isOffense, other)
     self.TriggerRadius = self.TriggerRadius / 100
 end
 
----@public 显示攻击范围
+---public 显示攻击范围
 function IDLBuildingAlliance:showAttackRang()
     if MyCfg.mode == GameMode.battle then
         -- 战斗中不能显示陷阱的范围，不然就穿邦了

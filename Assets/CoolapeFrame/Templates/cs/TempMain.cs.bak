@@ -9,8 +9,4 @@ public class #SCRIPTNAME# : CLMainBase
 		base.init ();
 	}
 
-	public override void doOffline ()
-	{
-		base.doOffline ();
-	}
 }

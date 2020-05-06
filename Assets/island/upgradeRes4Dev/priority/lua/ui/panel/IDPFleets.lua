@@ -83,6 +83,7 @@ function IDPFleets.onClickFleet(cell)
     data.toPos = mData.toPos
     data.fleetTask = mData.fleetTask
     data.isAttackIsland = mData.isAttackIsland
+    data.isAttackFleet = mData.isAttackFleet
     uiobjs.fleetsInfor.show(nil, data)
 end
 

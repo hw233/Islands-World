@@ -58,6 +58,18 @@ function m:SetCustomParticleData(customData, streamIndex) end
 ---@param optional List`1 customData
 ---@param optional ParticleSystemCustomData streamIndex
 function m:GetCustomParticleData(customData, streamIndex) end
+---public PlaybackState GetPlaybackState()
+---@return PlaybackState
+function m:GetPlaybackState() end
+---public Void SetPlaybackState(PlaybackState playbackState)
+---@param optional PlaybackState playbackState
+function m:SetPlaybackState(playbackState) end
+---public Trails GetTrails()
+---@return Trails
+function m:GetTrails() end
+---public Void SetTrails(Trails trailData)
+---@param optional Trails trailData
+function m:SetTrails(trailData) end
 ---public Void Simulate(Single t)
 ---public Void Simulate(Single t, Boolean withChildren)
 ---public Void Simulate(Single t, Boolean withChildren, Boolean restart)
@@ -103,7 +115,5 @@ function m:Emit(emitParams, count) end
 function m:TriggerSubEmitter(subEmitterIndex, particles) end
 ---public Void ResetPreMappedBufferMemory()
 function m.ResetPreMappedBufferMemory() end
----public Void ClearJob()
-function m:ClearJob() end
 UnityEngine.ParticleSystem = m
 return m

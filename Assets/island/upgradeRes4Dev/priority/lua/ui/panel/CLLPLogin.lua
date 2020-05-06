@@ -183,6 +183,10 @@ do
                             return
                         end
                         local server = content.server
+                        if not server then
+                            SetActive(uiobjs.ButtonEntry, true)
+                            return
+                        end
                         local state = server.status
                         if state == 3 then
                             -- 服务器停服了

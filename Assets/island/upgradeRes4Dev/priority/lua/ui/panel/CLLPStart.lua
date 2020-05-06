@@ -8,6 +8,7 @@ local panelIndex = 0
 
 -- 放在后面加载的页面
 local lateLoadPanels = {
+    "PanelMain",
     "PanelSceneManager" -- 切换场景页面
 }
 
@@ -25,15 +26,36 @@ function CLLPStart.init(go)
     transform = csSelf.transform
     gameObject = csSelf.gameObject
     -- 加载一些必要的lua
-    CLLPStart.setLuasAtBegainning()
+    pcall(CLLPStart.setLuasAtBegainning)
 end
 
 -- 加载一些必要的lua
 function CLLPStart.setLuasAtBegainning()
+    require "public.CLLInclude"
+
+    -- 日志监听开关
+    -- if ReporterMessageReceiver and ReporterMessageReceiver.self and ReporterMessageReceiver.self.gameObject then
+    --     if CLLWhiteList.isWhiteName() then
+    --         ReporterMessageReceiver.self.gameObject:SetActive(true)
+    --     else
+    --         ReporterMessageReceiver.self.gameObject:SetActive(false)
+    --     end
+    -- end
+
     -- 取得数据配置
     require("cfg.DBCfg")
     require("public.IDUtl")
     require("public.IDConst")
+
+    --UIAtlas.releaseSpriteTime = 5 -- 释放ui资源的时间（秒）
+
+    -- 设置是否可以成多点触控
+    -- CLCfgBase.self.uiCamera:GetComponent("UICamera").allowMultiTouch = false
+
+    -- if (SystemInfo.systemMemorySize < 2048) then
+    --     CLCfgBase.self.isFullEffect = false
+    -- end
+
     -- 网络
     Net.self:setLua()
     -- 资源释放时间
@@ -41,13 +63,6 @@ function CLLPStart.setLuasAtBegainning()
         CLAssetsManager.self.timeOutSec4Realse = 60
     end
 
-    -- if ReporterMessageReceiver.self and ReporterMessageReceiver.self.gameObject then
-    --     if KKWhiteList.isWhiteName() then
-    --         ReporterMessageReceiver.self.gameObject:SetActive(true)
-    --     else
-    --         ReporterMessageReceiver.self.gameObject:SetActive(false)
-    --     end
-    -- end
     CLPanelManager.self.mainPanelName = "PanelMain"
     -- 添加屏蔽字
     --MyMain.self:invoke4Lua(CLLPStart.addShieldWords, 1)
@@ -60,6 +75,10 @@ function CLLPStart.setLuasAtBegainning()
     --IDLBuildingSize.init()
     local worldmap = getCC(MyMain.self.transform, "worldmap", "CLBaseLua")
     worldmap:setLua()
+
+    -- 数据缓存
+    require "db.IDDBRoot"
+    IDDBRoot.init()
 end
 
 function CLLPStart.setData(pars)
@@ -160,6 +179,8 @@ function CLLPStart.procNetwork(cmd, succ, msg, pars)
                 ]]
             hideHotWheel()
         elseif cmd == NetProtoIsland.cmds.sendNetCfg then
+            IDDBRoot.clean()
+
             -- 服务器通知的网络相关配置，可以发送请求了
             showHotWheel()
             local uid = user.idx
@@ -175,7 +196,23 @@ function CLLPStart.procNetwork(cmd, succ, msg, pars)
                 end
             end
             CLLNet.send(
-                NetProtoIsland.send.login(uid, getChlCode(), Utl.uuid, MyCfg.self.isEditScene or __EditorMode__)
+                NetProtoIsland.send.login(
+                    uid,
+                    getChlCode(),
+                    1,
+                    Utl.uuid,
+                    MyCfg.self.isEditScene or __EditorMode__,
+                    function(orgs, data)
+                        ---@type NetProtoIsland.RC_login
+                        local result = data
+                        if result.retInfor == nil or bio2number(result.retInfor.code) ~= NetSuccess then
+                            CLLPStart.back2Splash()
+                        end
+                        hideHotWheel()
+                    end,
+                    nil,
+                    10
+                )
             )
         elseif cmd == NetProtoIsland.cmds.login then
             hideHotWheel()
@@ -197,21 +234,19 @@ function CLLPStart.procNetwork(cmd, succ, msg, pars)
         -- 接口返回不成功
         if (cmd == "outofNetConnect") then
             hideHotWheel()
-            CLUIUtl.showConfirm(
-                LGet("MsgOutofConnect"),
-                CLLPStart.connectServer,
-                function()
-                    local p = CLPanelManager.getPanel("PanelSplash")
-                    if (p ~= nil) then
-                        CLPanelManager.showPanel(p)
-                    end
-                    hideTopPanel()
-                end
-            )
+            CLUIUtl.showConfirm(LGet("MsgOutofConnect"), CLLPStart.connectServer, CLLPStart.back2Splash)
         else
             CLAlert.add(msg, Color.red, 1)
         end
     end
+end
+
+function CLLPStart.back2Splash()
+    local p = CLPanelManager.getPanel("PanelSplash")
+    if (p ~= nil) then
+        CLPanelManager.showPanel(p)
+    end
+    hideTopPanel()
 end
 
 -- 点击返回键关闭自己（页面）

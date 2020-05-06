@@ -8,6 +8,7 @@ local mData = nil --[[
     mData.offset:位置偏移
     --]]
 local uiobjs = {}
+local iconSize = 55
 
 -- 初始化，只调用一次
 function _cell.init(csObj)
@@ -37,11 +38,34 @@ function _cell.show(go, data)
     mData.diff = mData.endtime - mData.starttime
     uiobjs.followTarget:setTarget(mData.target.transform, mData.offset or Vector3.zero)
     if bio2number(serverData.state) == IDConst.BuildingState.upgrade then
-        CLUIUtl.setSpriteFit(uiobjs.spriteIcon, "icon_build", 80)
+        CLUIUtl.setSpriteFit(uiobjs.spriteIcon, "icon_build", iconSize)
     elseif bio2number(serverData.state) == IDConst.BuildingState.working then
         if bio2number(serverData.attrid) == IDConst.BuildingID.dockyardBuildingID then
             local shipID = bio2number(serverData.val)
-            CLUIUtl.setSpriteFit(uiobjs.spriteIcon, joinStr("roleIcon_", shipID), 80)
+            CLUIUtl.setSpriteFit(uiobjs.spriteIcon, joinStr("roleIcon_", shipID), iconSize)
+        elseif bio2number(serverData.attrid) == IDConst.BuildingID.TechCenter then
+            -- 科技中心
+            local techIdx = bio2number(serverData.val)
+            local tech = IDDBCity.curCity:getTechByIdx(techIdx)
+            if tech then
+                ---@type DBCFTechData
+                local attr = DBCfg.getDataById(DBCfg.CfgPath.Tech, bio2number(tech.id))
+                if attr then
+                    CLUIUtl.setSpriteFit(uiobjs.spriteIcon, attr.Icon, iconSize)
+                else
+                    printe("get tech attr is nil!!")
+                end
+            end
+        elseif bio2number(serverData.attrid) == IDConst.BuildingID.MagicAltar then
+            -- 魔法坛
+            local magicId = bio2number(serverData.val)
+            ---@type DBCFMagicData
+            local attr = DBCfg.getDataById(DBCfg.CfgPath.Magic, magicId)
+            if attr then
+                CLUIUtl.setSpriteFit(uiobjs.spriteIcon, attr.Icon, iconSize)
+            else
+                printe("get tech attr is nil!!")
+            end
         end
     end
 

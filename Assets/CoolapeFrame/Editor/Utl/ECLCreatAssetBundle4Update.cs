@@ -44,20 +44,20 @@ public class ECLCreatAssetBundle4Update
 		createUnity3dFiles (path, null, true);
 	}
 
-	public static void createAssets4Upgrade (string file, bool isCompress = true)
+	public static bool createAssets4Upgrade (string file, bool isCompress = true)
 	{
 		if (string.IsNullOrEmpty (file))
-			return;
+			return false;
 		string path = Path.GetDirectoryName (file);
-		createAssets4Upgrade (path, AssetDatabase.LoadMainAssetAtPath (file), isCompress);
+		return createAssets4Upgrade (path, AssetDatabase.LoadMainAssetAtPath (file), isCompress);
 	}
 
-	public static void createAssets4Upgrade (string file, UnityEngine.Object obj, bool isCompress)
+	public static bool createAssets4Upgrade (string file, UnityEngine.Object obj, bool isCompress)
 	{
 //		Debug.Log (file);
 		if (string.IsNullOrEmpty (file) || obj == null) {
 			Debug.LogError ("file==" + file);
-			return;
+			return false;
 		}
 		cleanShardAssets (obj);
         //==================================
@@ -72,32 +72,33 @@ public class ECLCreatAssetBundle4Update
 		}
 		
 		string bundlePath = "";
+        bool success = false;
         //		Directory.CreateDirectory (Application.dataPath + "/" + file);
 #if UNITY_ANDROID
 		bundlePath = file + "/Android/" + obj.name + ".unity3d";
 		Directory.CreateDirectory (Path.GetDirectoryName (bundlePath));
 		Debug.Log ("bundlePath==" + bundlePath);
-        BuildPipeline.BuildAssetBundle (obj, null, bundlePath, opt, BuildTarget.Android);
+        success = BuildPipeline.BuildAssetBundle (obj, null, bundlePath, opt, BuildTarget.Android);
 #elif UNITY_IPHONE || UNITY_IOS
 		bundlePath  = file + "/IOS/" +obj.name +  ".unity3d";
 		Directory.CreateDirectory(Path.GetDirectoryName(bundlePath));
-        BuildPipeline.BuildAssetBundle(obj, null, bundlePath, opt, BuildTarget.iOS);
+        success = BuildPipeline.BuildAssetBundle(obj, null, bundlePath, opt, BuildTarget.iOS);
 #elif UNITY_STANDALONE_WIN
 		bundlePath = file + "/Standalone/" + obj.name + ".unity3d";
 		Directory.CreateDirectory (Path.GetDirectoryName (bundlePath));
 		Debug.Log ("bundlePath==" + bundlePath);
-		BuildPipeline.BuildAssetBundle (obj, null, bundlePath, opt, BuildTarget.StandaloneWindows64);
+		success = BuildPipeline.BuildAssetBundle (obj, null, bundlePath, opt, BuildTarget.StandaloneWindows64);
 #elif UNITY_STANDALONE_OSX
         bundlePath = file + "/StandaloneOSX/" + obj.name + ".unity3d";
         Directory.CreateDirectory (Path.GetDirectoryName (bundlePath));
         Debug.Log ("bundlePath==" + bundlePath);
-        BuildPipeline.BuildAssetBundle (obj, null, bundlePath, opt, BuildTarget.StandaloneOSX);
+        success = BuildPipeline.BuildAssetBundle (obj, null, bundlePath, opt, BuildTarget.StandaloneOSX);
 #elif UNITY_WEBGL
         bundlePath = file + "/WebGL/" + obj.name + ".unity3d";
         Directory.CreateDirectory (Path.GetDirectoryName (bundlePath));
         Debug.Log ("bundlePath==" + bundlePath);
         //BuildPipeline.BuildAssetBundle (obj, null, bundlePath, opt, BuildTarget.WebGL);
-        BuildPipeline.BuildAssetBundle (obj, null, bundlePath, opt, BuildTarget.WebGL);
+        success = BuildPipeline.BuildAssetBundle (obj, null, bundlePath, opt, BuildTarget.WebGL);
 #endif
         FileInfo fileInfo = new FileInfo (bundlePath);
 		long size = (fileInfo.Length / 1024);
@@ -109,6 +110,7 @@ public class ECLCreatAssetBundle4Update
 
 		//==================================
 		resetShardAssets (obj);
+        return success;
 	}
 
 	public static void cleanShardAssets (UnityEngine.Object obj)

@@ -1,4 +1,4 @@
-﻿---@public 防御建筑:死亡电塔
+﻿---public 防御建筑:死亡电塔
 require("city.IDLBuildingDefense")
 
 ---@class IDLBuildingDefenseLightning:IDLBuildingDefense

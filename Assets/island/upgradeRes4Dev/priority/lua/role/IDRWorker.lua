@@ -45,7 +45,7 @@ function IDRWorker:run()
     end
 end
 
----@public 当A星网格刷新的回调
+---public 当A星网格刷新的回调
 function IDRWorker:onAstarChgCallback()
     if (not self.gameObject.activeInHierarchy) then
         return
@@ -57,7 +57,7 @@ function IDRWorker:onAstarChgCallback()
     end
 end
 
----@public 当寻路完成后的回调
+---public 当寻路完成后的回调
 function IDRWorker:onSearchPath(pathList, canReach)
     self.currIndex = self.grid:GetCellIndex(self.transform.position)
     self.oldIndex = self.currIndex
@@ -76,7 +76,7 @@ function IDRWorker:onMoving()
     end
 end
 
----@public 刷新影子的位置
+---public 刷新影子的位置
 function IDRWorker:repositionShadow()
     if self.shadow then
         self.tmpPos = self.transform.position
@@ -103,7 +103,7 @@ function IDRWorker:onArrived()
     end
 end
 
----@public 显示船
+---public 显示船
 function IDRWorker:showShip(index)
     if IDMainCity.isOnTheLandOrBeach(index) then
         -- 在陆地上

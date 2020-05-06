@@ -19,7 +19,7 @@
 //                   `=---='
 //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //           佛祖保佑       永无BUG
-//           游戏大卖       公司腾飞
+//           游戏大卖       经济自由
 //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 --]]
 --//TODO:角色在地表行走时，还要考虑那那个是假地块的情况
@@ -142,11 +142,9 @@ function IDRoleBase:init(selfObj, id, star, lev, _isOffense, other)
             self:wrapFunction4CS(self.onMoving),
             self:wrapFunction4CS(self.onArrived)
         )
-        local speed = bio2number(self.attr.MoveSpeed) / 100
-        speed = speed * (1 + self.csSelf:fakeRandom(-100, 100) / 1000)
-        self.seeker.speed = speed
+        self:setMoveSpeed(1)
     end
-
+    self:setAttackSpeed(1)
     self:regain()
 
     if not other.hideShadow then
@@ -157,7 +155,7 @@ function IDRoleBase:init(selfObj, id, star, lev, _isOffense, other)
     SetActive(self.body.gameObject, false)
     self.assets:init(self:wrapFunc(self.dress), IDConst.dressMode.normal)
 
-    if GameMode.battle == MyCfg.mode then
+    if GameMode.battle == MyCfg.mode or GameMode.battleFleet == MyCfg.mode then
         -- 战斗时，初始化数据
         ---@type UnitData4Battle
         self.data = {}
@@ -187,12 +185,26 @@ function IDRoleBase:init(selfObj, id, star, lev, _isOffense, other)
     end
 end
 
--- function IDRoleBase:uiEventDelegate(go)
---     -- 进入这个方法，说明资源加载好了
---     self:dress(IDConst.dressMode.normal)
--- end
+---public 设置移动速度
+---@param persent number 百分比
+function IDRoleBase:setMoveSpeed(persent)
+    persent = persent or 1
+    if self.seeker then
+        local speed = bio2number(self.attr.MoveSpeed) / 100
+        speed = speed * (1 + self.csSelf:fakeRandom(-100, 100) / 1000)
+        self.seeker.speed = speed * persent
+    end
+end
 
----@public 换装
+function IDRoleBase:setAttackSpeed(persent)
+    self.attackSpeed = bio2number(self.attr.AttackSpeedMS) / 1000 * persent
+end
+
+function IDRoleBase:getAttackSpeed()
+    return self.attackSpeed
+end
+
+---public 换装
 ---@param mode  IDConst.dressMode
 function IDRoleBase:dress(mode)
     if self.avata == nil then
@@ -201,6 +213,8 @@ function IDRoleBase:dress(mode)
     end
     if mode == IDConst.dressMode.ice then
         self.avata:switch2xx("body", "2", self:wrapFunc(self.onFinishDress))
+    elseif mode == IDConst.dressMode.red then
+        self.avata:switch2xx("body", "3", self:wrapFunc(self.onFinishDress))
     else
         self.avata:switch2xx("body", "1", self:wrapFunc(self.onFinishDress))
     end
@@ -210,7 +224,7 @@ function IDRoleBase:onFinishDress()
     SetActive(self.body.gameObject, true)
 end
 
----@public 加载影子
+---public 加载影子
 function IDRoleBase:loadShadow()
     if self.attr == nil then
         return
@@ -242,7 +256,7 @@ function IDRoleBase:loadShadow()
     end
 end
 
----@public 播放动作
+---public 播放动作
 function IDRoleBase:playAction(actionName, onCompleteMotion)
     if self.action == nil then
         printe("self.action is nil")
@@ -254,7 +268,7 @@ function IDRoleBase:playAction(actionName, onCompleteMotion)
     self.action:setAction(getAction(actionName), onCompleteMotion)
 end
 
----@public 当动作播放完的通用回调
+---public 当动作播放完的通用回调
 function IDRoleBase:onActionFinish(act)
     local actVal = act.currActionValue
     if getAction("idel") == actVal then
@@ -273,7 +287,7 @@ function IDRoleBase:idel()
     self:playAction("idel")
 end
 
----@public 被击中
+---public 被击中
 ---@param damage number 伤害值
 ---@param attacker IDLUnitBase 攻击方
 function IDRoleBase:onHurt(damage, attacker)
@@ -291,7 +305,7 @@ function IDRoleBase:iamDie()
     end
 end
 
----@public 播放死亡音效，播完后再通知战场
+---public 播放死亡音效，播完后再通知战场
 function IDRoleBase:playDeadSund(i)
     if i == 0 then
         SoundEx.playSound("heavy_die_01", 1, 1)
@@ -308,10 +322,19 @@ function IDRoleBase:playDeadSund(i)
     end
 end
 
----@public 冰冻
+function IDRoleBase:chgState(state)
+    -- 清理掉之前状态的相关处理
+    if self.state == IDConst.RoleState.frozen then
+        self:unFrozen()
+    elseif self.state == IDConst.RoleState.wild then
+        self:unsetWild()
+    end
+    self.state = state
+end
+
+---public 冰冻
 function IDRoleBase:frozen(sec)
-    --//TODO:注意冰冻会不会影响其它的处理
-    self.state = IDConst.RoleState.frozen
+    self:chgState(IDConst.RoleState.frozen)
     local leftTime = self.frozenTime - DateEx.nowMS
     if leftTime >= sec * 1000 then
         return
@@ -323,7 +346,7 @@ function IDRoleBase:frozen(sec)
     InvokeEx.invokeByFixedUpdate(self:wrapFunc(self.unFrozen), sec)
 end
 
----@public 解除冰冻
+---public 解除冰冻
 function IDRoleBase:unFrozen()
     self.state = IDConst.RoleState.idel
     self:dress(IDConst.dressMode.normal)
@@ -350,11 +373,11 @@ function IDRoleBase:regain()
     end
 end
 
----@public 当Astar 网格刷新时回调
+---public 当Astar 网格刷新时回调
 function IDRoleBase:onAstarChgCallback()
 end
 
----@public 当寻路完成
+---public 当寻路完成
 function IDRoleBase:onSearchPath(pathList, canReach)
     if MyCfg.mode == GameMode.battle then
         InvokeEx.cancelInvokeByFixedUpdate(self:wrapFunc(self.refresh4Searcher))
@@ -385,12 +408,20 @@ function IDRoleBase:onSearchPath(pathList, canReach)
     end
 end
 
----@public 不可攻击目标
+function IDRoleBase:moveTo4FleetBattle(toPos, target)
+    self.target = target
+    self.seeker.pathList:Clear()
+    self.seeker.pathList:Add(self.transform.position)
+    self.seeker.pathList:Add(toPos)
+    self.seeker:startMove()
+end
+
+---public 不可攻击目标
 function IDRoleBase:onCannotReach4AttackTarget()
     printw("//TODO:不可攻击目标")
 end
 
----@public 战斗时，要定时刷新寻敌器的位置
+---public 战斗时，要定时刷新寻敌器的位置
 function IDRoleBase:refresh4Searcher()
     if MyCfg.mode == GameMode.battle then
         IDLBattle.searcher.refreshUnit(self)
@@ -398,7 +429,7 @@ function IDRoleBase:refresh4Searcher()
     end
 end
 
----@public 当移动过程中的回调
+---public 当移动过程中的回调
 function IDRoleBase:onMoving()
     self:repositionShadow()
     local pos = self.transform.position
@@ -409,10 +440,21 @@ function IDRoleBase:onMoving()
             self.seeker:stopMove()
             self:onArrived()
         end
+    elseif MyCfg.mode == GameMode.battleFleet then
+        if self.target then
+            local pos1 = self.transform.position
+            pos1.y = 0
+            local pos2 = self.target.transform.position
+            pos2.y = 0
+            local dis = Vector3.Distance(pos1, pos2)
+            if dis <= self.MaxAttackRange then
+                self.seeker:stopMove()
+            end
+        end
     end
 end
 
----@public 刷新影子的位置
+---public 刷新影子的位置
 function IDRoleBase:repositionShadow()
     if self.shadow then
         self.tmpPos = self.transform.position
@@ -421,28 +463,30 @@ function IDRoleBase:repositionShadow()
     end
 end
 
----@public 检测是否已经可以攻击目标了
+---public 检测是否已经可以攻击目标了
 function IDRoleBase:checkArrived()
-    if self.target then
-        local index1 = IDLBattle.searcher.getRoleIndex(self)
-        local index2
-        if self.target.isRole then
-            index2 = IDLBattle.searcher.getRoleIndex(self.target)
-        else
-            index2 = self.target.gridIndex
-        end
-        local dis = IDLBattle.searcher.getDistance(index1, index2)
-        if self.target.isBuilding then
-            dis = dis - self.target.size / 2
-        end
-        if dis <= self.MaxAttackRange then
-            return true
+    if GameMode.battle == MyCfg.mode then
+        if self.target then
+            local index1 = IDLBattle.searcher.getRoleIndex(self)
+            local index2
+            if self.target.isRole then
+                index2 = IDLBattle.searcher.getRoleIndex(self.target)
+            else
+                index2 = self.target.gridIndex
+            end
+            local dis = IDLBattle.searcher.getDistance(index1, index2)
+            if self.target.isBuilding then
+                dis = dis - self.target.size / 2
+            end
+            if dis <= self.MaxAttackRange then
+                return true
+            end
         end
     end
     return false
 end
 
----@public 当到达目标时的回调
+---public 当到达目标时的回调
 function IDRoleBase:onArrived()
     self:refresh4Searcher()
     InvokeEx.cancelInvokeByFixedUpdate(self:wrapFunc(self.refresh4Searcher))
@@ -451,7 +495,7 @@ function IDRoleBase:onArrived()
     end
 end
 
----@public 攻击
+---public 攻击
 function IDRoleBase:doAttack()
     if MyCfg.mode ~= GameMode.battle then
         return
@@ -467,9 +511,10 @@ function IDRoleBase:doAttack()
         if self.target.isBuilding then
             dis = disOrgs - self.target.size / 2
         end
-        
-        if (disOrgs <= self.MaxAttackRange and disOrgs >= self.MinAttackRange)
-            or (dis <= self.MaxAttackRange and dis >= self.MinAttackRange)
+
+        if
+            (disOrgs <= self.MaxAttackRange and disOrgs >= self.MinAttackRange) or
+                (dis <= self.MaxAttackRange and dis >= self.MinAttackRange)
          then
             -- 可以直接攻击到
             self:startFire(self.target)
@@ -482,12 +527,12 @@ function IDRoleBase:doAttack()
             self:onDead()
         else
             -- 防守方如果找不到敌人，那就等着，可能还会有新的加入
-            InvokeEx.invokeByFixedUpdate(self:wrapFunc(self.doAttack), bio2number(self.attr.AttackSpeedMS) / 1000)
+            InvokeEx.invokeByFixedUpdate(self:wrapFunc(self.doAttack), self:getAttackSpeed())
         end
     end
 end
 
----@public 开始寻路
+---public 开始寻路
 function IDRoleBase:searchPath(toPos)
     -- 寻路过去
     if self.isSeekbyRay then
@@ -547,7 +592,7 @@ function IDRoleBase:startFire(target)
     if not (self.isPause or self.state == IDConst.RoleState.frozen) then
         self:fire(target)
     end
-    InvokeEx.invokeByFixedUpdate(self:wrapFunc(self.startFire), target, bio2number(self.attr.AttackSpeedMS) / 1000)
+    InvokeEx.invokeByFixedUpdate(self:wrapFunc(self.startFire), target, self:getAttackSpeed())
 end
 
 ---@param target IDLUnitBase
@@ -560,7 +605,7 @@ function IDRoleBase:fire(target)
     SoundEx.playSound(self.attr.AttackSound, 1, 3)
 end
 
----@public 取得伤害值
+---public 取得伤害值
 ---@param target NetProtoIsland.ST_building
 function IDRoleBase:getDamage(target)
     if target == nil then
@@ -575,16 +620,39 @@ function IDRoleBase:getDamage(target)
     return math.floor(damage)
 end
 
----@public 当子弹击中的回调
+---public 当子弹击中的回调
 ---@param bullet Coolape.CLBulletBase
 function IDRoleBase:onBulletHit(bullet)
-    IDLBattle.onBulletHit(bullet)
+    self.battle.onBulletHit(bullet)
+end
+
+---public 设置狂暴模式
+function IDRoleBase:setWild(sec)
+    if self.state ~= IDConst.RoleState.idel then
+        return
+    end
+    self:chgState(IDConst.RoleState.wild)
+    self:dress(IDConst.dressMode.red)
+    self:setMoveSpeed(1.5) -- 移动速度增加50%
+    self:setAttackSpeed(1.5) -- 攻击速度增加50%
+
+    InvokeEx.cancelInvokeByFixedUpdate(self:wrapFunc(self.unsetWild))
+    InvokeEx.invokeByFixedUpdate(self:wrapFunc(self.unsetWild), sec)
+end
+
+---public 取消狂暴模式
+function IDRoleBase:unsetWild()
+    self.state = IDConst.RoleState.idel
+    self:dress(IDConst.dressMode.normal)
+    self:setMoveSpeed(1)
+    self:setAttackSpeed(1)
 end
 
 function IDRoleBase:clean()
     InvokeEx.cancelInvokeByFixedUpdate(self:wrapFunc(self.doAttack))
     InvokeEx.cancelInvokeByFixedUpdate(self:wrapFunc(self.startFire))
     InvokeEx.cancelInvokeByFixedUpdate(self:wrapFunc(self.unFrozen))
+    InvokeEx.cancelInvokeByFixedUpdate(self:wrapFunc(self.unsetWild))
     InvokeEx.cancelInvokeByFixedUpdate(self:wrapFunc(self.refresh4Searcher))
 
     self:setTarget(nil)

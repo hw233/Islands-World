@@ -15,7 +15,7 @@ function _cell.init(csObj)
     uiobjs.LabelTitle = getCC(transform, "LabelTitle", "UILabel")
     uiobjs.LabelType = getCC(transform, "LabelType", "UILabel")
     uiobjs.LabelTime = getCC(transform, "LabelTime", "UILabel")
-    uiobjs.SpriteReddot = getChild(transform, "SpriteReddot").gameObject
+    uiobjs.SpriteState = getCC(transform, "SpriteState", "UISprite")
 end
 
 -- 显示，
@@ -23,10 +23,24 @@ end
 ---@param data NetProtoIsland.ST_mail
 function _cell.show(go, data)
     mData = data
-    uiobjs.LabelTitle.text = LWrap(mData.title, mData.titleParams)
-    uiobjs.LabelTime.text = DateEx.ToTimeCost(DateEx.nowMS - bio2number(mData.date))
+    local title = LWrap(mData.title, mData.titleParams)
+    if #(mData.historyList) > 1 then
+        uiobjs.LabelTitle.text = joinStr("Re:", title)
+    else
+        uiobjs.LabelTitle.text = title
+    end
+    uiobjs.LabelTime.text = IDUtl.timeCost(DateEx.nowMS - bio2number(mData.date))
     uiobjs.LabelType.text = LGet(IDConst.MailTypeName[bio2number(data.type)])
-    SetActive(uiobjs.SpriteReddot, bio2number(mData.state) ~= IDConst.MailState.readRewared)
+    if bio2number(mData.fromPidx) == bio2number(IDDBPlayer.myself.idx) then
+        -- 说明是自己发的邮件
+        CLUIUtl.setSpriteFit(uiobjs.SpriteState, "mail_Icon_Yj_yidu")
+    else
+        if bio2number(mData.state) == IDConst.MailState.readRewared then
+            CLUIUtl.setSpriteFit(uiobjs.SpriteState, "mail_Icon_Yj_yidu")
+        else
+            CLUIUtl.setSpriteFit(uiobjs.SpriteState, "mail_Icon_Yj_weidu")
+        end
+    end
     _cell.selected(mData.isSelected or false)
 end
 

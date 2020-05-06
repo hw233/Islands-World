@@ -20,7 +20,8 @@ namespace Coolape
 	public class CLCellLua : CLCellBase
 	{
 		public bool isNeedResetAtlase = true;
-		bool isFinishInit = false;
+        public object data;
+        bool isFinishInit = false;
 		object onClickCallback;
 		LuaFunction lfInit = null;
 		LuaFunction lfshow = null;
@@ -46,7 +47,8 @@ namespace Coolape
 		public override void init (object data, object onClick)
 		{
 			try {
-				onClickCallback = onClick;
+                this.data = data;
+                onClickCallback = onClick;
 				if (!isFinishInit) {
 					setLua ();
 					isFinishInit = true;
@@ -78,7 +80,7 @@ namespace Coolape
 		{
 			try {
 				if (onClickCallback != null) {
-                    Utl.doCallback(onClickCallback, this);
+                    Utl.doCallback(onClickCallback, this, data);
 				}
                 base.OnClick();
 			} catch (System.Exception e) {

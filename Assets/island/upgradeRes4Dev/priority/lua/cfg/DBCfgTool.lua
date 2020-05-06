@@ -4,7 +4,7 @@ local DBCfgTool = {}
 local mdb = {} -- 原始数据
 local mMaps4ID = {}
 
----@public 把json数据转成对象
+---public 把json数据转成对象
 ---@return list List 下标连续的列表
 ---@return map4ID Map 以ID为key的luatable
 function DBCfgTool.getDatas(cfgPath, isParseWithID)
@@ -49,7 +49,7 @@ function DBCfgTool.getDatas(cfgPath, isParseWithID)
     return list, map4ID
 end
 
----@public （基础数据和等级数据是分开的情况）通用取得有base数据和lev数据的表,key＝GID_Lev的形式
+---public （基础数据和等级数据是分开的情况）通用取得有base数据和lev数据的表,key＝GID_Lev的形式
 function DBCfgTool.pubGetBaseAndLevData(baseDataPath, levDataPath)
     local tmp, baseData = DBCfgTool.getDatas(baseDataPath, true)
     local levData = DBCfgTool.getDatas(levDataPath)
@@ -70,7 +70,7 @@ function DBCfgTool.pubGetBaseAndLevData(baseDataPath, levDataPath)
     return list
 end
 
----@public （基础数据和等级数据在一起的情况）通用取得有base数据和lev数据的表,key＝GID_Lev的形式
+---public （基础数据和等级数据在一起的情况）通用取得有base数据和lev数据的表,key＝GID_Lev的形式
 function DBCfgTool.pubGet4GIDLev(dataPath)
     local datas = DBCfgTool.getDatas(dataPath)
     local gid
@@ -86,7 +86,7 @@ function DBCfgTool.pubGet4GIDLev(dataPath)
     return m
 end
 
----@public 取得数据gid的分类数据列表及原始的数据map
+---public 取得数据gid的分类数据列表及原始的数据map
 ---@param dataPath string 数据路径
 ---@param gidKey string 分类的key，当为nil默认为GID
 ---@return gidListMap map key=gid, value = 以gid分类的数据列表
@@ -106,7 +106,7 @@ function DBCfgTool.pubGetList4GID(dataPath, gidKey)
         table.insert(list, v)
         gidListMap[gid] = list
     end
-    return gidListMap, map
+    return datas, map, gidListMap
 end
 
 return DBCfgTool

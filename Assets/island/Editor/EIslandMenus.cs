@@ -10,4 +10,10 @@ public class EIslandMenus
     {
         EditorWindow.GetWindow<EWorldmapCfgDataGneratorWind>(false, "Generate worldmap data", true);
     }
+
+    [MenuItem("Assets/Create/Lua Script/New Class Lua Panel", false, 81)]
+    public static void CreatNewLuaPanel()
+    {
+        ECLCreateFile.PubCreatNewFile("Assets/island/Templates/Lua/NewClassLuaPanel.lua", ECLCreateFile.GetSelectedPathOrFallback() + "/NewLuaPanel.lua");
+    }
 }

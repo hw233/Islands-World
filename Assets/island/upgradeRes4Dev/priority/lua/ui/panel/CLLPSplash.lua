@@ -277,6 +277,8 @@ do
     function CLLPSplash.onFinishResUpgrade(upgradeProcSuccess)
         if (not upgradeProcSuccess) then
             print("UpgradeResFailed")
+            CLUIUtl.showConfirm(LGet("UpgradeResFailed"), CLLPSplash.updateRes)
+            return
         else
             if (CLLVerManager.isHaveUpgrade()) then
                 -- 说明有更新，重新启动

@@ -10,12 +10,12 @@ local table = table
 local smatch = string.match
 local sfind = string.find
 
----@public 设置日志等级，分别是，debug，warning，error
+---public 设置日志等级，分别是，debug，warning，error
 function setLogLev(val)
     logLev = val or LogLev.debug
 end
 
----@public 设置日志的调用栈信息
+---public 设置日志的调用栈信息
 function setLogBackTraceLev(lev)
     logBackTraceLev = lev
 
@@ -65,7 +65,7 @@ local wrapMsg = function (...)
     local v
     for i = 1, select("#", ...) do
         v = select(i, ...)
-        if v then
+        if v or type(v) == "bool" then
             table.insert(tb, tostring(v))
         else
             table.insert(tb, "nil")

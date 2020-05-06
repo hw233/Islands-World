@@ -57,7 +57,7 @@ end
 function _cell.refreshData(data)
     mData = data
     _cell.data = mData
-    
+
     fleetHudData.target = transform
     fleetHudData.dataFleet = mData
     fleetHudData.offset = Vector3.zero
@@ -116,10 +116,7 @@ function _cell.refreshData(data)
 end
 
 function _cell.showHud()
-    if
-        bio2number(mData.status) == IDConst.FleetState.docked
-        or (not IDWorldMap.isVisibile(transform.position))
-    then
+    if bio2number(mData.status) == IDConst.FleetState.docked or (not IDWorldMap.isVisibile(transform.position)) then
         _cell.hideHud()
         return
     end
@@ -130,7 +127,11 @@ function _cell.showHud()
             "WorldTileHud",
             function(name, obj, orgs)
                 ---@param obj UnityEngine.GameObject
-                if fleetHud or (not gameObject.activeInHierarchy) then
+                if
+                    fleetHud or (not gameObject.activeInHierarchy) or
+                        bio2number(mData.status) == IDConst.FleetState.docked or
+                        (not IDWorldMap.isVisibile(transform.position))
+                 then
                     CLUIOtherObjPool.returnObj(obj)
                     SetActive(obj, false)
                     return
@@ -433,9 +434,9 @@ function _cell.IamIdel(canWalkAround)
     _cell.stopMove()
     canWalkAround = canWalkAround == nil and false or canWalkAround
     if (canWalkAround) then
-        csSelf.state = RoleState.walkAround
+        csSelf.state = IDConst.RoleState.walkAround
     else
-        csSelf.state = RoleState.idel
+        csSelf.state = IDConst.RoleState.idel
     end
 
     for i, v in ipairs(ships) do

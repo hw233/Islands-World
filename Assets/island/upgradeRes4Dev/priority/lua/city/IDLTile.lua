@@ -211,7 +211,7 @@ function cell.initSides()
     cell.sides = {left1, left2, right1, right2, up1, up2, down1, down2, leftUp, leftDown, rightUp, rightDown}
 end
 
----@public 取得四边的index
+---public 取得四边的index
 function cell.getSidesIndex()
     return cell.sides
 end

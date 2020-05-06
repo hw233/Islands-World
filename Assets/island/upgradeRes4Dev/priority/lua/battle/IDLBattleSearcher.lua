@@ -32,16 +32,14 @@ function IDLBattleSearcher.init(city)
     IDLBattleSearcher.wrapBuildingInfor(city.getBuildings())
 end
 
----@public 包装建筑的数据
+---public 包装建筑的数据
 function IDLBattleSearcher.wrapBuildingInfor(_buildings)
     ---@param b IDLBuilding
     for k, b in pairs(_buildings) do
-        if not 
-            (b.isTrap or b.isTree 
-            or bio2number(b.attr.GID) == IDConst.BuildingGID.decorate
-            or bio2number(b.serverData.state) == IDConst.BuildingState.renew
-            ) 
-        then
+        if
+            not (b.isTrap or b.isTree or bio2number(b.attr.GID) == IDConst.BuildingGID.decorate or
+                bio2number(b.serverData.state) == IDConst.BuildingState.renew)
+         then
             buildings[k] = b
             -- 把建筑距离海边最近的点找到，以方便当舰船无法到达最近目标时，找一个可以到达的目标
             local beachInfor = IDLBattleSearcher.getNearestBeach(b)
@@ -95,7 +93,7 @@ function IDLBattleSearcher.wrapBuildingInfor(_buildings)
     )
 end
 
----@public 取得建筑离最近的海岸的信息
+---public 取得建筑离最近的海岸的信息
 ---@param b IDLBuilding
 function IDLBattleSearcher.getNearestBeach(b)
     local list
@@ -112,7 +110,7 @@ function IDLBattleSearcher.getNearestBeach(b)
     end
 end
 
----@public 按照离建筑的远近排序
+---public 按照离建筑的远近排序
 ---@param building IDLBuilding
 function IDLBattleSearcher.sortGridCells(building, min, max, cells)
     local count = cells.Count
@@ -170,19 +168,19 @@ function IDLBattleSearcher.debugBuildingAttackRange(building)
     end
 end
 
----@public 要取得圆的范围，因此取得了圆的外切正方形的边长
+---public 要取得圆的范围，因此取得了圆的外切正方形的边长
 function IDLBattleSearcher.calculateSize(r)
     return r * 2
     -- return NumEx.getIntPart(math.sqrt(2 * (r * r)) + 0.5)
 end
 
----@public 刷新舰船的位置
+---public 刷新舰船的位置
 ---@param unit IDRoleBase
 function IDLBattleSearcher.refreshUnit(unit)
     --//注意所有移动的战斗单元需要定时刷新
     local index = grid.grid:GetCellIndex(unit.transform.position)
     if index < 0 then
-        -- 说明投放在网格区域外
+    -- 说明投放在网格区域外
     end
     if unit.isOffense then
         local oldIndex = rolesIndex[unit]
@@ -211,7 +209,7 @@ function IDLBattleSearcher.refreshUnit(unit)
     rolesIndex[unit] = index
 end
 
----@public 取得两个网格间的距离
+---public 取得两个网格间的距离
 function IDLBattleSearcher.getDistance(index1, index2)
     local key = joinStr(index1, "_", index2)
     local dis = disCache[key]
@@ -228,7 +226,7 @@ function IDLBattleSearcher.getDistance(index1, index2)
     end
 end
 
----@public 寻敌
+---public 寻敌
 ---@param targetsNum number 目标数量
 function IDLBattleSearcher.searchTarget(unit, targetsNum)
     if unit.isBuilding then
@@ -240,7 +238,7 @@ function IDLBattleSearcher.searchTarget(unit, targetsNum)
     end
 end
 
----@public 防御设施寻敌人
+---public 防御设施寻敌人
 ---@param building IDLBuilding
 ---@param targetsNum number 目标数量默认是1个
 function IDLBattleSearcher.buildingSearchRole4Def(building, targetsNum)
@@ -325,7 +323,7 @@ function IDLBattleSearcher.buildingSearchRole4Def(building, targetsNum)
     end
 end
 
----@public 角色寻敌(注意角色只能找一个目标，不能同时找多个目标)
+---public 角色寻敌(注意角色只能找一个目标，不能同时找多个目标)
 ---@param role IDRoleBase
 function IDLBattleSearcher.searchTarget4Role(role)
     local tempList = {}
@@ -387,7 +385,7 @@ function IDLBattleSearcher.searchTarget4Role(role)
     end
 end
 
----@public 取得离海岸最近的建筑
+---public 取得离海岸最近的建筑
 ---@param role IDRoleBase 角色
 ---@param order number 取得第x近的建筑
 function IDLBattleSearcher.getNearestBuildingWithBeach(role, order)
@@ -449,6 +447,9 @@ function IDLBattleSearcher.isTarget(attacker, unit, onlyOnGroundOrSky)
     if unit.isDead then
         return false
     end
+    if attacker.isSkill then
+        return true
+    end
     if bio2number(attacker.attr.GID) == IDConst.RoleGID.solider then
         -- 士兵
         if unit.attr.IsFlying then
@@ -494,7 +495,7 @@ function IDLBattleSearcher.isTarget(attacker, unit, onlyOnGroundOrSky)
     end
 end
 
----@public 取得范围内的最优目标
+---public 取得范围内的最优目标
 ---@param attacker IDLUnitBase
 ---@param pos UnityEngine.Vector3
 ---@param r number 半径
@@ -504,7 +505,7 @@ function IDLBattleSearcher.getTargetInRange(attacker, pos, r)
     local index = grid.grid:GetCellIndex(pos)
     local cells = grid:getOwnGrids(index, NumEx.getIntPart(r * 2))
     local list = nil
-    if attacker.isOffense then
+    if attacker.isOffense and (not IDLBattleSearcher.isRepairUnit(attacker)) then
         list = defense
     else
         list = offense
@@ -537,7 +538,15 @@ function IDLBattleSearcher.getTargetInRange(attacker, pos, r)
     return nil
 end
 
----@public 取得范围内的所有目标
+---@param unit IDRoleBase
+function IDLBattleSearcher.isRepairUnit(unit)
+    if bio2number(unit.attr.DamageMin) < 0 then
+        return true
+    end
+    return false
+end
+
+---public 取得范围内的所有目标
 ---@param attacker IDLUnitBase
 ---@param pos UnityEngine.Vector3
 ---@param r number 半径
@@ -546,7 +555,7 @@ function IDLBattleSearcher.getTargetsInRange(attacker, pos, r)
     local index = grid.grid:GetCellIndex(pos)
     local cells = grid:getOwnGrids(index, NumEx.getIntPart(r * 2))
     local list = nil
-    if attacker.isOffense then
+    if attacker.isOffense and (not IDLBattleSearcher.isRepairUnit(attacker)) then
         list = defense
     else
         list = offense
@@ -613,12 +622,12 @@ function IDLBattleSearcher.someOneDead(unit)
     end
 end
 
----@public 取得角色的index坐标
+---public 取得角色的index坐标
 function IDLBattleSearcher.getRoleIndex(role)
     return rolesIndex[role]
 end
 
----@public 是否有建筑还没有死掉，注意不包括陷阱、树、装饰(//TODO:后续可以考虑给装饰加上功能效果，然后可以被摧毁)
+---public 是否有建筑还没有死掉，注意不包括陷阱、树、装饰(//TODO:后续可以考虑给装饰加上功能效果，然后可以被摧毁)
 function IDLBattleSearcher.hadBuildingAlive()
     ---@param b IDLBuilding
     for k, b in pairs(buildings) do

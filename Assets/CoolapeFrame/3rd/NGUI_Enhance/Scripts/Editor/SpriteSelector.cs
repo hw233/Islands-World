@@ -58,6 +58,7 @@ public class SpriteSelector : ScriptableWizard
                 if(before != after)
                 {
                     NGUISettings.partialSprite = after;
+                    searchNow = false;
                 }
                 if (GUILayout.Button("", "SearchCancelButton", GUILayout.Width(18f)))
     			{

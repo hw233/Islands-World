@@ -6,6 +6,7 @@ local transform = nil
 ---@type NetProtoIsland.ST_mail
 local mData = nil
 local uiobjs = {}
+local table = table
 
 -- 初始化，只调用一次
 function _cell.init(csObj)
@@ -23,8 +24,13 @@ end
 -- 注意，c#侧不会在调用show时，调用refresh
 function _cell.show(go, data)
     mData = data
+    local lines = {}
+    for i = 1, mData.lineSize do
+        table.insert(lines, "=>")
+    end
+    uiobjs.LabelLine.text = table.concat(lines, "")
     uiobjs.LabelSender.text = joinStr(LGet("Sender"), ":", mData.fromName)
-    uiobjs.LabelTime.text = DateEx.toStrCn(mData.date)
+    uiobjs.LabelTime.text = DateEx.formatByMs(bio2number(mData.date))
     uiobjs.LabelContent.text = LWrap(mData.content, mData.contentParams)
     uiobjs.table:Reposition()
 end

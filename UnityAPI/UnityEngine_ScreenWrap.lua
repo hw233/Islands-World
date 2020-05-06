@@ -2,18 +2,18 @@
 ---@field public width System.Int32
 ---@field public height System.Int32
 ---@field public dpi System.Single
----@field public orientation UnityEngine.ScreenOrientation
----@field public sleepTimeout System.Int32
----@field public autorotateToPortrait System.Boolean
----@field public autorotateToPortraitUpsideDown System.Boolean
----@field public autorotateToLandscapeLeft System.Boolean
----@field public autorotateToLandscapeRight System.Boolean
 ---@field public currentResolution UnityEngine.Resolution
+---@field public resolutions UnityEngine.Resolution
 ---@field public fullScreen System.Boolean
 ---@field public fullScreenMode UnityEngine.FullScreenMode
 ---@field public safeArea UnityEngine.Rect
 ---@field public cutouts UnityEngine.Rect
----@field public resolutions UnityEngine.Resolution
+---@field public autorotateToPortrait System.Boolean
+---@field public autorotateToPortraitUpsideDown System.Boolean
+---@field public autorotateToLandscapeLeft System.Boolean
+---@field public autorotateToLandscapeRight System.Boolean
+---@field public orientation UnityEngine.ScreenOrientation
+---@field public sleepTimeout System.Int32
 ---@field public brightness System.Single
 local m = { }
 ---public Screen .ctor()

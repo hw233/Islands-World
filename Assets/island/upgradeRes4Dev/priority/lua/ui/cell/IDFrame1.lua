@@ -9,6 +9,7 @@ local transform = nil
 ---@field public panel Coolape.CLPanelLua
 ---@field public hideClose boolean true时隐藏关闭按钮
 ---@field public hideTitle boolean true时隐藏标题
+---@field public hideContentBg boolean true时隐藏内容背景框
 
 ---@type _ParamFrameData
 local mData = nil
@@ -18,11 +19,19 @@ local uiobjs = {}
 function _cell.init(csObj)
     csSelf = csObj
     transform = csSelf.transform
-    --[[
-        上的组件：getChild(transform, "offset", "Progress BarHong"):GetComponent("UISlider");
-        --]]
-    uiobjs.BtnClose = getChild(transform, "SpriteClose").gameObject
-    uiobjs.LabelTitle = getCC(transform, "LabelTitle", "UILabel")
+    local TopRight = getChild(transform, "TopRight")
+    ---@type UISprite
+    uiobjs.SpriteBg = getCC(transform, "SpriteBg", "UISprite")
+    uiobjs.SpriteContentBg = getCC(transform, "SpriteContentBg", "UISprite")
+    uiobjs.BtnClose = getChild(TopRight, "SpriteClose").gameObject
+    uiobjs.LabelTitle = getCC(TopRight, "LabelTitle", "UILabel")
+    ---@type UIAnchor
+    uiobjs.TopRight = TopRight:GetComponent("UIAnchor")
+    local sizeAdjust = UIRoot.GetPixelSizeAdjustment(uiobjs.SpriteBg.gameObject)
+
+    local persent1 = Screen.width * sizeAdjust / 1920
+    local persent2 = Screen.height * sizeAdjust / 1080
+    uiobjs.SpriteBg.transform.localScale = Vector3.one * (persent1 > persent2 and persent1 or persent2)
 end
 
 -- 显示，
@@ -42,6 +51,13 @@ function _cell.show(go, data)
         uiobjs.LabelTitle.text = mData.title
         SetActive(uiobjs.LabelTitle.gameObject, true)
     end
+
+    if mData.hideContentBg then
+        SetActive(uiobjs.SpriteContentBg.gameObject, false)
+    else
+        SetActive(uiobjs.SpriteContentBg.gameObject, true)
+    end
+    uiobjs.TopRight.enabled = true
 end
 
 function _cell.uiEventDelegate(go)

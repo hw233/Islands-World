@@ -58,7 +58,7 @@ function IDRSoldier:onMoving()
     end
 end
 
----@public 刷新影子的位置
+---public 刷新影子的位置
 function IDRSoldier:repositionShadow()
     if self.shadow then
         self.tmpPos = self.transform.position
@@ -66,7 +66,7 @@ function IDRSoldier:repositionShadow()
     end
 end
 
----@public 走还是游泳
+---public 走还是游泳
 function IDRSoldier:runOrSwim()
     if IDMainCity.isOnTheLandOrBeach(self.currIndex) then
         self:playAction("run")
@@ -103,7 +103,7 @@ function IDRSoldier:onFinsihFire(act)
     end
 end
 
----@public 跳过去
+---public 跳过去
 function IDRSoldier:jumpTo(pos, callback)
     self.tween:flyout(pos, 0.8, 1, nil, callback, true)
 end

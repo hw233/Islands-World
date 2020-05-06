@@ -58,10 +58,10 @@ function IDPBuildShip:show()
     self:showShipList(list, false)
 end
 
----@public 包装舰船列表数据
+---public 包装舰船列表数据
 function IDPBuildShip:wrapShipList()
     local shipList = DBCfg.getRolesByGID(IDConst.RoleGID.ship)
-    local dockyardShips = IDDBCity.curCity:getShipsByBIdx(bio2number(dockyardServerData.idx))
+    local dockyardShips = IDDBCity.curCity:getUnitsByBIdx(bio2number(dockyardServerData.idx))
     dockyardShips = dockyardShips or {}
     local dockyardLev = bio2number(dockyardServerData.lev)
     local list = {}
@@ -86,6 +86,7 @@ function IDPBuildShip:showShipList(list, refreshContentOnly)
 end
 
 function IDPBuildShip:initShipCell(cell, data)
+    data.isSelected = false
     cell:init(data, self:wrapFunc(self.onClickShipCell))
     if selectedCell == nil or selectedCell == cell then
         self:onClickShipCell(cell)
@@ -365,10 +366,10 @@ end
 -- 网络请求的回调；cmd：指命，succ：成功失败，msg：消息；paras：服务器下行数据
 function IDPBuildShip:procNetwork(cmd, succ, msg, paras)
     if succ == NetSuccess then
-        if cmd == NetProtoIsland.cmds.getShipsByBuildingIdx then
-            ---@type NetProtoIsland.RC_getShipsByBuildingIdx
+        if cmd == NetProtoIsland.cmds.getUnitsInBuilding then
+            ---@type NetProtoIsland.RC_getUnitsInBuilding
             local _data = paras
-            if bio2number(_data.dockyardShips.buildingIdx) == bio2number(dockyardServerData.idx) then
+            if bio2number(_data.unitsInBuilding.buildingIdx) == bio2number(dockyardServerData.idx) then
                 self:refreshContent()
             end
         elseif cmd == NetProtoIsland.cmds.onBuildingChg then

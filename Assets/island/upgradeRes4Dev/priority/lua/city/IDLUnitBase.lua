@@ -19,7 +19,7 @@
 //                   `=---='
 //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //           佛祖保佑       永无BUG
-//           游戏大卖       公司腾飞
+//           游戏大卖       经济自由
 //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 --]]
 require("public.class")
@@ -79,6 +79,7 @@ function IDLUnitBase:init(selfObj, id, star, lev, _isOffense, other)
     self.instanceID = self.gameObject:GetInstanceID()
     self.csSelf.instanceID = self.instanceID
     self.isPause = false
+    self.battle = other.battle
 end
 
 function IDLUnitBase:setCollider(val)
@@ -88,7 +89,7 @@ function IDLUnitBase:SetActive(active)
     SetActive(self.gameObject, active)
 end
 
----@public 被击中
+---public 被击中
 ---@param damage number 伤害值
 ---@param attacker IDLUnitBase 攻击方
 function IDLUnitBase:onHurt(damage, attacker)
@@ -107,7 +108,7 @@ function IDLUnitBase:onHurt(damage, attacker)
     end
 end
 
----@public 显示扣血效果
+---public 显示扣血效果
 function IDLUnitBase:showLifebar(damage)
     local data = {damage = damage, unit = self, offset = Vector3.up * 0.2}
     if self.lifebar == nil then
@@ -149,17 +150,17 @@ function IDLUnitBase:hideLifebar()
     end
 end
 
----@public 寻敌
+---public 寻敌
 function IDLUnitBase:doSearchTarget()
     printe("must override [doSearchTarget] function!")
 end
 
----@public 返回自己可攻击的点坐标
+---public 返回自己可攻击的点坐标
 function IDLUnitBase:getAttackPoint(attacker)
     return self.transform.position
 end
 
----@public 设置攻击目标
+---public 设置攻击目标
 ---@param target IDRoleBase
 function IDLUnitBase:setTarget(target)
     if self.target == target then
@@ -173,13 +174,13 @@ function IDLUnitBase:setTarget(target)
     end
 end
 
----@public 取得伤害值
+---public 取得伤害值
 ---@param target 目标
 function IDLUnitBase:getDamage(target)
     printe("must override [getDamage] function!")
 end
 
----@public 死掉了
+---public 死掉了
 function IDLUnitBase:onDead()
     if self.isDead then
         return
@@ -188,15 +189,15 @@ function IDLUnitBase:onDead()
     self.isDead = true
     self.csSelf.isDead = true
     self:iamDie()
-    IDLBattle.someOneDead(self)
+    self.battle.someOneDead(self)
 end
 
----@public 冰冻
+---public 冰冻
 function IDLUnitBase:frozen(sec)
     printe("must override [frozen] function!")
 end
 
----@public 我死掉了，处理死掉的效果
+---public 我死掉了，处理死掉的效果
 function IDLUnitBase:iamDie()
     printe("must override [iamDie] function!")
 end

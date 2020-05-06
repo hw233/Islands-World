@@ -6,6 +6,7 @@
 
 require("city.IDMainCity")
 require("battle.IDLBattle")
+require("battle.IDLFleetBattle")
 IDPSceneManager = {}
 
 ---@type Coolape.CLPanelLua
@@ -59,6 +60,10 @@ function IDPSceneManager.beforeLoadScene()
         if IDLBattle then
             IDLBattle.clean()
         end
+    elseif oldMode == GameMode.battleFleet then
+        if IDLFleetBattle then
+            IDLFleetBattle.clean()
+        end
     elseif oldMode == GameMode.map then
         if IDMainCity then
             IDMainCity.clean()
@@ -94,6 +99,8 @@ function IDPSceneManager.doLoadScene()
         IDPSceneManager.loadWorldMap()
     elseif currMode == GameMode.battle then
         IDPSceneManager.loadBattle()
+    elseif currMode == GameMode.battleFleet then
+        IDPSceneManager.loadBattleFleet()
     end
 end
 
@@ -246,14 +253,35 @@ function IDPSceneManager.onLoadBattle()
         IDWorldMap.ocean.luaTable.stopBGM()
     end
     SoundEx.playMainMusic("Fight_before")
-    ---@type _ParamBattleData
-    local data = mData.data
-    if data.isReplay then
-        getPanelAsy("PanelBattleReplay", onLoadedPanel, mData.data)
-    else
-        getPanelAsy("PanelBattle", onLoadedPanel, mData.data)
-    end
+    hideTopPanel(csSelf)
 end
 
+function IDPSceneManager.loadBattleFleet()
+    Time.fixedDeltaTime = 0.04
+    -- Turn off v-sync
+    QualitySettings.vSyncCount = 0
+    Application.targetFrameRate = 30
+
+    if dragSetting then
+        dragSetting.isLimitCheckStrict = false
+        dragSetting.canMove = true
+        dragSetting.canRotation = true
+        dragSetting.canScale = true
+        dragSetting.scaleMini = 10
+        dragSetting.scaleMax = 20
+        dragSetting.scaleHeightMini = 10
+        dragSetting.scaleHeightMax = 50
+        dragSetting.dragMovement = Vector3.one
+        dragSetting.scaleSpeed = 1
+    end
+
+    smoothFollow.distance = 10
+    smoothFollow.height = 10
+    IDLFleetBattle.init(mData.data, IDPSceneManager.onloadFleetBattle, IDPSceneManager.onProgress)
+end
+
+function IDPSceneManager.onloadFleetBattle()
+    getPanelAsy("PanelFleetBattle", onLoadedPanel, mData.data)
+end
 --------------------------------------------
 return IDPSceneManager

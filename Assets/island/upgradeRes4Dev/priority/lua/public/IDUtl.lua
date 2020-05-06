@@ -23,10 +23,14 @@ require("role.IDRSoldier")
 require("role.IDRShipLandCraft")
 require("role.IDRShipBreaker")
 require("worldmap.IDWorldTile")
+require("battle.IDLSkillBase")
+require("battle.IDLSkillAirRaid")
+require("battle.IDLSkillWild")
 
 IDUtl = {}
+local table = table
 
----@public 下级开放
+---public 下级开放
 ---@param attr 配制
 ---@param lev 等级
 ---@param type 类型 {1:建筑;}
@@ -34,7 +38,7 @@ function IDUtl.nextOpen(attr, lev, type)
     local list = {}
     if type == IDConst.UnitType.building then
         -- 建筑
-        if bio2number(attr.MaxLev) < lev then
+        if bio2number(attr.MaxLev) <= lev then
             -- 已经是最高等级了
             return list
         end
@@ -60,26 +64,26 @@ function IDUtl.nextOpen(attr, lev, type)
                         {name = LGet("Worker"), currVal = bio2number(headquartersOpen.Tiles), addVal = diff}
                     )
                 end
-            end
 
-            -- 各种建筑开放数量
-            local key = "Building"
-            local keyBuilding
-            local diff = 0
-            for buildingID = 1, 39 do
-                keyBuilding = joinStr(key, buildingID)
-                if headquartersOpen[keyBuilding] then
-                    diff = bio2number(headquartersOpenNext[keyBuilding]) - bio2number(headquartersOpen[keyBuilding])
-                    if diff > 0 then
-                        local bAttr = DBCfg.getBuildingByID(buildingID)
-                        table.insert(
-                            list,
-                            {
-                                name = LGet(bAttr.NameKey),
-                                currVal = bio2number(headquartersOpen[keyBuilding]),
-                                addVal = diff
-                            }
-                        )
+                -- 各种建筑开放数量
+                local key = "Building"
+                local keyBuilding
+                local diff = 0
+                for buildingID = 1, 39 do
+                    keyBuilding = joinStr(key, buildingID)
+                    if headquartersOpen[keyBuilding] then
+                        diff = bio2number(headquartersOpenNext[keyBuilding]) - bio2number(headquartersOpen[keyBuilding])
+                        if diff > 0 then
+                            local bAttr = DBCfg.getBuildingByID(buildingID)
+                            table.insert(
+                                list,
+                                {
+                                    name = LGet(bAttr.NameKey),
+                                    currVal = bio2number(headquartersOpen[keyBuilding]),
+                                    addVal = diff
+                                }
+                            )
+                        end
                     end
                 end
             end
@@ -89,7 +93,7 @@ function IDUtl.nextOpen(attr, lev, type)
     return list
 end
 
----@public 取得建筑升级条件
+---public 取得建筑升级条件
 ---@param id 建筑id
 function IDUtl.getBuildingUpgradeConditions(id, lev)
     local attr = DBCfg.getBuildingByID(id)
@@ -101,7 +105,7 @@ function IDUtl.getBuildingUpgradeConditions(id, lev)
     -- 粮食
     if bio2number(attr.BuildCostFoodMax) > 0 then
         d = {}
-        d.icon = "res_food"
+        d.icon = IDUtl.getResIcon(IDConst.ResType.food)
         d.value =
             DBCfg.getGrowingVal(
             bio2number(attr.BuildCostFoodMin),
@@ -115,7 +119,7 @@ function IDUtl.getBuildingUpgradeConditions(id, lev)
     -- 金币
     if bio2number(attr.BuildCostGoldMax) > 0 then
         d = {}
-        d.icon = "res_gold"
+        d.icon = IDUtl.getResIcon(IDConst.ResType.gold)
         d.value =
             DBCfg.getGrowingVal(
             bio2number(attr.BuildGoldFoodMin),
@@ -129,7 +133,7 @@ function IDUtl.getBuildingUpgradeConditions(id, lev)
     -- 油
     if bio2number(attr.BuildCostOilMax) > 0 then
         d = {}
-        d.icon = "res_shiyou"
+        d.icon = IDUtl.getResIcon(IDConst.ResType.oil)
         d.value =
             DBCfg.getGrowingVal(
             bio2number(attr.BuildCostOilMin),
@@ -145,7 +149,7 @@ function IDUtl.getBuildingUpgradeConditions(id, lev)
     return list
 end
 
----@public 取得建筑升级所要的资源
+---public 取得建筑升级所要的资源
 function IDUtl.getBuildingUpgradeNeedRes(id, lev)
     local attr = DBCfg.getBuildingByID(id)
     if attr == nil then
@@ -185,18 +189,31 @@ function IDUtl.getBuildingUpgradeNeedRes(id, lev)
     return map
 end
 
----@public 分钟转钻石
+---public 分钟转钻石
 function IDUtl.minutes2Diam(val)
     local ret = NumEx.getIntPart(val * bio2number(DBCfg.getConstCfg().Minute2DiamRate) / 100)
     return ret > 0 and ret or 1
 end
 
----@public 资源转钻石
+---public 资源转钻石
 function IDUtl.res2Diam(val)
     return math.ceil(val / 100)
 end
 
----@public 取得建筑的lua对象
+---public 取得技能的lua对象
+function IDUtl.newSkillLua(id)
+    if id == 1 then
+        -- 空袭
+        return IDLSkillAirRaid.new()
+    elseif id == 3 then
+        -- 狂暴
+        return IDLSkillWild.new()
+    else
+        return IDLSkillBase.new()
+    end
+end
+
+---public 取得建筑的lua对象
 function IDUtl.newBuildingLua(bAttr)
     local buildingLua
     local id = bio2number(bAttr.ID)
@@ -256,7 +273,7 @@ function IDUtl.newBuildingLua(bAttr)
     return buildingLua
 end
 
----@public 取得角色的lua对象
+---public 取得角色的lua对象
 function IDUtl.newRoleLua(id)
     local attr = DBCfg.getRoleByID(id)
     local gid = bio2number(attr.GID)
@@ -281,7 +298,7 @@ function IDUtl.newRoleLua(id)
     return role
 end
 
----@public 取得角色的预制件名
+---public 取得角色的预制件名
 function IDUtl.getRolePrefabName(id)
     local attr = DBCfg.getRoleByID(id)
     if attr then
@@ -290,7 +307,7 @@ function IDUtl.getRolePrefabName(id)
     end
 end
 
----@public 取得角色的icon
+---public 取得角色的icon
 function IDUtl.getRoleIcon(id)
     return joinStr("roleIcon_", id)
 end
@@ -301,7 +318,7 @@ function IDUtl.newMapTileLua(type)
     -- end
 end
 
----@public 通过建筑的配置表id取得资源类型
+---public 通过建筑的配置表id取得资源类型
 function IDUtl.getResTypeByBuildingID(attrId)
     if attrId == 6 or attrId == 7 then
         return IDConst.ResType.food
@@ -312,7 +329,7 @@ function IDUtl.getResTypeByBuildingID(attrId)
     end
 end
 
----@public 取得资源名
+---public 取得资源名
 function IDUtl.getResNameByType(type)
     if type == IDConst.ResType.food then
         return LGet("Food")
@@ -325,7 +342,7 @@ function IDUtl.getResNameByType(type)
     end
     return ""
 end
----@public 取得资源图标
+---public 取得资源图标
 function IDUtl.getResIcon(type)
     if type == IDConst.ResType.food then
         return "public_Icon_ziyuan_liangshi"
@@ -338,7 +355,7 @@ function IDUtl.getResIcon(type)
     end
 end
 
----@public 取得资源音效
+---public 取得资源音效
 function IDUtl.getResSoundEffect(type)
     if type == IDConst.ResType.food then
         return "collect_Food"
@@ -369,7 +386,7 @@ local playOneFlyPic = function(params)
     )
 end
 
----@public playFlyPics图标飞的效果
+---public playFlyPics图标飞的效果
 ---@param initPos UnityEngine.Vector3 初始会位置（可以nil）
 ---@param from UnityEngine.Transform 起飞的transform（可以nil）
 ---@param to UnityEngine.Transform 目的地（不可为nil）
@@ -387,14 +404,14 @@ function IDUtl.playFlyPics(initPos, from, to, icon, sound, count)
     end
 end
 
----@public 隐藏弹出的菜单
+---public 隐藏弹出的菜单
 function IDUtl.hidePopupMenus()
     if IDUtl.popupMenu then
         SetActive(IDUtl.popupMenu.gameObject, false)
     end
 end
 
----@public 点击后的弹出菜单
+---public 点击后的弹出菜单
 ---@param target LuaTable 目标对象，可以取得target.transform
 ---@param targetPosition UnityEngine.Vector3 popupMenu跟随的坐标
 ---@param buttonsList List 弹出的按钮列表{nameKey = 显示名的key,callback = 点击回调函数,icon = 按钮图标,bg = 按钮的背景}
@@ -433,8 +450,21 @@ function IDUtl.showPopupMenus(target, targetPosition, buttonsList, label, params
     end
 end
 
+---@param data _ParamPPopupButton
+function IDUtl.showPopupButtons(data)
+    getPanelAsy("PanelPopupButton", onLoadedPanelTT, data)
+end
+
+---@param data _ParamPPopupButton
+function IDUtl.hidePopupButtons()
+    local p = CLPanelManager.getPanel("PanelPopupButton")
+    if p then
+        hideTopPanel(p)
+    end
+end
+
 IDUtl.isLoadingScene = false
----@public 切换场景
+---public 切换场景
 function IDUtl.chgScene(mode, data, callback)
     if IDUtl.isLoadingScene then
         return
@@ -450,7 +480,7 @@ function IDUtl.chgScene(mode, data, callback)
     getPanelAsy("PanelSceneManager", onLoadedPanel, params)
 end
 
----@public 切换玩家账号
+---public 切换玩家账号
 function IDUtl.onSwitchPlayer()
     if IDMainCity then
         IDMainCity.grid:clean()
@@ -467,10 +497,14 @@ function IDUtl.clean()
     end
 end
 
----@public 格式化内容
+---public 格式化内容
 function LWrap(content, paramsJson)
     if not isNilOrEmpty(paramsJson) then
-        local paramMap = json.decode(paramsJson)
+        local success, paramMap = pcall(json.decode, paramsJson)
+        if not success then
+            printe(paramMap)
+            return content
+        end
         if paramMap then
             local key
             for k, v in pairs(paramMap) do
@@ -482,5 +516,59 @@ function LWrap(content, paramsJson)
     return content
 end
 
+---public 转过了好久的时间
+function IDUtl.timeCost(ms)
+    if ms < 10000 then
+        return LGet("JustNow")
+    else
+        return DateEx.ToTimeCost(ms)
+    end
+end
+
+---public 取得ui的内容范围，不同手机的分辨率不同，取得的值也不同
+IDUtl.getUIContent = function(go, top, bottom, left, right)
+    top = top or 0
+    bottom = bottom or 0
+    left = left or 0
+    right = right or 0
+    local sizeAdjust = UIRoot.GetPixelSizeAdjustment(go)
+    local contentRect =
+        Vector4(
+        (right - left) / 2,
+        (bottom - top) / 2,
+        Screen.width * sizeAdjust - (right + left),
+        Screen.height * sizeAdjust - (bottom + top)
+    )
+    return contentRect
+end
+
+---public 取得魔法当前等级的最大数量
+---@return number 最大数量
+---@return string 未解锁的原因(当返回的最大数量为0时，有值)
+IDUtl.getCurrMagicMaxNum = function(id)
+    local buildingLev = 0
+    local magicAltar = IDDBCity.curCity.magicAltar
+    if magicAltar then
+        buildingLev = bio2number(magicAltar.lev)
+    end
+
+    local attr = DBCfg.getDataById(DBCfg.CfgPath.Magic, id)
+    local key = joinStr("MagicAltarLev", buildingLev)
+    local num, desc = 0, ""
+    if attr[key] then
+        num = bio2number(attr[key])
+    end
+    if num <= 0 then
+        for lev = 1, 10 do
+            key = joinStr("MagicAltarLev", lev)
+            if bio2number(attr[key]) > 0 then
+                -- 说明解锁了
+                desc = joinStr(LGet("MagicAltar"), " ", LGetFmt("LevelWithNum", lev))
+                break
+            end
+        end
+    end
+    return num, desc
+end
 --------------------------------------------
 return IDUtl

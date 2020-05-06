@@ -25,7 +25,7 @@ do
         uiobjs.Label.text = mData.name
         if mData.addValue then
             if mData.addValue > 0 then
-                uiobjs.LabelVal.text = joinStr(mData.value, "[00ff00]", "+", mData.addValue, "[-]")
+                uiobjs.LabelVal.text = joinStr(mData.value, "[00ff00]", " +", mData.addValue, "[-]")
             elseif mData.addValue < 0 then
                 uiobjs.LabelVal.text = joinStr(mData.value, "[00ff00]", mData.addValue, "[-]")
             else
@@ -38,7 +38,7 @@ do
         if isNilOrEmpty(mData.icon) then
             SetActive(uiobjs.SpriteIcon.gameObject, false)
         else
-            CLUIUtl.setSpriteFit(uiobjs.SpriteIcon, mData.icon, 60)
+            CLUIUtl.setSpriteFit(uiobjs.SpriteIcon, mData.icon, 45)
             SetActive(uiobjs.SpriteIcon.gameObject, true)
         end
     end

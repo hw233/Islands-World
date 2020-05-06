@@ -80,6 +80,7 @@ do
     end
 
     function _cell.onClickBtn(cell)
+        IDUtl.hidePopupMenus()
         local d = cell.luaTable.getData()
         Utl.doCallback(d.callback, mData.params, d)
 
